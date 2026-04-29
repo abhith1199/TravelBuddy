@@ -1,6 +1,0 @@
-Count: 2
-IDs: [3, 2]
-total_trips: 2
-total_travelers: 11
-total_companies: 4
-completed_bookings: 7
