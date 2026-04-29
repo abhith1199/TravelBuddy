@@ -78,7 +78,11 @@ A core pillar of this project is the promotion of **group traveling**. This fost
    Open `http://127.0.0.1:8000/` in your browser.
 
 ## 📸 Screenshots
-*(Add your project screenshots here to make the README look even better!)*
+<img width="1920" height="1080" alt="Screenshot 2026-03-15 115638" src="https://github.com/user-attachments/assets/f3811b46-2fe0-447b-bcae-35a534098e0e" />
+<img width="1920" height="1080" alt="Screenshot 2026-03-15 122047" src="https://github.com/user-attachments/assets/946066e7-dd43-4250-8477-24305bbc91b6" />
+<img width="1920" height="1080" alt="Screenshot 2026-03-15 134530" src="https://github.com/user-attachments/assets/bb95f6d3-b8eb-43e4-ae10-6fa8810a8ecf" />
+<img width="1920" height="1080" alt="Screenshot 2026-03-15 140558" src="https://github.com/user-attachments/assets/a68e4b4b-4d01-4cca-b1bd-01c0dbb808e3" />
+
 
 ## 🤝 Contributing
 Contributions are welcome! Please feel free to submit a Pull Request.
