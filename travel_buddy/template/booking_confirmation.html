@@ -1,0 +1,161 @@
+{% extends 'base_modern.html' %}
+{% load static %}
+
+{% block title %}Confirm Booking - {{ booking.trip.title }}{% endblock %}
+
+{% block content %}
+<section class="min-h-screen bg-[#fafafa] pt-12 pb-24">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6">
+
+        <div class="text-center mb-10 animate-fade-in">
+            <h1 class="font-display font-black text-3xl md:text-4xl text-gray-900 tracking-tight mb-3">Review Your
+                Booking</h1>
+            <p class="text-gray-500 font-medium">Please verify the details below before proceeding to payment.</p>
+        </div>
+
+        <div class="bg-white rounded-[2rem] shadow-xl border border-gray-100 overflow-hidden shadow-glass animate-slide-up"
+            style="animation-delay: 100ms;">
+            <!-- Header Image Banner -->
+            <div class="h-48 relative overflow-hidden group">
+                {% if booking.trip.images.first %}
+                <img src="{{ booking.trip.images.first.image.url }}" alt="{{ booking.trip.title }}"
+                    class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+                {% else %}
+                <img src="{% static 'img/slider2.jpg' %}" alt="Trip Banner"
+                    class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+                {% endif %}
+                <div class="absolute inset-0 bg-gradient-to-t from-dark-900/80 to-transparent"></div>
+                <div class="absolute bottom-6 left-6 right-6">
+                    <span
+                        class="inline-block px-3 py-1 bg-primary-500 text-white text-[10px] font-black uppercase tracking-widest rounded-md mb-2">Trip
+                        Selection</span>
+                    <h2 class="font-display font-bold text-2xl text-white drop-shadow-md">{{ booking.trip.title }}</h2>
+                </div>
+            </div>
+
+            <div class="p-8 md:p-10 text-gray-700 space-y-8">
+                <!-- Details Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Left: Trip Specs -->
+                    <div class="space-y-6">
+                        <div>
+                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1"><i
+                                    class="fa-solid fa-location-dot mr-1"></i> Destination</p>
+                            <p class="font-bold text-gray-900 text-lg">{{ booking.trip.destination }}</p>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1"><i
+                                    class="fa-regular fa-calendar mr-1"></i> Travel Window</p>
+                            <p class="font-bold text-gray-900 flex items-center gap-2">
+                                {{ booking.trip.start_date|date:"d M Y" }}
+                                <i class="fa-solid fa-arrow-right text-gray-300 text-xs mx-1"></i>
+                                {{ booking.trip.end_date|date:"d M Y" }}
+                            </p>
+                            <span
+                                class="inline-block mt-2 bg-blue-50 text-blue-600 text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider">
+                                {{ booking.trip.duration_days }} Days Total
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Right: Pasenger Specs -->
+                    <div class="space-y-6 bg-gray-50 border border-gray-100 rounded-2xl p-6">
+                        <div>
+                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1"><i
+                                    class="fa-solid fa-users mr-1"></i> Party Size</p>
+                            <p class="font-display font-black text-4xl text-primary-500">{{ booking.num_people }} <span
+                                    class="text-sm font-bold text-gray-500 ml-1">Travelers</span></p>
+                        </div>
+
+                        {% if booking.num_males or booking.num_females or booking.num_others %}
+                        <div class="pt-4 border-t border-gray-200">
+                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Passenger
+                                Breakdown</p>
+                            <div class="flex flex-wrap gap-3">
+                                {% if booking.num_males %}
+                                <div
+                                    class="bg-white border border-gray-200 rounded-lg px-3 py-1.5 flex items-center gap-2 shadow-sm text-sm font-bold text-gray-700">
+                                    <i class="fa-solid fa-person text-blue-500"></i> {{ booking.num_males }}
+                                </div>
+                                {% endif %}
+                                {% if booking.num_females %}
+                                <div
+                                    class="bg-white border border-gray-200 rounded-lg px-3 py-1.5 flex items-center gap-2 shadow-sm text-sm font-bold text-gray-700">
+                                    <i class="fa-solid fa-person-dress text-pink-500"></i> {{ booking.num_females }}
+                                </div>
+                                {% endif %}
+                                {% if booking.num_others %}
+                                <div
+                                    class="bg-white border border-gray-200 rounded-lg px-3 py-1.5 flex items-center gap-2 shadow-sm text-sm font-bold text-gray-700">
+                                    <i class="fa-solid fa-user text-purple-500"></i> {{ booking.num_others }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Financial Summary -->
+                <div class="pt-8 border-t border-gray-100">
+                    <h3 class="font-display font-bold text-xl text-gray-900 mb-6 border-l-4 border-primary-500 pl-3">
+                        Financial Dashboard</h3>
+
+                    <div class="bg-dark-900 p-1 shadow-glow rounded-3xl overflow-hidden relative group">
+                        <div
+                            class="absolute inset-0 bg-gradient-to-r from-dark-900 to-dark-800 opacity-90 transition-opacity duration-500 group-hover:opacity-100">
+                        </div>
+                        <div
+                            class="absolute top-0 right-0 w-64 h-64 bg-primary-500 rounded-full blur-[80px] opacity-20 transform translate-x-1/2 -translate-y-1/2 pointer-events-none transition-transform duration-700 group-hover:scale-110">
+                        </div>
+                        <div
+                            class="relative z-10 p-8 flex flex-col md:flex-row justify-between md:items-end gap-6 text-white">
+                            <div class="space-y-3 flex-grow">
+                                <div
+                                    class="flex justify-between items-center bg-white/5 px-4 py-2 rounded-lg border border-white/10 hover:bg-white/10 transition-colors">
+                                    <span class="text-sm font-medium text-gray-300">Base Price per Traveler</span>
+                                    <span class="font-bold">₹{{ booking.trip.price|floatformat:0 }}</span>
+                                </div>
+                                <div
+                                    class="flex justify-between items-center bg-white/5 px-4 py-2 rounded-lg border border-white/10 hover:bg-white/10 transition-colors">
+                                    <span class="text-sm font-medium text-gray-300">Total Party Size</span>
+                                    <span class="font-bold text-primary-400">× {{ booking.num_people }}</span>
+                                </div>
+                            </div>
+
+                            <div class="md:pl-8 md:border-l border-white/20 text-right shrink-0">
+                                <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Total
+                                    Authorized Amount</p>
+                                <div class="font-display font-black text-5xl text-white tracking-tight">
+                                    <span class="text-primary-500 text-3xl align-top mr-1">₹</span>
+                                    {{ booking.total_price|floatformat:0 }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer Actions -->
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4">
+                    <a href="{% url 'trip_detail' booking.trip.id %}"
+                        class="text-sm font-bold text-gray-400 hover:text-gray-600 transition-colors order-2 sm:order-1 flex items-center gap-2">
+                        <i class="fa-solid fa-arrow-left text-xs"></i> Back to Trip Details
+                    </a>
+
+                    <a href="{% url 'payment_mock' booking.id %}"
+                        class="w-full sm:w-auto bg-primary-500 hover:bg-primary-600 text-white px-10 py-4 rounded-xl font-bold text-sm md:text-base shadow-glow transition-all hover:-translate-y-1 order-1 sm:order-2 flex items-center justify-center gap-2 group">
+                        Proceed to Payment Gateway <i
+                            class="fa-solid fa-lock text-white/50 group-hover:text-white transition-colors"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mt-6 animate-fade-in" style="animation-delay: 300ms;">
+            <p class="text-xs text-gray-400 font-medium flex items-center justify-center gap-1.5"><i
+                    class="fa-solid fa-shield-halved text-green-500"></i> Secure booking environment powered by
+                TravelBuddy.</p>
+        </div>
+    </div>
+</section>
+{% endblock %}

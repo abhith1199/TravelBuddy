@@ -1,0 +1,631 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}Console - Travel Buddy{% endblock %}
+
+{% block breadcrumb %}Overview{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Dashboard Content */
+    .dashboard-content {
+        padding: 40px 30px;
+        background: var(--admin-bg);
+    }
+
+    /* Welcome Header */
+    .welcome-header {
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        margin-bottom: 40px;
+        border: 1px solid var(--admin-border);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .welcome-header h1 {
+        font-size: 2rem;
+        margin-bottom: 8px;
+        color: #111827;
+        font-weight: 700;
+    }
+
+    .welcome-header p {
+        color: var(--admin-text-muted);
+        margin-bottom: 0;
+        font-size: 1.1rem;
+    }
+
+    /* Premium Stat Cards */
+    .stat-card {
+        background: white;
+        border-radius: 12px;
+        padding: 24px;
+        border: 1px solid var(--admin-border);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.1);
+        border-color: #d1d5db;
+    }
+
+    .stat-card .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        margin-bottom: 20px;
+    }
+
+    .stat-card.primary .stat-icon {
+        background: rgba(52, 152, 219, 0.1);
+        color: #3498db;
+    }
+
+    .stat-card.success .stat-icon {
+        background: rgba(16, 185, 129, 0.1);
+        color: #10b981;
+    }
+
+    .stat-card.warning .stat-icon {
+        background: rgba(245, 158, 11, 0.1);
+        color: #f59e0b;
+    }
+
+    .stat-card.danger .stat-icon {
+        background: rgba(239, 68, 68, 0.1);
+        color: #ef4444;
+    }
+
+    .stat-card .stat-label {
+        color: var(--admin-text-muted);
+        font-size: 0.875rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 8px;
+    }
+
+    .stat-card .stat-value {
+        font-size: 2.25rem;
+        font-weight: 800;
+        color: #111827;
+        line-height: 1;
+        margin-bottom: 15px;
+    }
+
+    /* Activity Feed */
+    .console-section {
+        background: white;
+        border-radius: 12px;
+        border: 1px solid var(--admin-border);
+        padding: 24px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .section-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #111827;
+        margin-bottom: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .activity-item {
+        padding: 16px;
+        border-radius: 8px;
+        border: 1px solid transparent;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .activity-item:hover {
+        background: #f9fafb;
+        border-color: var(--admin-border);
+    }
+
+    .activity-icon-box {
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        flex-shrink: 0;
+    }
+
+    /* Quick Actions */
+    .quick-actions {
+        background: white;
+        border-radius: 10px;
+        padding: 25px;
+        box-shadow: 0 3px 15px rgba(0, 0, 0, 0.08);
+        height: 100%;
+    }
+
+    .quick-actions h5 {
+        color: #2c3e50;
+        font-weight: 600;
+        margin-bottom: 20px;
+    }
+
+    .quick-actions-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 15px;
+    }
+
+    .action-btn {
+        background: #f8f9fa;
+        border: 1px solid #e3e6f0;
+        border-radius: 8px;
+        padding: 20px 15px;
+        text-align: center;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        color: #2c3e50;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .action-btn:hover {
+        background: #3498db;
+        color: white;
+        border-color: #3498db;
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(52, 152, 219, 0.2);
+        text-decoration: none;
+    }
+
+    .action-btn i {
+        font-size: 1.5rem;
+    }
+
+    .action-btn span {
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+
+    .action-btn .badge {
+        position: absolute;
+        top: -8px;
+        right: -8px;
+    }
+
+    /* Trip Status Summary */
+    .trip-status-summary {
+        background: white;
+        border-radius: 10px;
+        padding: 25px;
+        box-shadow: 0 3px 15px rgba(0, 0, 0, 0.08);
+    }
+
+    .trip-status-summary h5 {
+        color: #2c3e50;
+        font-weight: 600;
+        margin-bottom: 20px;
+    }
+
+    .status-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 15px;
+        margin-bottom: 8px;
+        background: #f8f9fa;
+        border-radius: 6px;
+        border-left: 4px solid;
+    }
+
+    .status-item.approved {
+        border-left-color: #27ae60;
+    }
+
+    .status-item.pending {
+        border-left-color: #f39c12;
+    }
+
+    .status-item.rejected {
+        border-left-color: #e74c3c;
+    }
+
+    .status-item.suspended {
+        border-left-color: #95a5a6;
+    }
+
+    .status-count {
+        font-weight: 600;
+        color: #2c3e50;
+    }
+
+    /* Notification color classes */
+    .bg-primary-light {
+        background: rgba(52, 152, 219, 0.1) !important;
+    }
+
+    .bg-success-light {
+        background: rgba(39, 174, 96, 0.1) !important;
+    }
+
+    .bg-warning-light {
+        background: rgba(243, 156, 18, 0.1) !important;
+    }
+
+    .bg-danger-light {
+        background: rgba(231, 76, 60, 0.1) !important;
+    }
+
+    .bg-secondary-light {
+        background: rgba(149, 165, 166, 0.1) !important;
+    }
+
+    .text-primary {
+        color: #3498db !important;
+    }
+
+    .text-success {
+        color: #27ae60 !important;
+    }
+
+    .text-warning {
+        color: #f39c12 !important;
+    }
+
+    .text-danger {
+        color: #e74c3c !important;
+    }
+
+    .text-secondary {
+        color: #95a5a6 !important;
+    }
+
+    .bg-primary-subtle {
+        background-color: rgba(52, 152, 219, 0.1) !important;
+    }
+
+    .text-primary-emphasis {
+        color: #3498db !important;
+    }
+
+    .bg-warning-subtle {
+        background-color: rgba(243, 156, 18, 0.1) !important;
+    }
+
+    .text-warning-emphasis {
+        color: #f39c12 !important;
+    }
+
+    /* Dashboard specific responsive adjustments */
+    @media (max-width: 768px) {
+        .dashboard-content {
+            padding: 15px;
+        }
+
+        .welcome-header {
+            padding: 20px;
+        }
+
+        .welcome-header h1 {
+            font-size: 1.5rem;
+        }
+
+        .stat-card {
+            padding: 20px;
+        }
+
+        .stat-card .stat-value {
+            font-size: 2rem;
+        }
+
+        .stat-card .stat-icon {
+            width: 50px;
+            height: 50px;
+            font-size: 1.2rem;
+        }
+
+        .quick-actions-grid {
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        }
+
+        .action-btn {
+            padding: 15px 10px;
+        }
+
+        .action-btn i {
+            font-size: 1.2rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .quick-actions-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    /* Animation for loading */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .animate-in {
+        animation: fadeInUp 0.5s ease forwards;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-content">
+    <!-- Welcome Header -->
+    <div class="welcome-header animate-in">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1>Platform Console</h1>
+                <p>Overview of system health and latest activities.</p>
+            </div>
+            <div class="text-end d-none d-md-block">
+                <div class="fw-bold text-dark current-time" style="font-size: 1.25rem;"></div>
+                <div class="text-muted small current-date"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="row g-4 mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card primary animate-in" style="animation-delay: 0.1s;">
+                <div>
+                    <div class="stat-icon">
+                        <i class="fa-solid fa-earth-americas"></i>
+                    </div>
+                    <div class="stat-label">Verified Trips</div>
+                    <div class="stat-value">{{ active_trips }}</div>
+                </div>
+                <div class="stat-trend text-primary small fw-semibold">
+                    <i class="fa-solid fa-circle-check me-1"></i> Live on platform
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card success animate-in" style="animation-delay: 0.2s;">
+                <div>
+                    <div class="stat-icon">
+                        <i class="fa-solid fa-money-bill-trend-up"></i>
+                    </div>
+                    <div class="stat-label">Total Revenue</div>
+                    <div class="stat-value">₹{{ total_revenue|floatformat:0 }}</div>
+                </div>
+                <div class="stat-trend text-success small fw-semibold">
+                    <i class="fa-solid fa-arrow-trend-up me-1"></i> All-time earnings
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card warning animate-in" style="animation-delay: 0.3s;">
+                <div>
+                    <div class="stat-icon">
+                        <i class="fa-solid fa-ticket-simple"></i>
+                    </div>
+                    <div class="stat-label">Total Bookings</div>
+                    <div class="stat-value">{{ total_bookings }}</div>
+                </div>
+                <div class="stat-trend text-warning small fw-semibold">
+                    <i class="fa-solid fa-clock-rotate-left me-1"></i> Confirmed orders
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card danger animate-in" style="animation-delay: 0.4s;">
+                <div>
+                    <div class="stat-icon">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                    </div>
+                    <div class="stat-label">Suspended</div>
+                    <div class="stat-value">{{ suspended_trips }}</div>
+                </div>
+                <div class="stat-trend text-danger small fw-semibold">
+                    <i class="fa-solid fa-ban me-1"></i> Under review
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Recent Activity Feed -->
+        <div class="col-lg-8">
+            <div class="console-section animate-in" style="animation-delay: 0.5s;">
+                <div class="section-title">
+                    <span><i class="fa-solid fa-bolt-lightning me-2 text-primary"></i>Recent System Activity</span>
+                    <a href="{% url 'admin_verification_management' %}"
+                        class="btn btn-sm btn-link text-decoration-none p-0">View Ledger</a>
+                </div>
+
+                <div class="activity-feed">
+                    {% if notifications %}
+                    {% for notification in notifications %}
+                    <div class="activity-item mb-2">
+                        <div class="activity-icon-box 
+                                {% if notification.type == 'NEW_COMPANY' %}bg-primary text-white
+                                {% elif notification.type == 'TRIP_PAUSE_REQUEST' %}bg-warning text-dark
+                                {% elif notification.type == 'TRIP_APPROVED' %}bg-success text-white
+                                {% elif notification.type == 'TRIP_REJECTED' %}bg-danger text-white
+                                {% else %}bg-secondary text-white{% endif %}">
+                            {% if notification.type == 'NEW_COMPANY' %}<i class="fa-solid fa-building"></i>
+                            {% elif notification.type == 'TRIP_PAUSE_REQUEST' %}<i class="fa-solid fa-pause"></i>
+                            {% elif notification.type == 'TRIP_APPROVED' %}<i class="fa-solid fa-check"></i>
+                            {% elif notification.type == 'TRIP_REJECTED' %}<i class="fa-solid fa-xmark"></i>
+                            {% else %}<i class="fa-solid fa-bell"></i>{% endif %}
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="fw-semibold text-dark" style="font-size: 0.95rem;">{{ notification.message }}</div>
+                                <span class="text-muted x-small" style="font-size: 0.75rem;">{{ notification.created_at|timesince }} ago</span>
+                            </div>
+                            <div class="d-flex align-items-center mt-1">
+                                <span class="badge {% if notification.type == 'NEW_COMPANY' %}bg-primary-subtle text-primary
+                                        {% elif notification.type == 'TRIP_PAUSE_REQUEST' %}bg-warning-subtle text-warning
+                                        {% else %}bg-light text-secondary{% endif %}" style="font-size: 0.7rem;">
+                                    {{ notification.get_type_display|default:notification.type }}
+                                </span>
+                                {% if not notification.is_read %}
+                                <span class="ms-2 badge bg-danger rounded-pill" style="font-size: 0.6rem;">NEW</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="fa-solid fa-inbox fa-3x text-light mb-3"></i>
+                        <p class="text-muted">No recent system events to display.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Access -->
+        <div class="col-lg-4">
+            <div class="console-section animate-in" style="animation-delay: 0.6s;">
+                <div class="section-title">
+                    <span><i class="fa-solid fa-compass me-2 text-primary"></i>Terminal Access</span>
+                </div>
+                <div class="d-grid gap-3">
+                    <a href="{% url 'admin_user_management' %}" class="action-btn">
+                        <i class="fa-solid fa-user-shield"></i>
+                        <span>Security & Access</span>
+                    </a>
+                    <a href="{% url 'admin_trip_management' %}" class="action-btn">
+                        <i class="fa-solid fa-database"></i>
+                        <span>Content Database</span>
+                    </a>
+                    <a href="{% url 'admin_reports_analytics' %}" class="action-btn">
+                        <i class="fa-solid fa-chart-simple"></i>
+                        <span>System Reports</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        console.log('Admin Dashboard loaded successfully');
+
+        // Animate elements on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate-in');
+                }
+            });
+        }, observerOptions);
+
+        // Observe all stat cards and sections
+        document.querySelectorAll('.stat-card, .recent-activity, .quick-actions').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Auto-refresh notifications count every 30 seconds
+        function refreshNotificationCount() {
+            fetch('/admin-dashboard/')
+                .then(response => response.text())
+                .then(data => {
+                    console.log('Dashboard refreshed');
+                })
+                .catch(error => console.error('Refresh error:', error));
+        }
+
+        // Start auto-refresh (every 30 seconds)
+        setInterval(refreshNotificationCount, 30000);
+
+        // Mark notifications as read on click
+        document.querySelectorAll('.activity-item').forEach(item => {
+            item.addEventListener('click', function () {
+                const badge = this.querySelector('.badge.bg-danger');
+                if (badge) {
+                    badge.remove();
+                }
+            });
+        });
+
+        // Update current time
+        function updateCurrentTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('en-US', {
+                hour: 'numeric',
+                minute: '2-digit',
+                hour12: true
+            });
+            const dateString = now.toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+
+            // Update any time/date displays if present
+            const timeElements = document.querySelectorAll('.current-time');
+            timeElements.forEach(el => {
+                el.textContent = timeString;
+            });
+
+            const dateElements = document.querySelectorAll('.current-date');
+            dateElements.forEach(el => {
+                el.textContent = dateString;
+            });
+        }
+
+        // Update time immediately and every minute
+        updateCurrentTime();
+        setInterval(updateCurrentTime, 60000);
+
+        // Add click animation to action buttons
+        document.querySelectorAll('.action-btn').forEach(btn => {
+            btn.addEventListener('click', function (e) {
+                if (this.style.opacity === '0.6') {
+                    e.preventDefault();
+                    // Show tooltip for disabled actions
+                    const tooltip = new bootstrap.Tooltip(this, {
+                        title: 'This feature is coming soon',
+                        placement: 'top'
+                    });
+                    tooltip.show();
+                    setTimeout(() => tooltip.dispose(), 2000);
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

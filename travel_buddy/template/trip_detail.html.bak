@@ -1,0 +1,413 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ trip.title }} - Travel Buddy{% endblock %}
+
+{% block extra_css %}
+<style>
+    .trip-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 120px 0 80px;
+        color: white;
+        position: relative;
+        margin-bottom: 50px;
+    }
+
+    .trip-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url("{% static 'img/slider1.jpg' %}") center/cover;
+        opacity: 0.2;
+        z-index: 0;
+    }
+
+    .trip-header .container {
+        position: relative;
+        z-index: 1;
+    }
+
+    .trip-gallery {
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        margin-bottom: 40px;
+    }
+
+    .main-image {
+        height: 400px;
+        width: 100%;
+        object-fit: cover;
+    }
+
+    .section-title h3 {
+        color: #2c3e50;
+        font-weight: 700;
+        margin-bottom: 20px;
+        position: relative;
+        padding-bottom: 10px;
+    }
+
+    .section-title h3::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 50px;
+        height: 3px;
+        background: #f8b600;
+    }
+
+    .content-box {
+        background: white;
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+        margin-bottom: 30px;
+    }
+
+    .sidebar-widget {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        padding: 30px;
+        margin-bottom: 30px;
+        border: none;
+    }
+
+    .price-display {
+        text-align: center;
+        margin-bottom: 25px;
+        padding-bottom: 25px;
+        border-bottom: 1px dashed #eee;
+    }
+
+    .price-display h2 {
+        color: #f8b600;
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin-bottom: 5px;
+    }
+
+    .trip-meta-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 0;
+        border-bottom: 1px solid #f8f9fa;
+        color: #666;
+    }
+
+    .trip-meta-item:last-child {
+        border-bottom: none;
+    }
+
+    .trip-meta-item i {
+        color: #f8b600;
+        width: 25px;
+    }
+
+    .trip-meta-item strong {
+        color: #2c3e50;
+    }
+
+    .company-profile {
+        text-align: center;
+    }
+
+    .company-avatar {
+        width: 80px;
+        height: 80px;
+        background: #f8b600;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 32px;
+        font-weight: 700;
+        margin: 0 auto 15px;
+    }
+
+    .btn-book {
+        background: #f8b600;
+        color: white;
+        border: none;
+        padding: 15px;
+        border-radius: 50px;
+        font-weight: 700;
+        text-transform: uppercase;
+        width: 100%;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 15px rgba(248, 182, 0, 0.3);
+    }
+
+    .btn-book:hover {
+        background: #e0a500;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(248, 182, 0, 0.4);
+        color: white;
+    }
+
+    .gallery-thumb {
+        height: 120px;
+        width: 100%;
+        object-fit: cover;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: transform 0.3s ease;
+    }
+
+    .gallery-thumb:hover {
+        transform: scale(1.05);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Trip Header -->
+<section class="trip-header">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-10 mx-auto text-center">
+                <span class="text-white-50 text-uppercase letter-spacing-2 mb-2 d-block">Amazing Adventure</span>
+                <h1 class="display-3 fw-bold mb-4">{{ trip.title }}</h1>
+                <div class="d-flex justify-content-center align-items-center text-white-50">
+                    <span class="mx-2"><i class="fa fa-map-marker text-warning mr-2"></i>{{ trip.destination }}</span>
+                    <span class="mx-3">|</span>
+                    <span class="mx-2"><i class="fa fa-calendar mr-2"></i>{{ trip.duration_days }} Days</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Trip Details -->
+<section class="pb-5">
+    <div class="container">
+        <div class="row">
+            <!-- Left Content -->
+            <div class="col-lg-8">
+                <!-- Main Image -->
+                <div class="trip-gallery mb-5">
+                    {% if images %}
+                    <img src="{{ images.0.image.url }}" alt="{{ trip.title }}" class="main-image">
+                    {% else %}
+                    <img src="{% static 'img/slider1.jpg' %}" alt="{{ trip.title }}" class="main-image">
+                    {% endif %}
+                </div>
+
+                <!-- Overview -->
+                <div class="content-box">
+                    <div class="section-title">
+                        <h3>Overview</h3>
+                    </div>
+                    <p class="text-muted lead" style="font-size: 1rem; line-height: 1.8;">
+                        {{ trip.description|linebreaksbr }}
+                    </p>
+                </div>
+
+                <!-- Itinerary -->
+                <div class="content-box">
+                    <div class="section-title">
+                        <h3>Itinerary</h3>
+                    </div>
+                    <div class="bg-light p-4 rounded mb-3">
+                        {{ trip.itinerary_details|linebreaks }}
+                    </div>
+                </div>
+
+                <!-- Gallery Grid -->
+                {% if images.count > 1 %}
+                <div class="content-box">
+                    <div class="section-title">
+                        <h3>Gallery</h3>
+                    </div>
+                    <div class="row g-3">
+                        {% for img in images %}
+                        {% if not forloop.first %}
+                        <div class="col-md-4 mb-3">
+                            <img src="{{ img.image.url }}" alt="Trip Image" class="gallery-thumb">
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Right Sidebar -->
+            <div class="col-lg-4">
+                <!-- Booking Card -->
+                <div class="sidebar-widget">
+                    <div class="price-display">
+                        <h2>₹{{ trip.price }}</h2>
+                        <span class="text-muted">per person</span>
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="trip-meta-item">
+                            <span><i class="fa fa-clock-o"></i> Duration</span>
+                            <strong>{{ trip.duration_days }} Days</strong>
+                        </div>
+                        <div class="trip-meta-item">
+                            <span><i class="fa fa-calendar"></i> Start Date</span>
+                            <strong>{{ trip.start_date|date:"d M Y" }}</strong>
+                        </div>
+                        <div class="trip-meta-item">
+                            <span><i class="fa fa-users"></i> Capacity</span>
+                            <strong>{{ trip.max_capacity }} People</strong>
+                        </div>
+                        <div class="trip-meta-item">
+                            <span><i class="fa fa-tag"></i> Vibe</span>
+                            <strong>{{ trip.get_vibe_tag_display }}</strong>
+                        </div>
+                    </div>
+
+                    {% if user.is_authenticated %}
+                    {% if user.usertype == 'traveler' %}
+                    {% if is_booked %}
+                    <div class="alert alert-success text-center mb-3">
+                        <i class="fa fa-check-circle mr-2"></i>You're booked!
+                    </div>
+                    <a href="{% url 'trip_communication' trip.id %}" class="btn btn-info btn-block rounded-pill py-3">
+                        <i class="fa fa-comments mr-2"></i>Group Chat
+                    </a>
+                    {% elif trip.current_bookings < trip.max_capacity %} <form action="{% url 'book_trip' trip.id %}"
+                        method="POST">
+                        {% csrf_token %}
+                        <div class="form-group mb-3">
+                            <label class="small text-muted mb-2">Travelers</label>
+                            <input type="number" name="num_people" class="form-control form-control-lg" value="1"
+                                min="1" max="10" style="border-radius: 10px;">
+                        </div>
+                        <button type="submit" class="btn-book">Book Adventure</button>
+                        </form>
+                        {% else %}
+                        <div class="alert alert-danger text-center rounded-pill">Fully Booked</div>
+                        {% endif %}
+                        {% else %}
+                        <div class="text-center p-3 bg-light rounded">
+                            <small class="text-muted">Logged in as {{ user.usertype|title }}</small>
+                        </div>
+                        {% endif %}
+                        {% else %}
+                        <a href="{% url 'login' %}?next={{ request.path }}"
+                            class="btn-book text-center text-decoration-none">
+                            Login to Book
+                        </a>
+                        {% endif %}
+                </div>
+
+                <!-- Crowd Peek Widget -->
+                {% if crowd_peek.total_travelers > 0 %}
+                <div class="sidebar-widget">
+                    <h5 class="mb-4" style="color: #2c3e50; font-weight: 700;">
+                        <i class="fas fa-users me-2 text-primary"></i>Crowd Peek
+                    </h5>
+
+                    <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
+                        <span class="text-muted"><i class="fas fa-birthday-cake me-2"></i>Avg Age</span>
+                        <strong class="fs-5">{{ crowd_peek.avg_age|default:"N/A" }}</strong>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-2 small">
+                            <span>Gender Mix</span>
+                            <span class="text-muted">{{ crowd_peek.total_travelers }} confirmed</span>
+                        </div>
+                        <div class="progress" style="height: 12px; border-radius: 6px;">
+                            {% if crowd_peek.gender_distribution.MALE > 0 %}
+                            <div class="progress-bar bg-info" role="progressbar"
+                                style="width: {% widthratio crowd_peek.gender_distribution.MALE crowd_peek.total_travelers 100 %}%"
+                                title="Male"></div>
+                            {% endif %}
+                            {% if crowd_peek.gender_distribution.FEMALE > 0 %}
+                            <div class="progress-bar" style="background-color: #e84393;" role="progressbar"
+                                style="width: {% widthratio crowd_peek.gender_distribution.FEMALE crowd_peek.total_travelers 100 %}%"
+                                title="Female"></div>
+                            {% endif %}
+                            {% if crowd_peek.gender_distribution.OTHER > 0 %}
+                            <div class="progress-bar bg-warning" role="progressbar"
+                                style="width: {% widthratio crowd_peek.gender_distribution.OTHER crowd_peek.total_travelers 100 %}%"
+                                title="Other"></div>
+                            {% endif %}
+                        </div>
+                        <div class="d-flex justify-content-between mt-2 small text-muted">
+                            <span><i class="fas fa-mars text-info me-1"></i> {{ crowd_peek.gender_distribution.MALE
+                                }}</span>
+                            <span><i class="fas fa-venus me-1" style="color: #e84393;"></i> {{
+                                crowd_peek.gender_distribution.FEMALE }}</span>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Company Card -->
+                <div class="sidebar-widget company-profile">
+                    <div class="company-avatar">
+                        {{ trip.company.company_name|slice:":1" }}
+                    </div>
+                    <h5 class="mb-1 fw-bold">{{ trip.company.company_name }}</h5>
+                    <p class="text-muted small mb-3">Trip Organizer</p>
+
+                    {% if trip.company.website %}
+                    <a href="{{ trip.company.website }}" target="_blank" class="text-primary small">
+                        <i class="fa fa-link mr-1"></i> Visit Website
+                    </a>
+                    {% endif %}
+                </div>
+
+                <div class="text-center mt-3">
+                    <button type="button" class="btn btn-link text-secondary text-decoration-none btn-sm opacity-75"
+                        data-bs-toggle="modal" data-bs-target="#reportModal">
+                        <i class="fas fa-flag me-1"></i> Report this Trip
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Report Modal -->
+<div class="modal fade" id="reportModal" tabindex="-1">
+    <div class="modal-dialog">
+        <form action="{% url 'submit_report' 'trip' trip.id %}" method="post">
+            {% csrf_token %}
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Report Trip</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-info small">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Reports are confidential and reviewed by our safety team.
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Reason</label>
+                        <select name="reason" class="form-select" required>
+                            <option value="SAFETY">Safety Violation</option>
+                            <option value="SCAM">Scam/Fraud</option>
+                            <option value="TOXIC_BEHAVIOR">Toxic Behavior</option>
+                            <option value="OTHER">Other</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Details</label>
+                        <textarea name="details" class="form-control" rows="4" required
+                            placeholder="Please provide specific details..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">Submit Report</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

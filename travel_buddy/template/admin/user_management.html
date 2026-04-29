@@ -1,0 +1,522 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}User Console - Travel Buddy{% endblock %}
+
+{% block breadcrumb %}User Management{% endblock %}
+
+{% block content %}
+<div class="dashboard-content">
+    <div class="row align-items-center mb-4">
+        <div class="col">
+            <h1 class="h2 fw-bold mb-1">User Management</h1>
+            <p class="text-muted mb-0">Identity and Access Control Control Console</p>
+        </div>
+        <div class="col-auto">
+            <a href="{% url 'admin_export_users' %}" class="btn btn-light border">
+                <i class="fa-solid fa-cloud-arrow-down me-2"></i>Export Dataset
+            </a>
+        </div>
+    </div>
+
+    <!-- User Stats -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="stat-card primary animate-in" style="animation-delay: 0.1s;">
+                <div>
+                    <div class="stat-icon"><i class="fa-solid fa-users"></i></div>
+                    <div class="stat-label">Total Users</div>
+                    <div class="stat-value">{{ total_users }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card success animate-in" style="animation-delay: 0.2s;">
+                <div>
+                    <div class="stat-icon"><i class="fa-solid fa-building"></i></div>
+                    <div class="stat-label">Companies</div>
+                    <div class="stat-value">{{ total_companies }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card warning animate-in" style="animation-delay: 0.3s;">
+                <div>
+                    <div class="stat-icon"><i class="fa-solid fa-user"></i></div>
+                    <div class="stat-label">Travelers</div>
+                    <div class="stat-value">{{ total_regular_users }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card danger animate-in" style="animation-delay: 0.4s;">
+                <div>
+                    <div class="stat-icon"><i class="fa-solid fa-user-shield"></i></div>
+                    <div class="stat-label">Admins</div>
+                    <div class="stat-value">{{ total_admins }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Management Toolbar -->
+    <div class="card border-0 shadow-sm mb-4" style="border-radius: 12px; overflow: hidden;">
+        <div class="card-body p-3 bg-white">
+            <div class="row align-items-center g-3">
+                <div class="col-md-auto">
+                    <div class="btn-group p-1 bg-light rounded-pill" role="group">
+                        <a href="?user_type=all"
+                            class="btn btn-sm px-3 rounded-pill {% if not user_type_filter %}btn-primary shadow-sm{% else %}btn-light text-muted border-0{% endif %}">
+                            All
+                        </a>
+                        <a href="?user_type=company"
+                            class="btn btn-sm px-3 rounded-pill {% if user_type_filter == 'company' %}btn-primary shadow-sm{% else %}btn-light text-muted border-0{% endif %}">
+                            Companies
+                        </a>
+                        <a href="?user_type=regular"
+                            class="btn btn-sm px-3 rounded-pill {% if user_type_filter == 'regular' %}btn-primary shadow-sm{% else %}btn-light text-muted border-0{% endif %}">
+                            Travelers
+                        </a>
+                    </div>
+                </div>
+                <div class="col-md">
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text bg-white border-end-0 text-muted"><i
+                                class="fa-solid fa-magnifying-glass"></i></span>
+                        <input type="text" id="userSearchInput" class="form-control border-start-0 ps-0"
+                            placeholder="Filter by name, email or ID...">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Users Console Table -->
+    <div class="card border-0 shadow-sm animate-in"
+        style="border-radius: 12px; overflow: hidden; animation-delay: 0.5s;">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0" id="usersTable">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="ps-4 border-0 text-muted small fw-bold py-3">IDENTITY</th>
+                        <th class="border-0 text-muted small fw-bold py-3">COMMUNICATION</th>
+                        <th class="border-0 text-muted small fw-bold py-3">ACCESS LEVEL</th>
+                        <th class="border-0 text-muted small fw-bold text-center py-3">STATUS</th>
+                        <th class="border-0 text-muted small fw-bold py-3">JOIN DATE</th>
+                        <th class="pe-4 border-0 text-muted small fw-bold text-end py-3">OPERATIONS</th>
+                    </tr>
+                </thead>
+                <tbody class="border-top-0">
+                    {% if users %}
+                    {% for user in users %}
+                    <tr data-user-id="{{ user.id }}" class="user-row border-bottom">
+                        <td class="ps-4 py-3">
+                            <div class="d-flex align-items-center">
+                                <div class="avatar-box me-3">
+                                    <div class="rounded-circle bg-light d-flex align-items-center justify-content-center text-primary"
+                                        style="width: 40px; height: 40px;">
+                                        {% if user.usertype == 'company' %}<i class="fa-solid fa-briefcase"></i>
+                                        {% elif user.is_superuser %}<i class="fa-solid fa-shield-halved"></i>
+                                        {% else %}<i class="fa-solid fa-user"></i>{% endif %}
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="fw-bold text-dark" style="font-size: 0.95rem;">
+                                        {% if user.usertype == 'company' %}{{ user.company_name|default:user.username }}
+                                        {% else %}{{ user.first_name|default:"" }} {{ user.last_name|default:user.username }}{% endif %}
+                                    </div>
+                                    <div class="text-muted x-small">@{{ user.username }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="d-flex flex-column">
+                                <span class="text-dark small"><i class="fa-solid fa-envelope me-2 opacity-50"></i>{{ user.email }}</span>
+                                {% if user.phone %}
+                                <span class="text-muted x-small mt-1"><i
+                                        class="fa-solid fa-phone me-2 opacity-50"></i>{{ user.phone }}</span>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td>
+                            {% if user.is_superuser %}
+                            <span
+                                class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 rounded-pill fw-bold"
+                                style="font-size: 0.7rem;">ROOT ADMIN</span>
+                            {% elif user.usertype == 'company' %}
+                            <span
+                                class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 rounded-pill fw-bold"
+                                style="font-size: 0.7rem;">PARTNER</span>
+                            {% else %}
+                            <span
+                                class="badge bg-info-subtle text-info border border-info-subtle px-3 rounded-pill fw-bold"
+                                style="font-size: 0.7rem;">TRAVELER</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            {% if user.is_active %}
+                            <span class="badge bg-success-subtle text-success px-3 rounded-pill fw-bold"
+                                style="font-size: 0.7rem;">
+                                <i class="fa-solid fa-circle-check me-1"></i>ACTIVE
+                            </span>
+                            {% else %}
+                            <span class="badge bg-danger-subtle text-danger px-3 rounded-pill fw-bold"
+                                style="font-size: 0.7rem;">
+                                <i class="fa-solid fa-circle-xmark me-1"></i>LOCKED
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="text-dark small">{{ user.date_joined|date:"d M Y" }}</div>
+                            <div class="text-muted x-small">{{ user.date_joined|date:"H:i" }}</div>
+                        </td>
+                        <td class="pe-4 text-end">
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-sm btn-light border view-user-btn"
+                                    data-user-id="{{ user.id }}" title="Inspect Account">
+                                    <i class="fa-solid fa-eye text-primary"></i>
+                                </button>
+                                {% if user.id != request.user.id %}
+                                {% if user.is_active %}
+                                <button type="button" class="btn btn-sm btn-light border deactivate-user-btn"
+                                    data-user-id="{{ user.id }}" data-username="{{ user.username }}"
+                                    title="Suspend Access">
+                                    <i class="fa-solid fa-pause text-warning"></i>
+                                </button>
+                                {% else %}
+                                <button type="button" class="btn btn-sm btn-light border activate-user-btn"
+                                    data-user-id="{{ user.id }}" data-username="{{ user.username }}"
+                                    title="Restore Access">
+                                    <i class="fa-solid fa-play text-success"></i>
+                                </button>
+                                {% endif %}
+                                <button type="button" class="btn btn-sm btn-light border delete-user-btn text-danger"
+                                    data-user-id="{{ user.id }}" data-username="{{ user.username }}"
+                                    title="Terminate Account">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center py-5">
+                            <div class="mb-3">
+                                <i class="fa-solid fa-user-slash text-muted" style="font-size: 3rem; opacity: 0.3;"></i>
+                            </div>
+                            <h5 class="text-muted fw-normal">No entries found in this scope</h5>
+                            {% if user_type_filter %}
+                            <a href="?user_type=all" class="btn btn-sm btn-primary rounded-pill mt-3 px-4">Clear All
+                                Filters</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card-footer bg-white py-3 border-0">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="text-muted small">
+                    Showing <span class="fw-bold text-dark">{{ users|length }}</span> of <span
+                        class="fw-bold text-dark">{{ total_users }}</span> accounts
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- View User Modal -->
+<div class="modal fade" id="viewUserModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
+            <div class="modal-header border-0 bg-light py-3 px-4">
+                <h5 class="modal-title fw-bold">
+                    <i class="fa-solid fa-id-card me-2 text-primary"></i>Account Intelligence
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-0" id="userDetailsContent">
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Syncing...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Confirmation Modal -->
+<div class="modal fade" id="confirmationModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
+            <div class="modal-header border-0 pb-0">
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center p-4">
+                <div id="confirmationIcon" class="mb-4"></div>
+                <h4 class="fw-bold mb-2" id="confirmationModalTitle"></h4>
+                <div class="text-muted mb-4" id="confirmationModalBody"></div>
+
+                <form method="post" action="" id="confirmationForm" class="d-grid mb-2">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-lg fw-bold rounded-pill" id="confirmationButton"></button>
+                </form>
+                <button type="button" class="btn btn-light w-100 rounded-pill fw-bold" data-bs-dismiss="modal">Cancel
+                    Operation</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .stat-card {
+        padding: 1.5rem;
+        border-radius: 16px;
+        background: white;
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        margin-bottom: 1rem;
+    }
+
+    .stat-card.primary .stat-icon {
+        background: rgba(79, 70, 229, 0.1);
+        color: #4f46e5;
+    }
+
+    .stat-card.success .stat-icon {
+        background: rgba(16, 185, 129, 0.1);
+        color: #10b981;
+    }
+
+    .stat-card.warning .stat-icon {
+        background: rgba(245, 158, 11, 0.1);
+        color: #f59e0b;
+    }
+
+    .stat-card.danger .stat-icon {
+        background: rgba(239, 68, 68, 0.1);
+        color: #ef4444;
+    }
+
+    .stat-label {
+        color: #6b7280;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+
+    .stat-value {
+        color: #111827;
+        font-size: 1.5rem;
+        font-weight: 700;
+    }
+
+    .table thead th {
+        font-family: 'Outfit', sans-serif;
+        letter-spacing: 0.02em;
+    }
+
+    .user-row {
+        transition: all 0.2s;
+    }
+
+    .user-row:hover {
+        background-color: rgba(79, 70, 229, 0.02) !important;
+    }
+
+    .avatar-box {
+        flex-shrink: 0;
+    }
+
+    .x-small {
+        font-size: 0.75rem;
+    }
+
+    .animate-in {
+        animation: fadeInSlideUp 0.5s ease forwards;
+        opacity: 0;
+    }
+
+    @keyframes fadeInSlideUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .btn-group .btn {
+        border-radius: 8px !important;
+        margin: 0 2px;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Search functionality
+        const searchInput = document.getElementById('userSearchInput');
+        const userRows = document.querySelectorAll('.user-row');
+
+        searchInput.addEventListener('input', function () {
+            const searchTerm = this.value.toLowerCase().trim();
+            userRows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
+        });
+
+        // View user details
+        const viewUserButtons = document.querySelectorAll('.view-user-btn');
+        const viewUserModal = new bootstrap.Modal(document.getElementById('viewUserModal'));
+        const userDetailsContent = document.getElementById('userDetailsContent');
+
+        viewUserButtons.forEach(button => {
+            button.addEventListener('click', function (e) {
+                e.stopPropagation();
+                const userId = this.getAttribute('data-user-id');
+                loadUserDetails(userId);
+            });
+        });
+
+        function loadUserDetails(userId) {
+            userDetailsContent.innerHTML = `
+            <div class="text-center py-5">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Syncing Intelligence...</span>
+                </div>
+            </div>`;
+            viewUserModal.show();
+
+            fetch(`/admin/get-user-details/${userId}/`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) throw new Error(data.error);
+
+                    let html = `
+                    <div class="p-4">
+                        <div class="d-flex align-items-center mb-4">
+                            <div class="bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 64px; height: 64px; font-size: 1.5rem;">
+                                <i class="fa-solid fa-${data.usertype === 'Company' ? 'building' : 'user'}"></i>
+                            </div>
+                            <div>
+                                <h4 class="fw-bold mb-1">${data.company_name || data.username}</h4>
+                                <span class="badge bg-primary-subtle text-primary rounded-pill px-3">${data.usertype}</span>
+                                <span class="badge bg-${data.is_active ? 'success' : 'danger'}-subtle text-${data.is_active ? 'success' : 'danger'} rounded-pill px-3 ms-2">
+                                    ${data.is_active ? 'ACTIVE' : 'LOCKED'}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <label class="text-muted small fw-bold text-uppercase mb-2 d-block">Communication</label>
+                                <div class="bg-light p-3 rounded-3">
+                                    <div class="mb-2"><i class="fa-solid fa-envelope me-2 opacity-50"></i>${data.email}</div>
+                                    {% if data.phone %}<div><i class="fa-solid fa-phone me-2 opacity-50"></i>${data.phone}</div>{% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="text-muted small fw-bold text-uppercase mb-2 d-block">Timeline</label>
+                                <div class="bg-light p-3 rounded-3">
+                                    <div class="mb-2"><i class="fa-solid fa-calendar-check me-2 opacity-50"></i>Joined: ${data.date_joined}</div>
+                                    <div><i class="fa-solid fa-clock me-2 opacity-50"></i>Last Visit: ${data.last_login || 'Never'}</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                    if (data.usertype === 'Company') {
+                        html += `
+                        <div class="mt-4">
+                            <label class="text-muted small fw-bold text-uppercase mb-2 d-block">Corporation Intelligence</label>
+                            <div class="bg-light p-3 rounded-3 row g-3 mx-0">
+                                <div class="col-6"><small class="text-muted d-block">Reg No.</small>${data.registration_number || 'N/A'}</div>
+                                <div class="col-6"><small class="text-muted d-block">Established</small>${data.established_year || 'N/A'}</div>
+                                <div class="col-12"><small class="text-muted d-block">Address</small>${data.company_address || 'N/A'}</div>
+                            </div>
+                        </div>
+                        `;
+                    }
+
+                    html += `</div>`;
+                    userDetailsContent.innerHTML = html;
+                })
+                .catch(error => {
+                    userDetailsContent.innerHTML = `
+                    <div class="text-center py-5 text-danger">
+                        <i class="fa-solid fa-triangle-exclamation fa-3x mb-3"></i>
+                        <p class="fw-bold">Sync Failure</p>
+                        <p class="small text-muted">${error.message}</p>
+                    </div>`;
+                });
+        }
+
+        // Action buttons
+        const confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'));
+        const titleEl = document.getElementById('confirmationModalTitle');
+        const bodyEl = document.getElementById('confirmationModalBody');
+        const iconEl = document.getElementById('confirmationIcon');
+        const submitBtn = document.getElementById('confirmationButton');
+        const formEl = document.getElementById('confirmationForm');
+
+        document.body.addEventListener('click', function (e) {
+            const deactBtn = e.target.closest('.deactivate-user-btn');
+            const actBtn = e.target.closest('.activate-user-btn');
+            const delBtn = e.target.closest('.delete-user-btn');
+
+            if (deactBtn) {
+                const id = deactBtn.dataset.userId;
+                const name = deactBtn.dataset.username;
+                setupConfirm('Suspend Operations', `Are you sure you want to suspend system access for <strong>${name}</strong>?`, 'warning', 'pause', `/admin/user/${id}/toggle-status/`);
+            } else if (actBtn) {
+                const id = actBtn.dataset.userId;
+                const name = actBtn.dataset.username;
+                setupConfirm('Restore Access', `Ready to restore system operations for <strong>${name}</strong>?`, 'success', 'play', `/admin/user/${id}/toggle-status/`);
+            } else if (delBtn) {
+                const id = delBtn.dataset.userId;
+                const name = delBtn.dataset.username;
+                setupConfirm('Terminate Account', `CRITICAL: This will permanently purge all data for <strong>${name}</strong>. Proceed?`, 'danger', 'trash-can', `/admin/user/${id}/delete/`);
+            }
+        });
+
+        function setupConfirm(title, body, type, icon, action) {
+            titleEl.textContent = title;
+            bodyEl.innerHTML = body;
+            iconEl.innerHTML = `<div class="bg-${type}-subtle text-${type} rounded-circle d-flex align-items-center justify-content-center mx-auto" style="width: 80px; height: 80px; font-size: 2.5rem;">
+                <i class="fa-solid fa-${icon}"></i>
+            </div>`;
+            submitBtn.className = `btn btn-lg btn-${type} fw-bold rounded-pill`;
+            submitBtn.textContent = 'Confirm Force Execution';
+            formEl.action = action;
+            confirmationModal.show();
+        }
+    });
+</script>
+{% endblock %}

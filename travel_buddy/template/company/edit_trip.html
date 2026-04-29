@@ -1,0 +1,405 @@
+{% extends 'company/base_company.html' %}
+
+{% block title %}Edit Trip - Travel Buddy{% endblock %}
+
+{% block company_content %}
+<div class="row mb-4 align-items-center">
+    <div class="col-md-8">
+        <h2 class="font-weight-bold text-dark" style="font-family: var(--font-display);">Edit Trip Details</h2>
+        <p class="text-muted" style="font-size: 1.1rem;">Update and refine your existing adventure package.</p>
+    </div>
+    <div class="col-md-4 text-md-right mt-3 mt-md-0">
+        <span class="badge badge-success px-4 py-2"
+            style="font-size: 1rem; border-radius: 30px; letter-spacing: 0.5px;"><i
+                class="fa fa-pencil mr-2"></i>Editing Mode</span>
+    </div>
+</div>
+
+<style>
+    .image-container {
+        position: relative;
+        display: inline-block;
+        width: 100%;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .image-container:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+
+    .delete-img-btn {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        background: rgba(239, 68, 68, 0.9);
+        color: white !important;
+        border: none;
+        border-radius: 50%;
+        width: 28px;
+        height: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        padding: 0;
+        font-size: 14px;
+        transition: all 0.2s;
+        z-index: 10;
+        backdrop-filter: blur(4px);
+    }
+
+    .delete-img-btn:hover {
+        background: #dc2626;
+        transform: scale(1.1);
+    }
+
+    .upload-btn-wrapper {
+        position: relative;
+        overflow: hidden;
+        display: inline-block;
+        width: 100%;
+    }
+
+    .upload-btn-wrapper input[type=file] {
+        font-size: 100px;
+        position: absolute;
+        left: 0;
+        top: 0;
+        opacity: 0;
+        cursor: pointer;
+        height: 100%;
+    }
+
+    .upload-btn-wrapper .upload-btn-custom {
+        border: 2px dashed rgba(255, 94, 20, 0.4);
+        background-color: rgba(255, 94, 20, 0.05);
+        color: var(--primary-color);
+        padding: 30px 20px;
+        border-radius: 16px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        text-align: center;
+    }
+
+    .upload-btn-wrapper:hover .upload-btn-custom {
+        background-color: rgba(255, 94, 20, 0.1);
+        border-color: var(--primary-color);
+    }
+
+    .form-control,
+    .custom-select {
+        border-radius: 12px;
+        padding: 0.75rem 1.25rem;
+        height: auto;
+        border: 1px solid #e2e8f0;
+        box-shadow: none;
+        transition: all 0.2s;
+    }
+
+    .form-control:focus,
+    .custom-select:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(255, 94, 20, 0.15);
+    }
+
+    .input-group-text {
+        border-radius: 12px 0 0 12px;
+        border: 1px solid #e2e8f0;
+        background-color: #f8fafc;
+        color: #64748b;
+        font-weight: 600;
+    }
+
+    .input-group .form-control {
+        border-radius: 0 12px 12px 0;
+    }
+
+    label {
+        font-weight: 600;
+        color: #334155;
+        margin-bottom: 0.5rem;
+        font-size: 0.95rem;
+    }
+
+    .section-title {
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 2px solid #f1f5f9;
+        display: flex;
+        align-items: center;
+    }
+
+    .section-title i {
+        color: var(--primary-color);
+        margin-right: 10px;
+        background: rgba(255, 94, 20, 0.1);
+        width: 36px;
+        height: 36px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+    }
+</style>
+
+<div class="card border-0 shadow-sm" style="border-radius: 20px; overflow: hidden;">
+    <div class="card-body p-4 p-md-5">
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <h5 class="section-title"><i class="fa fa-info-circle"></i> Basic Information</h5>
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <label for="title">Trip Title <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="title" name="title" required
+                        placeholder="e.g. Himalayan Adventure" value="{{ trip.title }}">
+                </div>
+                <div class="col-md-6 mb-4">
+                    <label for="destination">Destination <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="destination" name="destination" required
+                        placeholder="e.g. Manali, Himachal Pradesh" value="{{ trip.destination }}">
+                </div>
+            </div>
+
+            <div class="form-group mb-4">
+                <label for="description">Trip Overview <span class="text-danger">*</span></label>
+                <textarea class="form-control" id="description" name="description" rows="4"
+                    required>{{ trip.description }}</textarea>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <label for="price">Price (per person) <span class="text-danger">*</span></label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">₹</span>
+                        </div>
+                        <input type="number" class="form-control" id="price" name="price" required min="0"
+                            value="{{ trip.price }}">
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <label for="trip_type">Trip Type <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="trip_type" name="trip_type" required
+                        placeholder="e.g. Trekking, Beach" value="{{ trip.trip_type }}">
+                </div>
+                <div class="col-md-4 mb-4">
+                    <label for="vibe_tag">Vibe Tag <span class="text-danger">*</span></label>
+                    <select class="form-control custom-select" id="vibe_tag" name="vibe_tag" required>
+                        <option value="">Select Vibe...</option>
+                        <option value="ADVENTURE">Adventure & Thrill</option>
+                        <option value="CHILL">Chill & Relax</option>
+                        <option value="PARTY">Party Crowd</option>
+                        <option value="SPIRITUAL">Spiritual & Wellness</option>
+                        <option value="SOLO_FRIENDLY">Solo Friendly</option>
+                        <option value="DIGITAL_DETOX">Digital Detox</option>
+                        <option value="ROMANTIC">Couples/Romantic</option>
+                        <option value="CULTURE">Culture & History</option>
+                        <option value="EXPLORING">Exploring</option>
+                        <option value="TEAM_BUILDING">Team Building</option>
+                        <option value="CORPORATE">Corporate</option>
+                        <option value="WEEKEND">Weekend Getaway</option>
+                        <option value="NATURE">Nature</option>
+                    </select>
+                </div>
+            </div>
+
+            <h5 class="section-title mt-4"><i class="fa fa-calendar-check-o"></i> Schedule & Capacity</h5>
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <label for="start_date">Start Date <span class="text-danger">*</span></label>
+                    <input type="date" class="form-control" id="start_date" name="start_date" required
+                        value="{{ trip.start_date|date:'Y-m-d' }}">
+                </div>
+                <div class="col-md-4 mb-4">
+                    <label for="end_date">End Date <span class="text-danger">*</span></label>
+                    <input type="date" class="form-control" id="end_date" name="end_date" required
+                        value="{{ trip.end_date|date:'Y-m-d' }}">
+                </div>
+                <div class="col-md-4 mb-4">
+                    <label for="duration_days">Duration (Days)</label>
+                    <input type="number" class="form-control bg-light" id="duration_days" name="duration_days" required
+                        min="1" value="{{ trip.duration_days }}" readonly>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <label for="max_capacity">Max Travelers <span class="text-danger">*</span></label>
+                    <input type="number" class="form-control" id="max_capacity" name="max_capacity" required min="1"
+                        value="{{ trip.max_capacity }}">
+                </div>
+            </div>
+
+            <h5 class="section-title mt-4"><i class="fa fa-users"></i> Audience Controls</h5>
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <label for="age_min">Min Age</label>
+                    <input type="number" class="form-control" id="age_min" name="age_min" value="{{ trip.age_min }}"
+                        min="18">
+                </div>
+                <div class="col-md-4 mb-4">
+                    <label for="age_max">Max Age</label>
+                    <input type="number" class="form-control" id="age_max" name="age_max" value="{{ trip.age_max }}"
+                        min="18">
+                </div>
+                <div class="col-md-4 mb-4">
+                    <label for="gender_restriction">Gender Rule</label>
+                    <select class="form-control custom-select" id="gender_restriction" name="gender_restriction">
+                        <option value="ANY">Mixed Group (Any)</option>
+                        <option value="FEMALE_ONLY">Female Only</option>
+                        <option value="MALE_ONLY">Male Only</option>
+                        <option value="COUPLES_ONLY">Couples Only</option>
+                    </select>
+                </div>
+            </div>
+
+            <h5 class="section-title mt-4"><i class="fa fa-map"></i> Itinerary & Activities</h5>
+            <div class="form-group mb-4">
+                <label for="itinerary_details">Itinerary Details <span class="text-danger">*</span></label>
+                <textarea class="form-control" id="itinerary_details" name="itinerary_details" rows="6" required
+                    placeholder="Day 1: Arrival...&#10;Day 2: Trekking...">{{ trip.itinerary_details }}</textarea>
+            </div>
+            <div class="form-group mb-4">
+                <label for="social_activities">Social Activities (Ice-breakers, group events)</label>
+                <textarea class="form-control" id="social_activities" name="social_activities" rows="3"
+                    placeholder="e.g. Bonfire night, Speed friending">{{ trip.social_activities }}</textarea>
+            </div>
+
+            <h5 class="section-title mt-4"><i class="fa fa-camera"></i> Trip Media</h5>
+
+            {% if trip.images.all %}
+            <div class="row mb-4">
+                <div class="col-12 mb-2">
+                    <label class="font-weight-bold text-muted small text-uppercase">Existing Gallery</label>
+                </div>
+                {% for img in trip.images.all %}
+                <div class="col-md-3 col-sm-4 col-6 mb-3">
+                    <div class="image-container">
+                        <img src="{{ img.image.url }}" class="img-fluid w-100" style="height: 160px; object-fit: cover;"
+                            alt="Trip Image">
+                        <a href="{% url 'delete_trip_image' img.id %}" class="delete-img-btn"
+                            onclick="return confirm('Are you sure you want to remove this image?')"
+                            title="Remove Image">
+                            <i class="fa fa-times"></i>
+                        </a>
+                        {% if img.is_cover %}
+                        <span class="badge position-absolute"
+                            style="bottom: 10px; left: 10px; font-size: 0.75rem; background-color: var(--primary-color); color: white; padding: 5px 10px; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
+                            <i class="fa fa-star mr-1"></i>Cover
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="form-group mt-3 mb-5">
+                <label class="d-block mb-3 text-muted">Add New Trip Images</label>
+                <div class="upload-btn-wrapper">
+                    <div class="upload-btn-custom">
+                        <i class="fa fa-images fa-2x mb-1" style="color: var(--primary-color);"></i>
+                        <span id="upload-text" style="font-size: 1.05rem;">Click to browse or drag & drop</span>
+                        <span class="small text-muted font-weight-normal">Selected images will be added to the
+                            gallery</span>
+                    </div>
+                    <input type="file" id="trip_images" name="trip_images" multiple accept="image/*">
+                </div>
+                <div id="file-count" class="mt-2 text-center text-success font-weight-bold"></div>
+            </div>
+
+            <hr class="my-4" style="border-color: #f1f5f9;">
+
+            <div class="d-flex justify-content-end align-items-center">
+                <a href="{% url 'manage_trips' %}" class="btn btn-light px-4 py-2 mr-3"
+                    style="border-radius: 12px; font-weight: 600; color: #64748b;">Cancel</a>
+                <button type="submit" class="btn btn-primary px-5 py-3"
+                    style="border-radius: 12px; font-weight: bold; font-size: 1.1rem; box-shadow: 0 4px 15px rgba(255, 94, 20, 0.3);">
+                    Update Package <i class="fa fa-arrow-right ml-2"></i>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Set the selected values for dropdowns using JavaScript to avoid Django template syntax issues
+    document.addEventListener('DOMContentLoaded', function () {
+        // Set vibe_tag
+        var vibeTag = "{{ trip.vibe_tag }}";
+        if (vibeTag) {
+            document.getElementById('vibe_tag').value = vibeTag;
+        }
+
+        // Set gender_restriction
+        var genderRestriction = "{{ trip.gender_restriction }}";
+        if (genderRestriction) {
+            document.getElementById('gender_restriction').value = genderRestriction;
+        }
+
+        const startDateInput = document.getElementById('start_date');
+        const endDateInput = document.getElementById('end_date');
+        const durationInput = document.getElementById('duration_days');
+
+        // Set min date for start_date to today for editing (allow existing today trips but not past)
+        const today = new Date();
+        const minDateStr = today.toISOString().split('T')[0];
+        // Only set min if the existing date is not already in the past? 
+        // Actually the user said "start date should be after current date". 
+        // For editing, let's keep it consistent.
+        startDateInput.setAttribute('min', minDateStr);
+
+        function updateDuration() {
+            const startStr = startDateInput.value;
+            const endStr = endDateInput.value;
+
+            if (startStr) {
+                endDateInput.setAttribute('min', startStr);
+
+                if (endStr) {
+                    const start = new Date(startStr);
+                    const end = new Date(endStr);
+
+                    if (end >= start) {
+                        const diffTime = Math.abs(end - start);
+                        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+                        durationInput.value = diffDays;
+                    } else {
+                        durationInput.value = '';
+                    }
+                }
+            }
+        }
+
+        startDateInput.addEventListener('change', updateDuration);
+        endDateInput.addEventListener('change', updateDuration);
+
+        // File upload text update
+        const fileInput = document.getElementById('trip_images');
+        const uploadText = document.getElementById('upload-text');
+        const fileCountDisplay = document.getElementById('file-count');
+
+        fileInput.addEventListener('change', function () {
+            if (this.files.length > 0) {
+                uploadText.innerText = "Change Selection (" + this.files.length + " files)";
+                fileCountDisplay.innerHTML = '<i class="fa fa-check-circle mr-2"></i> ' + this.files.length + " image(s) ready to upload";
+            } else {
+                uploadText.innerText = "Click to browse or drag & drop";
+                fileCountDisplay.innerHTML = "";
+            }
+        });
+    });
+</script>
+{% endblock %}

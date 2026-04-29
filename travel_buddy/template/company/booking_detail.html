@@ -1,0 +1,190 @@
+{% extends 'company/base_company.html' %}
+{% load static %}
+
+{% block title %}Booking Details #{{ booking.id|add:"1000" }} - Travel Buddy{% endblock %}
+
+{% block company_content %}
+<div class="row mb-5 align-items-center">
+    <div class="col-md-8">
+        <h2 class="font-weight-bold" style="color: #2b2b2b;">Reservation Analysis</h2>
+        <p class="text-muted">Detailed breakdown of customer booking and payment status.</p>
+    </div>
+    <div class="col-md-4 text-md-right">
+        <a href="{% url 'view_bookings' %}" class="btn px-4 text-white shadow-sm"
+            style="background: linear-gradient(135deg, #ff7e5f, #feb47b); border: none; border-radius: 20px; font-weight: 600;">
+            <i class="fa fa-arrow-left mr-2"></i>Back to List
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Left Side: Booking Information -->
+    <div class="col-lg-8">
+        <div class="card border-0 mb-4"
+            style="border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); background: rgba(255,255,255,0.85); backdrop-filter: blur(12px);">
+            <div class="card-body p-4 p-md-5">
+                <div class="d-flex justify-content-between align-items-start mb-4">
+                    <div>
+                        <h3 class="font-weight-bold mb-1" style="color: #2b2b2b;">Booking <span
+                                style="color: #ff7e5f;">#TB-{{ booking.id|add:"1000" }}</span></h3>
+                        <p class="text-muted small mb-0 font-weight-bold"><i class="fa fa-clock-o mr-2"
+                                style="color: #ff7e5f;"></i>Reserved on {{ booking.booking_date|date:"d M Y, h:i A" }}
+                        </p>
+                    </div>
+                    <div>
+                        {% if booking.status == 'CONFIRMED' %}
+                        <span class="badge badge-pill badge-success px-4 py-2 shadow-sm"
+                            style="font-size: 12px;">Confirmed</span>
+                        {% elif booking.status == 'PENDING' %}
+                        <span class="badge badge-pill badge-warning px-4 py-2 text-white shadow-sm"
+                            style="font-size: 12px; background: #ffaa00;">Pending</span>
+                        {% else %}
+                        <span class="badge badge-pill badge-danger px-4 py-2 shadow-sm"
+                            style="font-size: 12px;">Cancelled</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="row mb-5 mt-5">
+                    <div class="col-md-6 border-right pr-md-4">
+                        <h6 class="text-uppercase small font-weight-bold text-muted mb-4 letter-spacing-1">Customer
+                            Profile</h6>
+                        <div class="d-flex align-items-center mb-4 p-3 rounded"
+                            style="background: rgba(255, 126, 95, 0.05); border: 1px solid rgba(255, 126, 95, 0.1);">
+                            <div class="avatar rounded-circle mr-3 d-flex align-items-center justify-content-center font-weight-bold text-white shadow-sm"
+                                style="width: 55px; height: 55px; font-size: 22px; background: linear-gradient(135deg, #ff7e5f, #feb47b);">
+                                {{ booking.traveler.username|first|upper }}
+                            </div>
+                            <div>
+                                <h5 class="mb-1 font-weight-bold text-dark">{{ booking.traveler.username }}</h5>
+                                <p class="text-muted small mb-0 font-weight-bold">{{ booking.traveler.email }}</p>
+                            </div>
+                        </div>
+                        <div class="info-list small px-2">
+                            {% if booking.traveler.phone %}
+                            <p class="mb-2 d-flex justify-content-between border-bottom pb-2"><span
+                                    class="text-muted font-weight-bold">Phone:</span> <span
+                                    class="font-weight-bold text-dark">{{ booking.traveler.phone }}</span></p>
+                            {% endif %}
+                            <p class="mb-0 d-flex justify-content-between"><span
+                                    class="text-muted font-weight-bold">Member Since:</span> <span
+                                    class="font-weight-bold text-dark">{{ booking.traveler.date_joined|date:"M Y" }}</span></p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 pl-md-4">
+                        <h6 class="text-uppercase small font-weight-bold text-muted mb-4 letter-spacing-1 mt-4 mt-md-0">
+                            Transaction Summary</h6>
+                        <div class="price-breakdown p-4 rounded-lg shadow-sm"
+                            style="background: linear-gradient(135deg, #ffffff, #fafafa); border: 1px solid #eee;">
+                            <div class="d-flex justify-content-between mb-3 border-bottom pb-2">
+                                <span class="text-muted small font-weight-bold">Package Price</span>
+                                <span class="font-weight-bold text-dark">₹{{ booking.trip.price }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-3 border-bottom pb-2">
+                                <span class="text-muted small font-weight-bold">Participants</span>
+                                <span class="font-weight-bold text-dark">x {{ booking.num_people }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mt-3 pt-2">
+                                <h5 class="mb-0 font-weight-bold text-dark">Total Revenue</h5>
+                                <h3 class="mb-0 font-weight-bold" style="color: #ff7e5f;">₹{{ booking.total_price }}
+                                </h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="trip-preview p-4 rounded-lg bg-white overflow-hidden position-relative"
+                    style="border: 2px dashed rgba(255, 126, 95, 0.3) !important; background: rgba(255, 126, 95, 0.02) !important;">
+                    <div class="row align-items-center">
+                        <div class="col-md-4">
+                            {% if booking.trip.images.exists %}
+                            <img src="{{ booking.trip.images.first.image.url }}" class="img-fluid rounded-lg shadow-sm"
+                                alt="Trip Cover" style="height: 120px; width: 100%; object-fit: cover;">
+                            {% else %}
+                            <div class="bg-light rounded-lg d-flex align-items-center justify-content-center"
+                                style="height: 120px;">
+                                <i class="fa fa-image text-muted fa-2x"></i>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-8 pl-md-4 mt-3 mt-md-0">
+                            <p class="text-uppercase xsmall font-weight-bold mb-1"
+                                style="color: #ff7e5f; letter-spacing: 1px;">Adventure Package</p>
+                            <h4 class="font-weight-bold text-dark mb-3">{{ booking.trip.title }}</h4>
+                            <div class="row small text-muted font-weight-bold">
+                                <div class="col-sm-6 mb-2">
+                                    <i class="fa fa-map-marker mr-2" style="color: #ff7e5f;"></i>{{ booking.trip.destination }}
+                                </div>
+                                <div class="col-sm-6 mb-2">
+                                    <i class="fa fa-calendar mr-2" style="color: #ff7e5f;"></i>{{ booking.trip.start_date|date:"d M Y" }}
+                                </div>
+                            </div>
+                            <a href="{% url 'trip_detail' booking.trip.id %}" target="_blank"
+                                class="small font-weight-bold mt-2 d-inline-block px-3 py-2 rounded shadow-sm text-white"
+                                style="background: linear-gradient(135deg, #ff7e5f, #feb47b); text-decoration: none;">
+                                View Public Listing <i class="fa fa-external-link ml-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Side: Actions -->
+    <div class="col-lg-4">
+        <div class="card border-0 mb-4"
+            style="border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); background: rgba(255,255,255,0.85); backdrop-filter: blur(12px);">
+            <div class="card-body p-4">
+                <h6 class="text-uppercase small font-weight-bold text-muted mb-4 letter-spacing-1">Operations</h6>
+                <div class="d-flex flex-column" style="gap: 15px;">
+                    <a href="{% url 'trip_communication' booking.trip.id %}"
+                        class="btn text-white py-3 px-4 shadow-sm text-center"
+                        style="background: linear-gradient(135deg, #ff7e5f, #feb47b); border: none; border-radius: 8px; font-weight: 600;">
+                        <i class="fa fa-comments mr-2"></i>Open Trip Communication
+                    </a>
+                    <button class="btn btn-outline-dark py-3 px-4 btn-block font-weight-bold shadow-sm"
+                        style="border-radius: 8px; border-width: 2px;">
+                        <i class="fa fa-envelope mr-2" style="color: #ff7e5f;"></i>Contact Traveler
+                    </button>
+                    <a href="{% url 'download_receipt' booking.id %}" target="_blank"
+                        class="btn btn-light border py-3 px-4 btn-block font-weight-bold shadow-sm"
+                        style="border-radius: 8px; text-decoration: none; color: inherit;">
+                        <i class="fa fa-print mr-2 text-muted"></i>Download Receipt
+                    </a>
+                </div>
+                <hr class="my-4 border-light">
+                <div class="alert border-0 shadow-sm py-3 px-3 small mb-0 rounded"
+                    style="background: rgba(255, 126, 95, 0.1); color: #2b2b2b;">
+                    <i class="fa fa-info-circle mr-2" style="color: #ff7e5f;"></i> Need help? <a href="#"
+                        class="font-weight-bold" style="color: #ff7e5f; text-decoration: underline;">Contact Admin</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .letter-spacing-1 {
+        letter-spacing: 1px;
+    }
+
+    .rounded-lg {
+        border-radius: 1rem !important;
+    }
+
+    .font-weight-bold {
+        font-weight: 600 !important;
+    }
+
+    .xsmall {
+        font-size: 10px;
+    }
+
+    .badge-pill {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+</style>
+{% endblock %}

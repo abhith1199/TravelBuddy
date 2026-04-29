@@ -1,0 +1,588 @@
+{% extends 'base_modern.html' %}
+{% load static %}
+
+{% block title %}{{ trip.title }} - Travel Buddy{% endblock %}
+
+{% block content %}
+<!-- Trip Detail Hero Section -->
+<section class="relative min-h-[60vh] flex flex-col justify-end overflow-hidden bg-dark-900 pb-20 pt-40">
+    <!-- Hero Background Image & Gradient Overlays -->
+    <div class="absolute inset-0 z-0 opacity-70">
+        {% if images %}
+        <img src="{{ images.0.image.url }}" alt="{{ trip.title }}" class="w-full h-full object-cover">
+        {% else %}
+        <img src="{% static 'img/slider1.jpg' %}" alt="{{ trip.title }}" class="w-full h-full object-cover">
+        {% endif %}
+        <!-- Gradient Overlay for Contrast -->
+        <div class="absolute inset-0 bg-gradient-to-t from-dark-900 via-dark-900/60 to-transparent"></div>
+    </div>
+
+    <!-- Hero Content -->
+    <div class="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-white">
+        <div class="max-w-4xl animate-slide-up" style="animation-delay: 100ms;">
+            <!-- Badge -->
+            <div
+                class="inline-block px-4 py-1.5 rounded-full bg-primary-500/90 backdrop-blur-md text-white text-xs font-bold uppercase tracking-widest shadow-lg border border-primary-400/50 mb-6">
+                {{ trip.get_vibe_tag_display }}
+            </div>
+
+            <!-- Title -->
+            <h1
+                class="font-display text-5xl md:text-6xl lg:text-7xl font-extrabold mb-6 tracking-tight drop-shadow-2xl leading-none">
+                {{ trip.title }}
+            </h1>
+
+            <!-- Meta Information -->
+            <div
+                class="flex flex-wrap items-center gap-6 text-base md:text-lg font-medium text-gray-200 drop-shadow-md">
+                <div class="flex items-center gap-2">
+                    <div
+                        class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center border border-white/20 text-primary-400">
+                        <i class="fa-solid fa-location-dot"></i>
+                    </div>
+                    <span>{{ trip.destination }}</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div
+                        class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center border border-white/20 text-primary-400">
+                        <i class="fa-regular fa-clock"></i>
+                    </div>
+                    <span>{{ trip.duration_days }} Days Adventure</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div
+                        class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center border border-white/20 text-primary-400">
+                        <i class="fa-solid fa-users"></i>
+                    </div>
+                    <span>{{ trip.current_bookings }}/{{ trip.max_capacity }} Travelers</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Main Details Layout -->
+<section class="py-16 bg-[#fafafa] relative z-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+        <!-- Alerts & Messages -->
+        {% if messages %}
+        <div class="mb-10 space-y-4 max-w-4xl">
+            {% for message in messages %}
+            <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex items-start justify-between gap-4 animate-fade-in"
+                role="alert">
+                <div class="flex items-center gap-4">
+                    <div
+                        class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 {% if message.tags == 'success' %}bg-green-50 text-green-500{% else %}bg-primary-50 text-primary-500{% endif %}">
+                        <i
+                            class="fa-solid {% if message.tags == 'success' %}fa-check{% else %}fa-info{% endif %} text-xl"></i>
+                    </div>
+                    <div>
+                        <strong class="block text-sm font-bold text-gray-900 mb-1">System Notification</strong>
+                        <p class="text-sm text-gray-600">{{ message }}</p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="flex flex-col lg:flex-row gap-10">
+            <!-- Left Column: Content -->
+            <div class="lg:w-2/3 space-y-10">
+
+                <!-- Overview Section -->
+                <div class="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
+                    <h2 class="font-display font-bold text-2xl text-gray-900 mb-6 flex items-center gap-3">
+                        <div
+                            class="w-12 h-12 rounded-2xl bg-primary-50 text-primary-500 flex items-center justify-center">
+                            <i class="fa-solid fa-circle-info text-xl"></i>
+                        </div>
+                        Overview
+                    </h2>
+                    <div class="prose max-w-none text-gray-600 leading-relaxed text-lg">
+                        {{ trip.description|linebreaksbr }}
+                    </div>
+                </div>
+
+                <!-- Itinerary Section -->
+                <div class="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
+                    <h2 class="font-display font-bold text-2xl text-gray-900 mb-8 flex items-center gap-3">
+                        <div
+                            class="w-12 h-12 rounded-2xl bg-primary-50 text-primary-500 flex items-center justify-center">
+                            <i class="fa-solid fa-route text-xl"></i>
+                        </div>
+                        Itinerary Details
+                    </h2>
+
+                    <div class="relative">
+                        <!-- Vertical Line -->
+                        <div class="absolute left-[27px] top-4 bottom-4 w-1 bg-gray-100 rounded-full hidden sm:block">
+                        </div>
+
+                        <div class="space-y-8 relative">
+                            {% if trip.itinerary_details %}
+                            <!-- This emulates a timeline look using Tailwind -->
+                            <div class="flex flex-col sm:flex-row gap-6">
+                                <div
+                                    class="w-14 h-14 rounded-full bg-white border-4 border-primary-100 flex items-center justify-center flex-shrink-0 z-10 shadow-sm">
+                                    <div class="w-4 h-4 rounded-full bg-primary-500"></div>
+                                </div>
+                                <div class="bg-gray-50 rounded-2xl p-6 border border-gray-100 flex-grow">
+                                    <div class="prose max-w-none text-gray-600">
+                                        {{ trip.itinerary_details|linebreaks }}
+                                    </div>
+                                </div>
+                            </div>
+                            {% else %}
+                            <div
+                                class="flex items-center gap-4 text-gray-500 p-6 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
+                                <i class="fa-regular fa-calendar-xmark text-2xl"></i>
+                                <p class="font-medium">Itinerary details coming soon.</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Social Activities Section -->
+                {% if social_activities %}
+                <div class="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
+                    <h2 class="font-display font-bold text-2xl text-gray-900 mb-6 flex items-center gap-3">
+                        <div
+                            class="w-12 h-12 rounded-2xl bg-primary-50 text-primary-500 flex items-center justify-center">
+                            <i class="fa-solid fa-glass-cheers text-xl"></i>
+                        </div>
+                        Social Activities
+                    </h2>
+                    <div class="bg-primary-50 border border-primary-100 rounded-2xl p-6 prose max-w-none text-gray-700">
+                        {{ social_activities|linebreaks }}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Photo Gallery Section -->
+                {% if images.count > 1 %}
+                <div class="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
+                    <h2 class="font-display font-bold text-2xl text-gray-900 mb-6 flex items-center gap-3">
+                        <div
+                            class="w-12 h-12 rounded-2xl bg-primary-50 text-primary-500 flex items-center justify-center">
+                            <i class="fa-solid fa-images text-xl"></i>
+                        </div>
+                        Photo Gallery
+                    </h2>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        {% for img in images %}
+                        <div onclick="openLightbox('{{ img.image.url }}')"
+                            class="aspect-[4/3] rounded-2xl overflow-hidden shadow-sm group cursor-pointer border border-gray-100">
+                            <img src="{{ img.image.url }}" alt="Trip Image"
+                                class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+            </div>
+
+            <!-- Right Column: Sidebar (Sticky) -->
+            <div class="lg:w-1/3">
+                <div class="sticky top-28 space-y-6">
+
+                    <!-- Booking Card -->
+                    <div class="bg-white rounded-3xl p-8 shadow-xl border border-gray-100 overflow-hidden relative">
+                        <!-- Top Gradient Accent -->
+                        <div class="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-primary-400 to-primary-600">
+                        </div>
+
+                        <!-- Price -->
+                        <div class="mb-8 p-4 bg-gray-50 rounded-2xl text-center border border-gray-100">
+                            <p class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Per Person</p>
+                            <div class="font-display text-4xl font-black text-gray-900">₹{{ trip.price }}</div>
+                            <p class="text-xs text-primary-600 font-semibold mt-1">Secure your spot today!</p>
+                        </div>
+
+                        <!-- Quick Info Grid -->
+                        <div class="grid grid-cols-2 gap-3 mb-8">
+                            <div class="bg-gray-50 rounded-xl p-4 text-center border border-gray-100">
+                                <i class="fa-solid fa-hourglass-start text-primary-500 text-lg mb-2"></i>
+                                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Duration
+                                </p>
+                                <p class="font-semibold text-gray-900 text-sm">{{ trip.duration_days }} Days</p>
+                            </div>
+                            <div class="bg-gray-50 rounded-xl p-4 text-center border border-gray-100">
+                                <i class="fa-solid fa-calendar-check text-primary-500 text-lg mb-2"></i>
+                                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Starts</p>
+                                <p class="font-semibold text-gray-900 text-sm">{{ trip.start_date|date:"d M y" }}</p>
+                            </div>
+                            <div class="bg-gray-50 rounded-xl p-4 text-center border border-gray-100">
+                                <i class="fa-solid fa-users-viewfinder text-primary-500 text-lg mb-2"></i>
+                                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Group Max
+                                </p>
+                                <p class="font-semibold text-gray-900 text-sm">{{ trip.max_capacity }} Ppl</p>
+                            </div>
+                            <div class="bg-gray-50 rounded-xl p-4 text-center border border-gray-100">
+                                <i class="fa-solid fa-fire text-primary-500 text-lg mb-2"></i>
+                                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Vibe</p>
+                                <p class="font-semibold text-gray-900 text-xs">{{ trip.get_vibe_tag_display }}</p>
+                            </div>
+                        </div>
+
+                        <!-- Booking Actions -->
+                        {% if is_booked %}
+                        <div class="bg-green-50 border border-green-200 rounded-2xl p-4 mb-4 text-center">
+                            <i class="fa-solid fa-circle-check text-green-500 text-2xl mb-2"></i>
+                            <h4 class="font-bold text-green-800">You are booked!</h4>
+                            <p class="text-xs text-green-600 mt-1">Get ready for your adventure.</p>
+                        </div>
+                        <a href="{% url 'trip_communication' trip.id %}"
+                            class="w-full block text-center bg-gray-900 hover:bg-black text-white px-6 py-4 rounded-xl font-bold transition-all shadow-md hover:shadow-lg">
+                            <i class="fa-solid fa-comments me-2"></i> Join Group Chat
+                        </a>
+                        {% elif trip.current_bookings >= trip.max_capacity %}
+                        <div class="bg-red-50 border border-red-200 rounded-2xl p-6 mb-4 text-center">
+                            <i class="fa-solid fa-users-slash text-red-500 text-3xl mb-3"></i>
+                            <h4 class="font-display font-bold text-red-800 text-xl">Fully Booked!</h4>
+                            <p class="text-sm text-red-600 mt-2 font-medium">This trip is no longer accepting new reservations.</p>
+                        </div>
+                        {% else %}
+                        {% if user.is_authenticated %}
+                        {% if user.usertype == 'traveler' %}
+                        <!-- Dynamic Booking Form -->
+                        <form action="{% url 'book_trip' trip.id %}" method="POST" id="bookingForm"
+                            class="bg-gray-50 p-6 rounded-2xl border border-gray-100">
+                            {% csrf_token %}
+
+                            <div class="mb-5">
+                                <div class="flex justify-between items-center mb-2">
+                                    <label class="text-xs font-bold text-gray-600 uppercase tracking-widest">Total
+                                        Travelers</label>
+                                    <span class="text-primary-500 font-medium text-sm flex items-center gap-1"><i
+                                            class="fa-solid fa-info-circle"></i> Auto-calculated</span>
+                                </div>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                        <i class="fa-solid fa-user-group text-gray-400"></i>
+                                    </div>
+                                    <input type="number" name="num_people" id="id_num_people"
+                                        class="block w-full pl-12 pr-4 py-4 bg-white border border-gray-200 rounded-xl text-lg font-bold text-gray-900 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-shadow"
+                                        value="1" min="1" max="10" readonly>
+                                </div>
+                            </div>
+
+                            <p
+                                class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3 border-b border-gray-200 pb-2">
+                                Breakdown by Gender</p>
+
+                            <div class="grid grid-cols-3 gap-3 mb-6">
+                                <div>
+                                    <label class="block text-xs font-bold text-blue-600 mb-1.5 text-center">MEN</label>
+                                    <input type="number" name="num_males"
+                                        class="block w-full text-center py-2.5 bg-white border border-gray-200 rounded-xl font-medium focus:ring-2 focus:ring-primary-500 focus:border-primary-500 gender-count transition-shadow"
+                                        value="0" min="0">
+                                </div>
+                                <div>
+                                    <label
+                                        class="block text-xs font-bold text-pink-500 mb-1.5 text-center">WOMEN</label>
+                                    <input type="number" name="num_females"
+                                        class="block w-full text-center py-2.5 bg-white border border-gray-200 rounded-xl font-medium focus:ring-2 focus:ring-primary-500 focus:border-primary-500 gender-count transition-shadow"
+                                        value="0" min="0">
+                                </div>
+                                <div>
+                                    <label
+                                        class="block text-xs font-bold text-purple-600 mb-1.5 text-center">OTHER</label>
+                                    <input type="number" name="num_others"
+                                        class="block w-full text-center py-2.5 bg-white border border-gray-200 rounded-xl font-medium focus:ring-2 focus:ring-primary-500 focus:border-primary-500 gender-count transition-shadow"
+                                        value="0" min="0">
+                                </div>
+                            </div>
+
+                            <button type="submit"
+                                class="w-full btn-modern bg-primary-500 hover:bg-primary-600 text-white px-6 py-4 rounded-xl font-bold text-lg shadow-glow transition-transform hover:-translate-y-1">
+                                Reserve Spot Now
+                            </button>
+                        </form>
+
+                        <!-- Math Logic JS preserved -->
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function () {
+                                const inputs = document.querySelectorAll('.gender-count');
+                                const totalInput = document.getElementById('id_num_people');
+
+                                function updateTotal() {
+                                    let total = 0;
+                                    inputs.forEach(input => {
+                                        total += parseInt(input.value) || 0;
+                                    });
+                                    totalInput.value = total || 1;
+                                }
+
+                                inputs.forEach(input => {
+                                    input.addEventListener('input', updateTotal);
+                                    input.addEventListener('change', updateTotal);
+                                });
+                            });
+                        </script>
+                        {% else %}
+                        <div class="bg-gray-50 border border-gray-200 rounded-xl p-4 text-center">
+                            <p class="text-sm font-medium text-gray-600">You are logged in as a <strong>{{
+                                    user.usertype|title }}</strong>.</p>
+                            <p class="text-xs text-gray-500 mt-1">Only Travelers can book trips.</p>
+                        </div>
+                        {% endif %}
+                        {% else %}
+                        <a href="{% url 'login' %}?next={{ request.path }}"
+                            class="w-full block text-center btn-modern bg-primary-500 text-white px-6 py-4 rounded-xl font-bold shadow-glow hover:-translate-y-1 transition-transform">
+                            Sign In To Book
+                        </a>
+                        {% endif %}
+                        {% endif %}
+                    </div>
+
+                    <!-- Crowd Peek Widget -->
+                    {% if crowd_peek.total_travelers > 0 %}
+                    <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+                        <h3 class="font-display font-bold text-lg text-gray-900 mb-4 flex items-center justify-between">
+                            <span class="flex items-center gap-2">
+                                <i class="fa-solid fa-users-rays text-primary-500"></i> Crowd Peek
+                            </span>
+                            <span class="bg-gray-100 text-gray-600 text-xs px-2.5 py-1 rounded-lg font-semibold">
+                                {{ crowd_peek.total_travelers }} Total
+                            </span>
+                        </h3>
+
+                        <!-- Rounded Progress Bar Segmented -->
+                        <div class="h-3 w-full bg-gray-100 rounded-full overflow-hidden flex mb-4">
+                            {% if crowd_peek.gender_distribution.MALE > 0 %}
+                            <div class="bg-blue-500 h-full transition-all duration-1000"
+                                style="width: {% widthratio crowd_peek.gender_distribution.MALE crowd_peek.total_travelers 100 %}%;">
+                            </div>
+                            {% endif %}
+                            {% if crowd_peek.gender_distribution.FEMALE > 0 %}
+                            <div class="bg-pink-500 h-full transition-all duration-1000"
+                                style="width: {% widthratio crowd_peek.gender_distribution.FEMALE crowd_peek.total_travelers 100 %}%;">
+                            </div>
+                            {% endif %}
+                            {% if crowd_peek.gender_distribution.OTHER > 0 %}
+                            <div class="bg-purple-500 h-full transition-all duration-1000"
+                                style="width: {% widthratio crowd_peek.gender_distribution.OTHER crowd_peek.total_travelers 100 %}%;">
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Legend -->
+                        <div class="flex flex-wrap gap-x-4 gap-y-2 mb-4">
+                            {% if crowd_peek.gender_distribution.MALE > 0 %}
+                            <div class="flex items-center gap-1.5 text-sm font-medium text-gray-600">
+                                <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
+                                {{ crowd_peek.gender_distribution.MALE }} Men
+                            </div>
+                            {% endif %}
+                            {% if crowd_peek.gender_distribution.FEMALE > 0 %}
+                            <div class="flex items-center gap-1.5 text-sm font-medium text-gray-600">
+                                <span class="w-2.5 h-2.5 rounded-full bg-pink-500"></span>
+                                {{ crowd_peek.gender_distribution.FEMALE }} Women
+                            </div>
+                            {% endif %}
+                            {% if crowd_peek.gender_distribution.OTHER > 0 %}
+                            <div class="flex items-center gap-1.5 text-sm font-medium text-gray-600">
+                                <span class="w-2.5 h-2.5 rounded-full bg-purple-500"></span>
+                                {{ crowd_peek.gender_distribution.OTHER }} Other
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        {% if crowd_peek.avg_age %}
+                        <div class="bg-gray-50 rounded-xl p-3 flex justify-between items-center border border-gray-100">
+                            <span
+                                class="text-xs font-bold text-gray-500 uppercase tracking-widest flex items-center gap-1.5">
+                                <i class="fa-solid fa-cake-candles text-primary-400"></i> Avg Age
+                            </span>
+                            <span class="font-bold text-gray-900">{{ crowd_peek.avg_age }} Years</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+
+                    <!-- Company / Host Widget -->
+                    <div class="bg-dark-900 rounded-3xl p-6 text-white relative overflow-hidden shadow-xl mt-6">
+                        <!-- Background glow -->
+                        <div
+                            class="absolute top-0 right-0 w-32 h-32 bg-primary-500/20 rounded-full blur-3xl -mr-10 -mt-10">
+                        </div>
+
+                        <div class="relative z-10 flex flex-col items-center text-center">
+                            <!-- Company Avatar block -->
+                            <div
+                                class="w-16 h-16 rounded-2xl bg-white text-dark-900 flex items-center justify-center font-display font-black text-2xl shadow-lg mb-4">
+                                {{ trip.company.company_name|slice:":1" }}
+                            </div>
+
+                            <h4 class="font-display font-bold text-xl mb-1">{{ trip.company.company_name }}</h4>
+                            <p class="text-xs text-gray-400 mb-4 font-medium uppercase tracking-widest">
+                                Host since {{ trip.company.date_joined|date:"Y" }}
+                            </p>
+
+                            <!-- Details Badges -->
+                            <div class="flex flex-col gap-2 mb-6 w-full max-w-[200px]">
+                                <div
+                                    class="flex items-center justify-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-1.5 text-sm">
+                                    <i class="fa-solid fa-star text-yellow-500"></i>
+                                    <span class="font-medium text-gray-100">{{ trip.company.get_company_rating }} / 5.0
+                                        Rating</span>
+                                </div>
+                                <div
+                                    class="flex items-center justify-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-1.5 text-sm">
+                                    <i class="fa-solid fa-shield-halved text-green-500"></i>
+                                    <span class="font-medium text-gray-100">Verified Host</span>
+                                </div>
+                            </div>
+
+                            <a href="mailto:{{ trip.company.email }}"
+                                class="w-full block bg-transparent hover:bg-white text-white hover:text-dark-900 border-2 border-white/30 hover:border-white font-bold py-3 px-6 rounded-xl transition-all duration-300">
+                                Contact Host
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Report Link -->
+                    <div class="text-center pt-2">
+                        <button type="button"
+                            class="text-xs text-gray-400 hover:text-red-500 font-medium transition-colors"
+                            onclick="document.getElementById('reportModal').classList.remove('hidden')">
+                            <i class="fa-regular fa-flag me-1"></i> Report this listing
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Modern Report Modal -->
+<div id="reportModal" class="fixed inset-0 z-[100] hidden">
+    <!-- Overlay -->
+    <div class="absolute inset-0 bg-dark-900/60 backdrop-blur-sm transition-opacity"
+        onclick="this.parentElement.classList.add('hidden')"></div>
+
+    <!-- Modal Content -->
+    <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
+        <div
+            class="relative bg-white rounded-3xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:max-w-md w-full border border-gray-100 animate-slide-up">
+            <form action="{% url 'submit_report' 'trip' trip.id %}" method="post">
+                {% csrf_token %}
+
+                <div class="bg-white px-8 pt-8 pb-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-2xl font-display font-bold text-gray-900">Report Listing</h3>
+                        <button type="button"
+                            class="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors"
+                            onclick="document.getElementById('reportModal').classList.add('hidden')">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+
+                    <p class="text-sm text-gray-500 mb-6 font-medium">
+                        Tell us why you are reporting this trip. We review all reports strictly within 24 hours.
+                    </p>
+
+                    <div class="space-y-5">
+                        <div>
+                            <label
+                                class="block text-xs font-bold text-gray-600 uppercase tracking-widest mb-2">Reason</label>
+                            <select name="reason"
+                                class="block w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl font-medium text-gray-900 focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-shadow appearance-none cursor-pointer"
+                                style="background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23666%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 1rem center; background-size: 0.65em auto;"
+                                required>
+                                <option value="SAFETY">Safety Violation</option>
+                                <option value="SCAM">Scam / Fraudulent</option>
+                                <option value="TOXIC_BEHAVIOR">Toxic Behavior</option>
+                                <option value="OTHER">Other Issue</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label
+                                class="block text-xs font-bold text-gray-600 uppercase tracking-widest mb-2">Details</label>
+                            <textarea name="details" rows="4"
+                                class="block w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl font-medium text-gray-900 focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-shadow placeholder-gray-400 resize-none"
+                                placeholder="Please provide specific details..." required></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 px-8 py-6 flex gap-3">
+                    <button type="button"
+                        class="w-1/2 px-4 py-3 bg-white border border-gray-200 text-gray-700 rounded-xl font-bold hover:bg-gray-50 transition-colors"
+                        onclick="document.getElementById('reportModal').classList.add('hidden')">
+                        Cancel
+                    </button>
+                    <button type="submit"
+                        class="w-1/2 px-4 py-3 bg-red-600 border border-transparent text-white rounded-xl font-bold hover:bg-red-700 shadow-md shadow-red-600/20 transition-all">
+                        Submit Report
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Image Lightbox Modal -->
+<div id="imageLightbox"
+    class="fixed inset-0 z-[110] hidden bg-black/95 backdrop-blur-md flex items-center justify-center p-4 transition-opacity duration-300 opacity-0"
+    onclick="closeLightbox()">
+    <!-- Close Button -->
+    <button
+        class="absolute top-6 right-6 text-white/70 hover:text-white bg-white/10 hover:bg-white/20 rounded-full w-12 h-12 flex items-center justify-center transition-all z-10"
+        onclick="closeLightbox(event)">
+        <i class="fa-solid fa-xmark text-2xl"></i>
+    </button>
+
+    <!-- Image Container -->
+    <div class="max-w-7xl max-h-[90vh] relative mt-10" onclick="event.stopPropagation()">
+        <img id="lightboxImage" src="" alt="Gallery Image Full"
+            class="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl transform scale-95 transition-transform duration-300">
+    </div>
+</div>
+
+<script>
+    function openLightbox(imageUrl) {
+        const lightbox = document.getElementById('imageLightbox');
+        const img = document.getElementById('lightboxImage');
+        img.src = imageUrl;
+        lightbox.classList.remove('hidden');
+
+        // Trigger animation
+        setTimeout(() => {
+            lightbox.classList.remove('opacity-0');
+            img.classList.remove('scale-95');
+            img.classList.add('scale-100');
+        }, 10);
+    }
+
+    function closeLightbox(event) {
+        if (event) event.stopPropagation();
+        const lightbox = document.getElementById('imageLightbox');
+        const img = document.getElementById('lightboxImage');
+
+        // Reverse animation
+        lightbox.classList.add('opacity-0');
+        img.classList.remove('scale-100');
+        img.classList.add('scale-95');
+
+        setTimeout(() => {
+            lightbox.classList.add('hidden');
+            img.src = '';
+        }, 300);
+    }
+
+    // Close lightbox on escape key
+    document.addEventListener('keydown', function (event) {
+        if (event.key === "Escape" && !document.getElementById('imageLightbox').classList.contains('hidden')) {
+            closeLightbox();
+        }
+    });
+</script>
+
+{% endblock %}

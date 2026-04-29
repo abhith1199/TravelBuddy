@@ -1,0 +1,1009 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Travel Buddy{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+        <link rel="stylesheet" href="{% static 'css/font-awesome.min.css' %}">
+        <link rel="stylesheet" href="{% static 'css/linearicons.css' %}">
+        <style>
+            /* cleaned stray property */
+
+        .navbar-nav .nav-link.active {
+            color: #ff5e14 !important;
+        }
+
+        /* Fix for potential white gap */
+        body {
+            padding-top: 0 !important;
+        }
+
+        /* BS5 Compatibility Layer (Injected to bypass cache) */
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            margin-right: -5px;
+            margin-left: -5px;
+        }
+
+        .form-row>.col,
+        .form-row>[class*="col-"] {
+            padding-right: 5px;
+            padding-left: 5px;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .text-right {
+            text-align: right !important;
+        }
+
+        .float-right {
+            float: right !important;
+        }
+
+        .float-left {
+            float: left !important;
+        }
+
+        .mr-auto {
+            margin-right: auto !important;
+        }
+
+        .ml-auto {
+            margin-left: auto !important;
+        }
+
+        /* Remove any body padding that might cause white space */
+        body {
+            padding-top: 0 !important;
+            margin: 0 !important;
+        }
+
+        /* Ensure banner fills to the top (no white gap) */
+        .banner-area {
+            margin-top: 0 !important;
+            padding-top: 0 !important;
+        }
+
+        /* Nav layout fix - FORCE HORIZONTAL */
+        .navbar-nav {
+            flex-direction: row !important;
+            display: flex !important;
+            align-items: center !important;
+        }
+
+        .navbar-collapse {
+            display: flex !important;
+            flex-basis: auto !important;
+        }
+
+        @media (max-width: 991px) {
+            .navbar-nav {
+                flex-direction: column !important;
+            }
+
+            .navbar-collapse {
+                display: none !important;
+                flex-basis: 100% !important;
+            }
+
+            .navbar-collapse.show {
+                display: flex !important;
+            }
+        }
+
+        /* Trip Cards */
+        .trip-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            margin-bottom: 30px;
+            height: 100%;
+        }
+
+        .trip-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .trip-image {
+            height: 200px;
+            width: 100%;
+            object-fit: cover;
+        }
+
+        .trip-content {
+            padding: 20px;
+        }
+
+        .trip-price {
+            color: #ff5e14;
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .trip-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            font-size: 14px;
+            color: #101010;
+        }
+
+        .trip-vibe {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .vibe-adventure {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .vibe-chill {
+            background: #e8f5e9;
+            color: #388e3c;
+        }
+
+        .vibe-party {
+            background: #fce4ec;
+            color: #c2185b;
+        }
+
+        .vibe-spiritual {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        .vibe-culture {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+
+        .capacity-bar {
+            height: 5px;
+            background: #eee;
+            border-radius: 3px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+
+        .capacity-fill {
+            height: 100%;
+            background: #4CAF50;
+            border-radius: 3px;
+        }
+
+        .btn-view {
+            background: #ff5e14;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 5px;
+            display: inline-block;
+            text-transform: uppercase;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-view:hover {
+            background: #e04e00;
+            color: white;
+            text-decoration: none;
+            transform: scale(1.05);
+        }
+        /* BS5 Compatibility Layer (Injected to bypass cache) */
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            margin-right: -5px;
+            margin-left: -5px;
+        }
+
+        .form-row>.col,
+        .form-row>[class*="col-"] {
+            padding-right: 5px;
+            padding-left: 5px;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .text-right {
+            text-align: right !important;
+        }
+
+        .float-right {
+            float: right !important;
+        }
+
+        .float-left {
+            float: left !important;
+        }
+
+        .mr-auto {
+            margin-right: auto !important;
+        }
+
+        .ml-auto {
+            margin-left: auto !important;
+        }
+
+        /* Remove any body padding that might cause white space */
+        body {
+            padding-top: 0 !important;
+            margin: 0 !important;
+        }
+
+        /* Ensure banner starts below navbar. padding-top handled dynamically so keep defaults minimal */
+        .banner-area {
+            margin-top: 0 !important;
+            padding-top: 0 !important;
+        }
+
+        /* Nav layout fix - FORCE HORIZONTAL */
+        .navbar-nav {
+            flex-direction: row !important;
+            display: flex !important;
+            align-items: center !important;
+        }
+
+        .navbar-collapse {
+            display: flex !important;
+            flex-basis: auto !important;
+        }
+
+        @media (max-width: 991px) {
+            .navbar-nav {
+                flex-direction: column !important;
+            }
+
+            .navbar-collapse {
+                display: none !important;
+                flex-basis: 100% !important;
+            }
+
+            .navbar-collapse.show {
+                display: flex !important;
+            }
+        }
+
+        /* Trip Cards */
+        .trip-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            margin-bottom: 30px;
+            height: 100%;
+        }
+
+        .trip-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .trip-image {
+            height: 200px;
+            width: 100%;
+            object-fit: cover;
+        }
+
+        .trip-content {
+            padding: 20px;
+        }
+
+        .trip-price {
+            color: #ff5e14;
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .trip-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            font-size: 14px;
+            color: #101010;
+        }
+
+        .trip-vibe {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .vibe-adventure {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .vibe-chill {
+            background: #e8f5e9;
+            color: #388e3c;
+        }
+
+        .vibe-party {
+            background: #fce4ec;
+            color: #c2185b;
+        }
+
+        .vibe-spiritual {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        .vibe-culture {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+
+        .capacity-bar {
+            height: 5px;
+            background: #eee;
+            border-radius: 3px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+
+        .capacity-fill {
+            height: 100%;
+            background: #4CAF50;
+            border-radius: 3px;
+        }
+
+        .btn-view {
+            background: #ff5e14;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 5px;
+            display: inline-block;
+            text-transform: uppercase;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-view:hover {
+            background: #e04e00;
+            color: white;
+            text-decoration: none;
+            transform: scale(1.05);
+        }
+
+        /* Feature Icons */
+        .feature-icon {
+            font-size: 40px;
+            color: #ff5e14;
+            margin-bottom: 15px;
+        }
+
+        /* Stats Cards */
+        .stats-card {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .stats-number {
+            font-size: 40px;
+            font-weight: 700;
+            color: #ff5e14;
+            margin-bottom: 10px;
+        }
+
+        /* User Badges */
+        .user-type-badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-top: 5px;
+        }
+
+        .badge-traveler {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .badge-company {
+            background: #e8f5e9;
+            color: #388e3c;
+        }
+
+        .badge-admin {
+            background: #fce4ec;
+            color: #c2185b;
+        }
+
+        /* Navbar Styles */
+        @media (min-width: 992px) {
+            .navbar-nav {
+                display: flex !important;
+                flex-direction: row !important;
+                align-items: center !important;
+                margin-left: auto !important;
+            }
+
+            .navbar-nav .nav-item {
+                margin: 0 10px !important;
+            }
+
+            .navbar-nav .nav-link {
+                color: rgba(255, 255, 255, 0.9) !important;
+                font-weight: 600 !important;
+                text-transform: uppercase;
+                padding: 25px 0 !important;
+                transition: all 0.3s ease;
+                font-size: 13px !important;
+                letter-spacing: 1px !important;
+            }
+        }
+
+        .navbar-nav .nav-link:hover {
+            color: #ff5e14 !important;
+            background: transparent !important;
+        }
+
+        .dropdown-menu {
+            margin-top: 0 !important;
+            border: none;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15) !important;
+            border-radius: 8px !important;
+            padding: 10px 0;
+            background: #fff !important;
+        }
+
+        .dropdown-item {
+            padding: 8px 20px;
+            color: #333;
+            transition: all 0.2s ease;
+        }
+
+        .dropdown-item:hover {
+            background: #ff5e14;
+            color: white;
+        }
+
+        .dropdown-item i {
+            margin-right: 8px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .dropdown-header {
+            padding: 10px 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #eee;
+        }
+
+        /* Testimonials */
+        .single-testimonial {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            height: 100%;
+        }
+
+        .testimonial-author h5 {
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        /* How It Works */
+        .single-how {
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            height: 100%;
+        }
+
+        @media (max-width: 991px) {
+            .navbar-collapse {
+                background: rgba(0, 0, 0, 0.9);
+                padding: 20px;
+                border-radius: 10px;
+                margin-top: 10px;
+            }
+
+            .navbar-nav .nav-item {
+                margin: 5px 0;
+            }
+
+            .dropdown-menu {
+                background: rgba(255, 255, 255, 0.95);
+                margin-left: 20px;
+            }
+
+            .navbar-nav.ml-auto {
+                margin-top: 10px;
+                border-top: 1px solid rgba(255, 255, 255, 0.1);
+                padding-top: 10px;
+            }
+        }
+
+        /* Footer */
+        .footer-area {
+            background-color: #1a1a1a !important;
+            color: #ddd !important;
+        }
+
+        .footer-area h6 {
+            color: #fff !important;
+            font-weight: 700 !important;
+        }
+
+        .footer-area p {
+            color: #bbb !important;
+        }
+
+        .footer-nav {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .footer-nav li {
+            margin-bottom: 8px;
+        }
+
+        .footer-nav a {
+            color: #aaa !important;
+            transition: color 0.3s ease;
+        }
+
+        .footer-nav a:hover {
+            color: #ff5e14 !important;
+            text-decoration: none;
+        }
+
+        .footer-social a {
+            width: 35px;
+            height: 35px;
+            line-height: 35px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            display: inline-block;
+            border-radius: 50%;
+            margin-right: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .footer-social a:hover {
+            background: #ff5e14;
+            color: #fff;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(255, 94, 20, 0.3);
+        }
+
+        /* PREMIUM ALERT SYSTEM (Bootstrap 5) */
+        .alert-toast-container {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            z-index: 9999;
+            width: 380px;
+            max-width: 90vw;
+            pointer-events: none;
+        }
+
+        .alert-premium {
+            pointer-events: auto;
+            border: none;
+            border-radius: 16px;
+            padding: 18px 25px;
+            margin-bottom: 15px;
+            background: white;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1), 0 5px 15px rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            position: relative;
+            overflow: hidden;
+            animation: alertSpringIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+            border-left: 5px solid #ff5e14;
+        }
+
+        .alert-premium.alert-success {
+            border-left-color: #2ecc71;
+        }
+
+        .alert-premium.alert-danger {
+            border-left-color: #e74c3c;
+        }
+
+        .alert-premium.alert-warning {
+            border-left-color: #f1c40f;
+        }
+
+        .alert-premium.alert-info {
+            border-left-color: #3498db;
+        }
+
+        .alert-premium .alert-icon {
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        .alert-success .alert-icon {
+            color: #2ecc71;
+        }
+
+        .alert-danger .alert-icon {
+            color: #e74c3c;
+        }
+
+        .alert-warning .alert-icon {
+            color: #f1c40f;
+        }
+
+        .alert-info .alert-icon {
+            color: #3498db;
+        }
+
+        .alert-premium .alert-content {
+            flex-grow: 1;
+            font-weight: 500;
+            font-size: 14px;
+            color: #2c3e50;
+        }
+
+        .alert-premium .btn-close {
+            background-size: 10px;
+            opacity: 0.5;
+            transition: 0.2s;
+        }
+
+        .alert-premium .btn-close:hover {
+            opacity: 1;
+            transform: rotate(90deg);
+        }
+
+        @keyframes alertSpringIn {
+            0% {
+                opacity: 0;
+                transform: translateX(100%) scale(0.9);
+            }
+
+            70% {
+                transform: translateX(-10px) scale(1.02);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+            }
+        }
+
+        @keyframes alertFadeOut {
+            from {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+            to {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+        }
+
+        /* Mobile Menu Refinements */
+        @media (max-width: 991px) {
+            .navbar-collapse {
+                background: rgba(0, 0, 0, 0.95);
+                backdrop-filter: blur(10px);
+                margin: 15px -15px 0;
+                padding: 20px;
+                border-radius: 15px;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            .navbar-nav .nav-link {
+                padding: 12px 0 !important;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            }
+
+            .navbar-nav .nav-link::after {
+                display: none;
+            }
+
+            .navbar-toggler {
+                border: none !important;
+                padding: 0 !important;
+            }
+
+            .navbar-toggler:focus {
+                box-shadow: none !important;
+            }
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body class="{% block body_class %}{% endblock %}">
+    {% block navbar %}
+    <!-- Start Header Area -->
+    <header
+        class="default-header {% if request.path == '/' or is_home or transparent_nav %}transparent{% endif %}{% block transparent_nav %}{% endblock %}">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-transparent">
+            <div class="container">
+                <a class="navbar-brand" href="{% url 'index' %}">
+                    <div class="d-flex align-items-center">
+                        <i class="fa fa-suitcase text-white me-2" style="font-size: 28px;"></i>
+                        <span class="text-white" style="font-size: 24px; font-weight: 700; letter-spacing: 1px;">
+                            Travel Buddy
+                        </span>
+                    </div>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="text-white lnr lnr-menu"></span>
+                </button>
+
+
+
+                <div class="collapse navbar-collapse justify-content-between align-items-center"
+                    id="navbarSupportedContent">
+                    <!-- Center-aligned navigation items -->
+                    <ul class="navbar-nav mx-auto">
+                        <li class="nav-item"><a class="nav-link" href="{% url 'index' %}">HOME</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'browse_trips' %}">BROWSE TRIPS</a>
+                        </li>
+
+                        {% if user.is_authenticated %}
+                        {% if user.usertype == 'traveler' %}
+                        <li class="nav-item"><a class="nav-link" href="{% url 'my_bookings' %}">MY BOOKINGS</a></li>
+                        {% elif user.usertype == 'company' %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="companyDropdown" role="button"
+                                data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                COMPANY
+                            </a>
+                            <ul class="dropdown-menu border-0 shadow-sm" aria-labelledby="companyDropdown">
+                                <li><a class="dropdown-item" href="{% url 'company_dashboard' %}">Dashboard</a></li>
+                                <li><a class="dropdown-item" href="{% url 'create_trip' %}">Create Trip</a></li>
+                                <li><a class="dropdown-item" href="{% url 'manage_trips' %}">Manage Trips</a></li>
+                                <li><a class="dropdown-item" href="{% url 'view_bookings' %}">View Bookings</a></li>
+                                <li><a class="dropdown-item" href="{% url 'company_profile' %}">Profile</a></li>
+                            </ul>
+                        </li>
+                        {% elif user.is_superuser or user.usertype == 'admin' %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button"
+                                data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                ADMIN
+                            </a>
+                            <ul class="dropdown-menu border-0 shadow-sm" aria-labelledby="adminDropdown">
+                                <li><a class="dropdown-item" href="{% url 'admin_dashboard' %}">Dashboard</a></li>
+                                <li><a class="dropdown-item" href="{% url 'admin_trip_management' %}">Trips</a></li>
+                                <li><a class="dropdown-item"
+                                        href="{% url 'admin_verification_management' %}">Verifications</a></li>
+                                <li><a class="dropdown-item" href="{% url 'admin_user_management' %}">Users</a></li>
+                            </ul>
+                        </li>
+                        {% endif %}
+                        {% endif %}
+
+
+
+
+                        <!-- Account Dropdown - Now inline with other nav items -->
+                        <!-- Account Section -->
+                        {% if user.is_authenticated %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                                data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                {% if user.usertype == 'company' and user.company_name %}
+                                {{ user.company_name|upper }}
+                                {% else %}
+                                {{ user.username|upper }}
+                                {% endif %}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end border-0 shadow-sm"
+                                aria-labelledby="userDropdown">
+                                <li><a class="dropdown-item" href="{% url 'profile' %}"><i class="fa fa-user"></i>
+                                        Profile</a></li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li><a class="dropdown-item" href="{% url 'logout' %}"><i class="fa fa-sign-out"></i>
+                                        Logout</a></li>
+                            </ul>
+                        </li>
+                        {% else %}
+                        <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">LOGIN</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'register' %}">REGISTER</a></li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+    {% endblock %}
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Unified Premium Toast Container -->
+        {% if messages %}
+        <div class="alert-toast-container">
+            {% for message in messages %}
+            <div class="alert-premium alert-{{ message.tags|default:'info' }}" role="alert">
+                <div class="alert-icon">
+                    {% if message.tags == 'success' %}<i class="fa-solid fa-circle-check"></i>
+                    {% elif message.tags == 'danger' %}<i class="fa-solid fa-triangle-exclamation"></i>
+                    {% elif message.tags == 'warning' %}<i class="fa-solid fa-circle-exclamation"></i>
+                    {% else %}<i class="fa-solid fa-circle-info"></i>{% endif %}
+                </div>
+                <div class="alert-content">
+                    {{ message }}
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </div>
+
+    {% block footer %}
+    <!-- start footer Area -->
+    <footer class="footer-area section-gap">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-5 col-md-6 col-sm-6">
+                    <div class="single-footer-widget">
+                        <h6>About Travel Buddy</h6>
+                        <p>
+                            Connecting travelers with verified travel companies for unforgettable group adventures.
+                            We focus on balanced group dynamics, authentic experiences, and safe travel.
+                        </p>
+                        <p class="footer-text">Copyright &copy;
+                            <script>document.write(new Date().getFullYear());</script> Travel Buddy |
+                            All rights reserved
+                        </p>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-6 col-sm-6">
+                    <div class="single-footer-widget">
+                        <h6>Quick Links</h6>
+                        <ul class="footer-nav">
+                            <li><a href="{% url 'index' %}">Home</a></li>
+                            <li><a href="{% url 'browse_trips' %}">Browse Trips</a></li>
+                            <li><a href="#about">About Us</a></li>
+                            <li><a href="#contact">Contact</a></li>
+                            <li><a href="{% url 'register' %}">Register</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-6 col-sm-6">
+                    <div class="single-footer-widget">
+                        <h6>For Companies</h6>
+                        <ul class="footer-nav">
+                            <li><a href="{% url 'register' %}">Register Company</a></li>
+                            <li><a href="#features">Features</a></li>
+                            <li><a href="#stats">Benefits</a></li>
+                            <li><a href="#contact">Contact Sales</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 col-sm-6">
+                    <div class="single-footer-widget">
+                        <h6>Newsletter</h6>
+                        <p>Stay updated with new trips and offers</p>
+                        <div class="footer-social d-flex align-items-center mt-3">
+                            <a href="#"><i class="fa fa-facebook"></i></a>
+                            <a href="#"><i class="fa fa-twitter"></i></a>
+                            <a href="#"><i class="fa fa-instagram"></i></a>
+                            <a href="#"><i class="fa fa-linkedin"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <!-- End footer Area -->
+    {% endblock %}
+
+    <script src="{% static 'js/vendor/jquery-2.2.4.min.js' %}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js"
+        integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4"
+        crossorigin="anonymous"></script>
+    <script src="{% static 'js/vendor/bootstrap.min.js' %}"></script>
+    <script src="{% static 'js/jquery.ajaxchimp.min.js' %}"></script>
+    <script src="{% static 'js/jquery.magnific-popup.min.js' %}"></script>
+    <script src="{% static 'js/owl.carousel.min.js' %}"></script>
+    <script src="{% static 'js/jquery.sticky.js' %}"></script>
+    <script src="{% static 'js/slick.js' %}"></script>
+    <script src="{% static 'js/jquery.counterup.min.js' %}"></script>
+    <script src="{% static 'js/waypoints.min.js' %}"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+    <script>
+        $(document).ready(function () {
+            // Counter animation for stats
+            $('.counter').counterUp({
+                delay: 10,
+                time: 1000
+            });
+
+            // Contact form submission
+            $('#contactForm').submit(function (e) {
+                e.preventDefault();
+                alert('Thank you for your message! We will get back to you soon.');
+                this.reset();
+            });
+
+            // Smooth scrolling for anchor links
+            $('a[href^="#"]').on('click', function (event) {
+                var target = $(this.getAttribute('href'));
+                if (target.length) {
+                    event.preventDefault();
+                    $('html, body').stop().animate({
+                        scrollTop: target.offset().top - 70
+                    }, 1000);
+                }
+            });
+        });
+    </script>
+
+    {% block extra_js %}{% endblock %}
+    <!-- Auto-hide alerts script -->
+    <script>
+        $(document).ready(function () {
+            // Auto-hide alert toasts after 5 seconds
+            setTimeout(function () {
+                $('.alert-premium').each(function () {
+                    let alert = bootstrap.Alert.getOrCreateInstance(this);
+                    $(this).css('animation', 'alertFadeOut 0.5s ease forwards');
+                    setTimeout(() => alert.close(), 500);
+                });
+            }, 5000);
+        });
+    </script>
+
+    <!-- Layout fix: ensure page content is offset by header height to prevent overlap -->
+    <script>
+        (function () {
+            function adjustContentOffset() {
+                var header = document.querySelector('.default-header');
+                var main = document.querySelector('.main-content');
+                if (!header) return;
+                var h = header.offsetHeight || 0;
+                if (main) {
+                    main.style.paddingTop = h + 'px';
+                } else {
+                    document.body.style.paddingTop = h + 'px';
+                }
+            }
+
+            document.addEventListener('DOMContentLoaded', adjustContentOffset);
+            window.addEventListener('resize', adjustContentOffset);
+        })();
+    </script>
+</body>
+
+</html>

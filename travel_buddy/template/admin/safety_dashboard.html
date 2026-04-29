@@ -1,0 +1,296 @@
+{% extends 'admin/base.html' %}
+{% load static %}
+
+{% block title %}Safety Sentinel - Travel Buddy{% endblock %}
+
+{% block breadcrumb %}Safety & Compliance{% endblock %}
+
+{% block content %}
+<div class="dashboard-content">
+    <!-- Safety Header -->
+    <div class="row align-items-center mb-4">
+        <div class="col">
+            <h1 class="h2 fw-bold mb-1">Safety Sentinel</h1>
+            <p class="text-muted mb-0">Platform Threat Detection and Emergency Response Console</p>
+        </div>
+        <div class="col-auto">
+            <button class="btn btn-light border" onclick="location.reload()">
+                <i class="fa-solid fa-radar me-2"></i>Scan for Threats
+            </button>
+        </div>
+    </div>
+
+    <!-- Minimalist Search Console -->
+    <div class="card border-0 shadow-sm mb-4" style="border-radius: 12px; overflow: hidden;">
+        <div class="card-body p-3 bg-white">
+            <div class="row align-items-center">
+                <div class="col">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0 text-muted"><i
+                                class="fa-solid fa-magnifying-glass"></i></span>
+                        <input type="text" id="reportSearchInput" class="form-control border-start-0 ps-0"
+                            placeholder="Identify threat by reporter, reason, or object identity...">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Threat Data Table -->
+    <div class="card border-0 shadow-sm animate-in"
+        style="border-radius: 12px; overflow: hidden; animation-delay: 0.5s;">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0" id="reportsTable">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="ps-4 border-0 text-muted small fw-bold py-3">THREAT TARGET</th>
+                        <th class="border-0 text-muted small fw-bold py-3">REASON / SIGNALS</th>
+                        <th class="border-0 text-muted small fw-bold py-3">SOURCE REPORTER</th>
+                        <th class="border-0 text-muted small fw-bold py-3">DETECTION DATE</th>
+                        <th class="pe-4 border-0 text-muted small fw-bold text-end py-3">RESPONSE</th>
+                    </tr>
+                </thead>
+                <tbody class="border-top-0">
+                    {% for report in reports %}
+                    <tr class="report-row border-bottom">
+                        <td class="ps-4 py-3">
+                            <div class="d-flex align-items-center">
+                                <div class="avatar-box me-3">
+                                    <div class="rounded-circle bg-danger-subtle text-danger d-flex align-items-center justify-content-center"
+                                        style="width: 40px; height: 40px;">
+                                        <i class="fa-solid fa-user-slash"></i>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="fw-bold text-dark" style="font-size: 0.95rem;">{{ report.reported_object }}</div>
+                                    <div class="text-muted x-small text-uppercase">{{ report.content_type.model }} #{{ report.object_id }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge bg-danger-subtle text-danger px-3 rounded-pill fw-bold"
+                                style="font-size: 0.7rem;">{{ report.get_reason_display }}</span>
+                            <div class="text-muted small mt-1 text-truncate" style="max-width: 200px;"
+                                title="{{ report.details }}">
+                                {{ report.details|default:"No telemetry provided" }}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center me-2"
+                                    style="width: 28px; height: 28px; font-size: 0.8rem;">
+                                    {{ report.reporter.username|make_list|first|upper }}
+                                </div>
+                                <span class="text-dark small">{{ report.reporter.username }}</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="text-dark small">{{ report.created_at|date:"d M Y" }}</div>
+                            <div class="text-muted x-small">{{ report.created_at|date:"H:i" }}</div>
+                        </td>
+                        <td class="pe-4 text-end">
+                            <div class="btn-group">
+                                <button class="btn btn-sm btn-light border view-report-btn"
+                                    data-reported="{{ report.reported_object }}"
+                                    data-type="{{ report.content_type.model|title }}" data-id="{{ report.object_id }}"
+                                    data-reason="{{ report.get_reason_display }}"
+                                    data-details="{{ report.details|default:''|safe }}"
+                                    data-reporter="{{ report.reporter.username }}"
+                                    data-date="{{ report.created_at|date:'d M Y / H:i' }}"
+                                    title="Inspect Threat Content">
+                                    <i class="fa-solid fa-eye text-primary"></i>
+                                </button>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center py-5">
+                            <div class="mb-3">
+                                <i class="fa-solid fa-shield-heart text-success opacity-25"
+                                    style="font-size: 3rem;"></i>
+                            </div>
+                            <h5 class="text-muted fw-normal">Threat landscape crystal clear</h5>
+                            <p class="small text-muted mb-0">No active threats detected on the perimeter</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Logic -->
+<div class="modal fade" id="viewReportModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
+            <div class="modal-header bg-danger text-white border-0 py-3 px-4" style="border-radius: 16px 16px 0 0;">
+                <h5 class="modal-title fw-bold">
+                    <i class="fa-solid fa-tower-observation me-2"></i>Threat Intelligence Audit
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4" id="reportDetailsBody">
+                <!-- Content will follow the Identity Console pattern -->
+            </div>
+            <div class="modal-footer border-0 p-4 pt-0">
+                <button type="button" class="btn btn-light rounded-pill px-4 fw-bold" data-bs-dismiss="modal">Close
+                    Terminal</button>
+                <div class="ms-auto">
+                    <span class="badge bg-danger-subtle text-danger px-3 py-2 rounded-pill fw-bold"
+                        style="font-size: 0.7rem;">ACTION PENDING</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .stat-card {
+        padding: 1.5rem;
+        border-radius: 16px;
+        background: white;
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        margin-bottom: 1rem;
+    }
+
+    .stat-card.primary .stat-icon {
+        background: rgba(79, 70, 229, 0.1);
+        color: #4f46e5;
+    }
+
+    .stat-card.success .stat-icon {
+        background: rgba(16, 185, 129, 0.1);
+        color: #10b981;
+    }
+
+    .stat-card.warning .stat-icon {
+        background: rgba(245, 158, 11, 0.1);
+        color: #f59e0b;
+    }
+
+    .stat-card.danger .stat-icon {
+        background: rgba(239, 68, 68, 0.1);
+        color: #ef4444;
+    }
+
+    .stat-label {
+        color: #6b7280;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+
+    .stat-value {
+        color: #111827;
+        font-size: 1.5rem;
+        font-weight: 700;
+    }
+
+    .report-row {
+        transition: all 0.2s;
+    }
+
+    .report-row:hover {
+        background-color: rgba(239, 68, 68, 0.02) !important;
+    }
+
+    .x-small {
+        font-size: 0.75rem;
+    }
+
+    .animate-in {
+        animation: fadeInSlideUp 0.5s ease forwards;
+        opacity: 0;
+    }
+
+    @keyframes fadeInSlideUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .btn-group .btn {
+        border-radius: 8px !important;
+        margin: 0 2px;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const searchInput = document.getElementById('reportSearchInput');
+        const rows = document.querySelectorAll('.report-row');
+        searchInput.addEventListener('input', function () {
+            const term = this.value.toLowerCase().trim();
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(term) ? '' : 'none';
+            });
+        });
+
+        const viewReportModal = new bootstrap.Modal(document.getElementById('viewReportModal'));
+        const bodyEl = document.getElementById('reportDetailsBody');
+
+        document.querySelectorAll('.view-report-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const data = this.dataset;
+
+                bodyEl.innerHTML = `
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <label class="text-muted small fw-bold text-uppercase mb-2 d-block">Threat Target</label>
+                        <div class="bg-light p-3 rounded-3">
+                            <div class="fw-bold text-dark">${data.reported}</div>
+                            <div class="text-muted x-small text-uppercase">${data.type} ID: #${data.id}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="text-muted small fw-bold text-uppercase mb-2 d-block">Source Intelligence</label>
+                        <div class="bg-light p-3 rounded-3">
+                            <div class="text-dark small"><i class="fa-solid fa-user me-2 opacity-50"></i>Reporter: @${data.reporter}</div>
+                            <div class="text-muted x-small mt-1"><i class="fa-solid fa-clock me-2 opacity-50"></i>Logged: ${data.date}</div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <label class="text-muted small fw-bold text-uppercase mb-2 d-block">Report Integrity & Signals</label>
+                        <div class="bg-light p-3 rounded-3">
+                            <div class="badge bg-danger-subtle text-danger px-3 rounded-pill mb-2">${data.reason}</div>
+                            <p class="text-dark mb-0" style="white-space: pre-wrap;">${data.details || 'No additional telemetry shared.'}</p>
+                        </div>
+                    </div>
+                </div>`;
+
+                viewReportModal.show();
+            });
+        });
+    });
+</script>
+{% endblock %}

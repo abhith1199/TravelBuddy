@@ -1,0 +1,154 @@
+{% extends 'base_modern.html' %}
+{% load static %}
+
+{% block title %}Review Your Trip - Travel Buddy{% endblock %}
+
+{% block content %}
+<!-- Review Hero -->
+<section class="relative bg-dark-900 pt-16 pb-32 overflow-hidden">
+    <div class="absolute inset-0 z-0 opacity-20 bg-[url('{% static 'img/pattern.svg' %}')] bg-repeat"></div>
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 relative z-10 text-center animate-slide-up">
+        <span
+            class="inline-block py-1 px-3 rounded-full bg-primary-500 text-white text-[10px] font-black tracking-widest uppercase mb-6 shadow-glow">
+            Trip Feedback
+        </span>
+        <h1 class="font-display text-4xl md:text-5xl font-black text-white mb-4 tracking-tight drop-shadow-xl">Share
+            Your Experience</h1>
+        <p class="text-gray-300 text-lg max-w-2xl mx-auto">Your insights help our community find the best adventures and
+            empower organizers to craft better journeys.</p>
+    </div>
+</section>
+
+<!-- Review Form Area -->
+<section class="max-w-3xl mx-auto px-4 sm:px-6 relative z-20 -mt-16 pb-24">
+    <div class="bg-white rounded-[2rem] shadow-xl border border-gray-100 overflow-hidden animate-slide-up"
+        style="animation-delay: 150ms;">
+
+        <!-- Trip Info Banner -->
+        <div class="p-6 bg-gray-50 border-b border-gray-100 flex items-center gap-5">
+            <div class="w-16 h-16 rounded-2xl overflow-hidden flex-shrink-0 shadow-sm">
+                {% if booking.trip.images.first %}
+                <img src="{{ booking.trip.images.first.image.url }}" alt="{{ booking.trip.title }}"
+                    class="w-full h-full object-cover">
+                {% else %}
+                <img src="{% static 'img/slider1.jpg' %}" alt="Trip" class="w-full h-full object-cover">
+                {% endif %}
+            </div>
+            <div>
+                <h3 class="font-display font-bold text-xl text-gray-900 leading-tight mb-1">{{ booking.trip.title }}
+                </h3>
+                <div class="text-xs font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1.5">
+                    <i class="fa-regular fa-calendar text-primary-500"></i>
+                    Traveled {{ booking.trip.start_date|date:"F Y" }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Form Body -->
+        <form method="post" class="p-8 md:p-10 space-y-10">
+            {% csrf_token %}
+
+            <!-- Overall Rating Custom Star Widget -->
+            <div class="text-center bg-gray-50 p-8 rounded-3xl border border-gray-100">
+                <h2 class="font-display font-bold text-xl text-gray-900 mb-6">How was your overall experience?</h2>
+                <div class="flex flex-row-reverse justify-center items-center gap-2 group review-stars">
+                    <!-- Right to Left for CSS adjacent sibling selector -->
+                    {% for i in "54321" %}
+                    {% if forloop.last %}
+                    <input type="radio" name="rating_overall" id="star{{ i }}" value="{{ i }}" class="hidden peer"
+                        checked>
+                    {% else %}
+                    <input type="radio" name="rating_overall" id="star{{ i }}" value="{{ i }}" class="hidden peer">
+                    {% endif %}
+                    <label for="star{{ i }}"
+                        class="text-4xl text-gray-300 cursor-pointer transition-all duration-200 peer-checked:text-yellow-400 hover:text-yellow-400 peer-checked:scale-110 hover:scale-110">
+                        <i class="fa-solid fa-star"></i>
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Specific Ratings -->
+            <div>
+                <h3 class="font-display font-bold text-lg text-gray-900 mb-5 border-b border-gray-100 pb-3">Detailed
+                    Ratings</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Social -->
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2"><i
+                                class="fa-solid fa-users text-primary-500 mr-1"></i> Social Vibe</label>
+                        <select name="rating_social"
+                            class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm font-medium text-gray-700 outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-100 transition-all appearance-none cursor-pointer">
+                            <option value="5">⭐⭐⭐⭐⭐ Excellent</option>
+                            <option value="4">⭐⭐⭐⭐ Great</option>
+                            <option value="3" selected>⭐⭐⭐ Good</option>
+                            <option value="2">⭐⭐ Average</option>
+                            <option value="1">⭐ Poor</option>
+                        </select>
+                    </div>
+                    <!-- Logistics -->
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2"><i
+                                class="fa-solid fa-route text-primary-500 mr-1"></i> Logistics</label>
+                        <select name="rating_logistics"
+                            class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm font-medium text-gray-700 outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-100 transition-all appearance-none cursor-pointer">
+                            <option value="5">⭐⭐⭐⭐⭐ Seamless</option>
+                            <option value="4">⭐⭐⭐⭐ Smooth</option>
+                            <option value="3" selected>⭐⭐⭐ Okay</option>
+                            <option value="2">⭐⭐ Bumpy</option>
+                            <option value="1">⭐ Problematic</option>
+                        </select>
+                    </div>
+                    <!-- Safety -->
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2"><i
+                                class="fa-solid fa-shield-halved text-primary-500 mr-1"></i> Safety</label>
+                        <select name="rating_safety"
+                            class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm font-medium text-gray-700 outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-100 transition-all appearance-none cursor-pointer">
+                            <option value="5">⭐⭐⭐⭐⭐ Very Safe</option>
+                            <option value="4">⭐⭐⭐⭐ Safe</option>
+                            <option value="3" selected>⭐⭐⭐ Standard</option>
+                            <option value="2">⭐⭐ Uncertain</option>
+                            <option value="1">⭐ Sketchy</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Written Review -->
+            <div>
+                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-3"><i
+                        class="fa-solid fa-pen-nib text-primary-500 mr-1"></i> Written Review</label>
+                <textarea name="comment" rows="5"
+                    class="w-full bg-white border border-gray-200 rounded-2xl px-5 py-4 text-sm font-medium text-gray-700 outline-none focus:border-primary-500 focus:ring-4 focus:ring-primary-50 transition-all resize-none"
+                    placeholder="What were the highlights? How was the host? Would you recommend this trip?"></textarea>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-gray-100">
+                <a href="{% url 'my_bookings' %}"
+                    class="text-sm font-bold text-gray-400 hover:text-gray-600 transition-colors order-2 sm:order-1">
+                    Cancel Review
+                </a>
+                <button type="submit"
+                    class="w-full sm:w-auto bg-primary-500 hover:bg-primary-600 text-white px-8 py-3.5 rounded-xl font-bold text-sm shadow-glow transition-all hover:-translate-y-1 order-1 sm:order-2 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-paper-plane text-white/80"></i> Publish Review
+                </button>
+            </div>
+        </form>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Style for star hover effects */
+    .review-stars label:hover,
+    .review-stars label:hover~label,
+    .review-stars input:checked~label {
+        color: #facc15;
+        /* Tailwind yellow-400 */
+    }
+</style>
+{% endblock %}

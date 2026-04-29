@@ -1,0 +1,94 @@
+\documentclass[tikz,border=10pt]{standalone}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,shapes,fit,calc}
+
+\begin{document}
+\begin{tikzpicture}[
+  font=\sffamily,
+  actor/.style={draw,rectangle,minimum width=2.8cm,minimum height=1.0cm,align=center},
+  mainproc/.style={draw,ellipse,minimum width=3.2cm,minimum height=1.0cm,align=center},
+  subproc/.style={draw,ellipse,minimum width=2.6cm,minimum height=0.9cm,align=center,font=\small},
+  datastore/.style={draw,rectangle,minimum width=2.0cm,minimum height=0.8cm,align=center},
+  arr/.style={-{Stealth[length=2.5mm,width=1.8mm]},line width=0.7pt},
+  lab/.style={font=\footnotesize,midway,fill=white,inner sep=1pt}
+]
+
+% Left: External Actor
+\node[actor] (actor) {Traveler};
+
+% Main Process 1: Manage Trip
+\node[mainproc, right=2.6cm of actor, yshift=1.2cm] (mp1) {Manage Trip\\2.2};
+
+% Sub-processes of Manage Trip (arranged in vertical cluster)
+\node[subproc, right=2.8cm of mp1, yshift=20pt] (p221) {View Trips\\2.2.1};
+\node[subproc, right=2.8cm of mp1, yshift=-5pt] (p222) {Book Trip\\2.2.2};
+\node[subproc, right=2.8cm of mp1, yshift=-30pt] (p223) {Manage Bookings\\2.2.3};
+\node[subproc, right=2.8cm of mp1, yshift=-55pt] (p224) {Trip Communication\\2.2.4};
+
+% Sub-process: Submit Review (separate column)
+\node[subproc, right=5.4cm of mp1, yshift=20pt] (p225) {Submit Review\\2.2.5};
+
+% Sub-process: Search Trip
+\node[subproc, right=2.8cm of mp1, yshift=-80pt] (p226) {Search Trip\\2.2.6};
+
+% Main Process 2: Profile Settings
+\node[mainproc, right=2.6cm of actor, yshift=-2.2cm] (mp2) {Profile Settings\\2.3};
+
+% Sub-processes of Profile Settings
+\node[subproc, right=2.8cm of mp2, yshift=8pt] (p331) {Change Username\\2.3.1};
+\node[subproc, right=2.8cm of mp2, yshift=-20pt] (p332) {Change Password\\2.3.2};
+
+% Data stores (far right)
+\node[datastore, right=5.4cm of p221, yshift=40pt] (ds_trips) {Trips};
+\node[datastore, right=5.4cm of p222, yshift=5pt] (ds_bookings) {Bookings};
+\node[datastore, right=5.4cm of p224, yshift=-30pt] (ds_chats) {Chats};
+\node[datastore, right=5.4cm of p225, yshift=5pt] (ds_reviews) {Reviews};
+\node[datastore, right=5.4cm of p331, yshift=30pt] (ds_users) {Users};
+\node[datastore, right=5.4cm of p332, yshift=-20pt] (ds_notif) {Notifications};
+
+% Arrows: Actor -> Main processes
+\draw[arr] (actor.east) -- ($(mp1.west)-(0.3,0)$) node[lab,left]{Trip requests};
+\draw[arr] (actor.east) -- ($(mp2.west)-(0.3,0)$) node[lab,left]{Profile updates};
+
+% Arrows: Main -> Sub (Manage Trip)
+\draw[arr] (mp1.east) -- (p221.west);
+\draw[arr] (mp1.east) -- (p222.west);
+\draw[arr] (mp1.east) -- (p223.west);
+\draw[arr] (mp1.east) -- (p224.west);
+\draw[arr] (mp1.east) -- (p225.west);
+\draw[arr] (mp1.east) -- (p226.west);
+
+% Arrows: Main -> Sub (Profile Settings)
+\draw[arr] (mp2.east) -- (p331.west);
+\draw[arr] (mp2.east) -- (p332.west);
+
+% Arrows: Sub -> Data stores (Manage Trip)
+\draw[arr] (p221.east) -- (ds_trips.west) node[lab,above]{Get trips};
+\draw[arr] (ds_trips.west) -- (p221.east) node[lab,below]{Trips data};
+
+\draw[arr] (p222.east) -- (ds_bookings.west) node[lab,above]{Create booking};
+\draw[arr] (ds_bookings.west) -- (p222.east) node[lab,below]{Booking status};
+
+\draw[arr] (p223.east) -- (ds_bookings.west) node[lab]{Modify / Cancel};
+
+\draw[arr] (p224.east) -- (ds_chats.west) node[lab,above]{Store messages};
+\draw[arr] (ds_chats.west) -- (p224.east) node[lab,below]{Chat history};
+
+\draw[arr] (p225.east) -- (ds_reviews.west) node[lab]{Submit review};
+\draw[arr] (ds_reviews.west) -- (p225.east) node[lab]{Review status};
+
+\draw[arr] (p226.east) -- (ds_trips.west) node[lab,above]{Search query};
+\draw[arr] (ds_trips.west) -- (p226.east) node[lab,below]{Matching trips};
+
+% Arrows: Sub -> Data stores (Profile Settings)
+\draw[arr] (p331.east) -- (ds_users.west) node[lab,above]{Update username};
+\draw[arr] (ds_users.west) -- (p331.east) node[lab,below]{Status};
+
+\draw[arr] (p332.east) -- (ds_users.west) node[lab,above]{Change password};
+\draw[arr] (ds_users.west) -- (p332.east) node[lab,below]{Status};
+
+% Notifications for booking events
+\draw[arr] (p222.south) to[out=-45,in=180] (ds_notif.west) node[lab,below]{Booking notification};
+
+\end{tikzpicture}
+\end{document}

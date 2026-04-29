@@ -1,0 +1,248 @@
+{% extends 'company/base_company.html' %}
+
+{% block title %}Company Verification - Travel Buddy{% endblock %}
+
+{% block company_content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="fw-bold">Company Verification</h1>
+                <div>
+                    <span class="badge bg-warning fs-6">Pending Verification</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-lg">
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        <i class="fas fa-shield-alt text-warning fs-1 mb-3"></i>
+                        <h3 class="fw-bold">Complete Company Verification</h3>
+                        <p class="text-muted">Submit your verification documents to start creating amazing trips</p>
+                    </div>
+
+
+
+                    <!-- Verification Status Alert -->
+                    <div class="alert alert-info" role="alert">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Verification Required:</strong> Your company account is currently pending verification.
+                        Please complete the form below and upload required documents to proceed.
+                    </div>
+
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+
+                        <!-- License Information -->
+                        <div class="card mb-4">
+                            <div class="card-header bg-warning text-dark">
+                                <h5 class="mb-0"><i class="fas fa-certificate me-2"></i>License Information</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="tourismLicenseNumber" class="form-label">Tourism/Travel License
+                                            Number *</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-id-card"></i></span>
+                                            <input type="text" class="form-control" id="tourismLicenseNumber"
+                                                name="tourismLicenseNumber"
+                                                placeholder="Enter your tourism license number" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6 mb-3">
+                                        <label for="gstNumber" class="form-label">GST Number (Optional)</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-receipt"></i></span>
+                                            <input type="text" class="form-control" id="gstNumber" name="gstNumber"
+                                                placeholder="Enter GST number if applicable">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="licenseDocument" class="form-label">License Document Upload
+                                            *</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-file-upload"></i></span>
+                                            <input type="file" class="form-control" id="licenseDocument"
+                                                name="licenseDocument" accept=".pdf,.jpg,.jpeg,.png" required>
+                                        </div>
+                                        <div class="form-text">Upload your tourism/travel license document (PDF, JPG,
+                                            PNG)</div>
+                                    </div>
+
+                                    <div class="col-md-6 mb-3">
+                                        <label for="governmentId" class="form-label">Government ID Upload *</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-id-badge"></i></span>
+                                            <input type="file" class="form-control" id="governmentId"
+                                                name="governmentId" accept=".pdf,.jpg,.jpeg,.png" required>
+                                        </div>
+                                        <div class="form-text">Upload authorized person government ID (PDF, JPG, PNG)
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Business Details -->
+                        <div class="card mb-4">
+                            <div class="card-header bg-info text-white">
+                                <h5 class="mb-0"><i class="fas fa-briefcase me-2"></i>Business Details</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="businessType" class="form-label">Business Type *</label>
+                                        <select class="form-select" id="businessType" name="businessType" required>
+                                            <option value="">Select business type</option>
+                                            <option value="tour_operator">Tour Operator</option>
+                                            <option value="travel_agency">Travel Agency</option>
+                                            <option value="adventure_company">Adventure Company</option>
+                                            <option value="cruise_company">Cruise Company</option>
+                                            <option value="hotel_resort">Hotel/Resort</option>
+                                            <option value="transportation">Transportation Service</option>
+                                            <option value="other">Other</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-6 mb-3">
+                                        <label for="establishedYear" class="form-label">Year of Establishment *</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-calendar"></i></span>
+                                            <input type="number" class="form-control" id="establishedYear"
+                                                name="establishedYear" placeholder="2020" min="1900" max="2024"
+                                                required>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="services" class="form-label">Services Offered *</label>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="domestic_tours"
+                                                    name="services" value="domestic_tours">
+                                                <label class="form-check-label" for="domestic_tours">Domestic
+                                                    Tours</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="international_tours"
+                                                    name="services" value="international_tours">
+                                                <label class="form-check-label" for="international_tours">International
+                                                    Tours</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="adventure_tours"
+                                                    name="services" value="adventure_tours">
+                                                <label class="form-check-label" for="adventure_tours">Adventure
+                                                    Tours</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="corporate_travel"
+                                                    name="services" value="corporate_travel">
+                                                <label class="form-check-label" for="corporate_travel">Corporate
+                                                    Travel</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="group_tours"
+                                                    name="services" value="group_tours">
+                                                <label class="form-check-label" for="group_tours">Group Tours</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="custom_packages"
+                                                    name="services" value="custom_packages">
+                                                <label class="form-check-label" for="custom_packages">Custom
+                                                    Packages</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="companyDescription" class="form-label">Company Description *</label>
+                                    <textarea class="form-control" id="companyDescription" name="companyDescription"
+                                        rows="4"
+                                        placeholder="Tell us about your company, your mission, and what makes you unique..."
+                                        required></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Company Information Preview -->
+                        <div class="card mb-4">
+                            <div class="card-header bg-secondary text-white">
+                                <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Registered Information</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <p><strong>Company Name:</strong> {{ user.company_name|default:"Not provided" }}
+                                        </p>
+                                        <p><strong>Registration Number:</strong> {{ user.registration_number|default:"Not provided" }}</p>
+                                        <p><strong>Company Email:</strong> {{ user.email }}</p>
+                                        <p><strong>Company Phone:</strong> {{ user.company_phone|default:"Not provided" }}</p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p><strong>Contact Person:</strong> {{ user.first_name }} {{ user.last_name }}
+                                        </p>
+                                        <p><strong>Contact Position:</strong> {{ user.contact_position|default:"Not provided" }}</p>
+                                        <p><strong>Website:</strong> {{ user.website|default:"Not provided" }}</p>
+                                        <p><strong>Address:</strong> {{ user.company_address|default:"Not provided" }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Terms and Submit -->
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="terms" required>
+                            <label class="form-check-label" for="terms">
+                                I certify that all information provided is accurate and truthful. I understand that
+                                false information may result in immediate rejection and account suspension.
+                            </label>
+                        </div>
+
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="processing">
+                            <label class="form-check-label" for="processing">
+                                I understand that verification may take 3-5 business days and I will be notified via
+                                email once the review is complete.
+                            </label>
+                        </div>
+
+                        <div class="d-grid mb-3">
+                            <button type="submit" class="btn btn-warning btn-lg">
+                                <i class="fas fa-shield-alt me-2"></i>Submit for Verification
+                            </button>
+                        </div>
+
+                        <div class="text-center">
+                            <p class="text-muted">Need help? Contact our support team at support@travelbuddy.com</p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

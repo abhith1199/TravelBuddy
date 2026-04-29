@@ -1,0 +1,180 @@
+{% extends 'base_modern.html' %}
+{% load static %}
+
+{% block title %}Edit Profile - Travel Buddy{% endblock %}
+
+{% block content %}
+<!-- Premium Header -->
+<section class="relative pt-32 pb-24 flex items-center justify-center overflow-hidden bg-dark-900">
+    <!-- Background Image -->
+    <div class="absolute inset-0 z-0 opacity-100">
+        <img src="{% static 'img/slider3.jpg' %}" alt="Profile Background"
+            class="w-full h-full object-cover filter saturate-150">
+        <div class="absolute inset-0 bg-gradient-to-b from-dark-900/90 via-dark-900/60 to-dark-900/95"></div>
+    </div>
+
+    <div class="relative z-10 text-center px-4 animate-slide-up">
+        <div
+            class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white/10 backdrop-blur-md border border-white/20 mb-6 text-primary-400">
+            <i class="fa-solid fa-user text-3xl"></i>
+        </div>
+        <h1 class="font-display text-4xl md:text-5xl font-bold text-white mb-4 tracking-tight">Your Profile</h1>
+        <p class="text-gray-300 text-lg font-medium max-w-xl mx-auto">Keep your details up-to-date for personalized trip
+            recommendations.</p>
+    </div>
+</section>
+
+<!-- Main Content -->
+<section class="py-12 relative z-20 -mt-10">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6">
+        <div class="bg-white rounded-[2rem] shadow-xl border border-gray-100 overflow-hidden shadow-glass">
+
+            <div class="p-8 md:p-12">
+                {% if messages %}
+                <div class="mb-8 space-y-3">
+                    {% for message in messages %}
+                    <div
+                        class="flex items-start gap-3 p-4 rounded-xl border {% if message.tags == 'error' %}bg-red-50 border-red-200 text-red-800{% elif message.tags == 'success' %}bg-green-50 border-green-200 text-green-800{% else %}bg-blue-50 border-blue-200 text-blue-800{% endif %} animate-fade-in">
+                        <i
+                            class="fa-solid {% if message.tags == 'error' %}fa-circle-xmark text-red-500{% elif message.tags == 'success' %}fa-circle-check text-green-500{% else %}fa-circle-info text-blue-500{% endif %} text-xl mt-0.5"></i>
+                        <p class="font-medium text-sm">{{ message }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <form method="post" class="space-y-8">
+                    {% csrf_token %}
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div>
+                            <label
+                                class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 ml-1">First
+                                Name</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400"><i
+                                        class="fa-regular fa-id-card"></i></span>
+                                <input type="text" name="first_name"
+                                    class="block w-full pl-11 pr-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 font-medium focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-shadow"
+                                    value="{{ user.first_name }}">
+                            </div>
+                        </div>
+                        <div>
+                            <label
+                                class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 ml-1">Last
+                                Name</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400"><i
+                                        class="fa-regular fa-id-card"></i></span>
+                                <input type="text" name="last_name"
+                                    class="block w-full pl-11 pr-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 font-medium focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-shadow"
+                                    value="{{ user.last_name }}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div>
+                            <label
+                                class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 ml-1">Email
+                                <span class="text-gray-400 normal-case font-normal">(Locked)</span></label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400"><i
+                                        class="fa-solid fa-envelope"></i></span>
+                                <input type="email"
+                                    class="block w-full pl-11 pr-4 py-3.5 bg-gray-100 border border-gray-200 rounded-xl text-gray-500 font-medium cursor-not-allowed"
+                                    value="{{ user.email }}" disabled>
+                            </div>
+                        </div>
+                        <div>
+                            <label
+                                class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 ml-1">Phone
+                                Number</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400"><i
+                                        class="fa-solid fa-phone"></i></span>
+                                <input type="tel" name="phone"
+                                    class="block w-full pl-11 pr-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 font-medium focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-shadow"
+                                    value="{{ user.phone|default:'' }}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div>
+                            <label
+                                class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 ml-1">Date
+                                of Birth</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400"><i
+                                        class="fa-solid fa-cake-candles"></i></span>
+                                <input type="date" name="birth_date"
+                                    class="block w-full pl-11 pr-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 font-medium focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-shadow"
+                                    value="{{ user.birth_date|date:'Y-m-d' }}">
+                            </div>
+                        </div>
+                        <div>
+                            <label
+                                class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 ml-1">Gender</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400"><i
+                                        class="fa-solid fa-venus-mars"></i></span>
+                                <select name="gender"
+                                    class="block w-full pl-11 pr-10 py-3.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 font-medium focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-shadow appearance-none cursor-pointer">
+                                    <option value="" class="text-gray-400">Select Gender</option>
+                                    <option value="MALE" {% if user.gender=='MALE' %}selected{% endif %}>Male</option>
+                                    <option value="FEMALE" {% if user.gender=='FEMALE' %}selected{% endif %}>Female
+                                    </option>
+                                    <option value="OTHER" {% if user.gender=='OTHER' %}selected{% endif %}>Other
+                                    </option>
+                                </select>
+                                <div
+                                    class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
+                                    <i class="fa-solid fa-chevron-down text-xs"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 ml-1">About
+                            You</label>
+                        <div class="relative">
+                            <span class="absolute top-4 left-4 text-gray-400"><i class="fa-solid fa-pen-nib"></i></span>
+                            <textarea name="bio" rows="4"
+                                class="block w-full pl-11 pr-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 font-medium focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-shadow resize-none placeholder-gray-400"
+                                placeholder="Tell us a little bit about yourself, your travel style, etc...">{{ user.bio|default:'' }}</textarea>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 ml-1">Travel
+                            Interests</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400"><i
+                                    class="fa-brands fa-wpexplorer text-lg"></i></span>
+                            <input type="text" name="interests"
+                                class="block w-full pl-11 pr-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 font-medium focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-shadow placeholder-gray-400"
+                                value="{{ user.interests|default:'' }}"
+                                placeholder="e.g. Hiking, Beach, Photography, Food (comma separated)">
+                        </div>
+                    </div>
+
+                    <div
+                        class="pt-6 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <a href="{% url 'user_dashboard' %}"
+                            class="w-full sm:w-auto text-center px-6 py-4 rounded-xl font-bold text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-colors">
+                            <i class="fa-solid fa-arrow-left mr-2"></i> Back
+                        </a>
+                        <button type="submit"
+                            class="w-full sm:w-auto bg-primary-500 hover:bg-primary-600 text-white px-10 py-4 rounded-xl font-bold tracking-wide shadow-glow transition-transform hover:-translate-y-1">
+                            Save Changes <i class="fa-solid fa-check ml-2"></i>
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

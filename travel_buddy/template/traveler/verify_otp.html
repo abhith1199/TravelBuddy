@@ -1,0 +1,111 @@
+{% extends 'base_modern.html' %}
+{% load static %}
+
+{% block title %}Verify OTP - Travel Buddy{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Transparent navbar for auth pages */
+    #main-nav {
+        background: transparent !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        border-bottom: none !important;
+        box-shadow: none !important;
+    }
+
+    #main-nav .text-dark-900,
+    #main-nav .text-gray-600 {
+        color: rgba(255, 255, 255, 0.9) !important;
+    }
+
+    #main-nav .text-gray-600:hover {
+        color: #ff5e14 !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Premium Header with Background -->
+<section class="relative min-h-screen flex items-center justify-center overflow-hidden bg-dark-900 py-12 -mt-20">
+    <!-- Background Image -->
+    <div class="absolute inset-0 z-0 opacity-100">
+        <img src="{% static 'img/slider2.jpg' %}" alt="Settings Background"
+            class="w-full h-full object-cover filter saturate-150">
+        <div class="absolute inset-0 bg-gradient-to-b from-dark-900/90 via-dark-900/70 to-dark-900/95"></div>
+    </div>
+
+    <!-- Main Content Container -->
+    <div class="relative z-10 w-full max-w-md px-4 sm:px-6">
+
+        <!-- Header Section -->
+        <div class="text-center mb-8 animate-slide-up">
+            <div
+                class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 mb-4 text-primary-400">
+                <i class="fa-solid fa-shield-check text-2xl"></i>
+            </div>
+            <h2 class="font-display text-3xl md:text-4xl font-bold text-white mb-2 tracking-tight">Verify Identity</h2>
+            <p class="text-gray-300 text-sm font-medium">
+                We sent a 6-digit code to <strong class="text-white">{{ email }}</strong>.
+            </p>
+        </div>
+
+        <!-- Form Card -->
+        <div class="bg-white rounded-[2rem] shadow-glass border border-gray-100 overflow-hidden animate-slide-up"
+            style="animation-delay: 100ms;">
+            <div class="p-8 sm:p-10">
+
+                {% if messages %}
+                <div class="mb-6 space-y-3">
+                    {% for message in messages %}
+                    <div
+                        class="flex items-start gap-3 p-4 rounded-xl border {% if message.tags == 'error' %}bg-red-50 border-red-200 text-red-800{% else %}bg-green-50 border-green-200 text-green-800{% endif %}">
+                        <i
+                            class="fa-solid {% if message.tags == 'error' %}fa-circle-xmark text-red-500{% else %}fa-circle-check text-green-500{% endif %} text-xl mt-0.5"></i>
+                        <p class="font-medium text-sm">{{ message }}</p>
+                        <button type="button" class="ml-auto text-gray-400 hover:text-gray-600 focus:outline-none"
+                            onclick="this.parentElement.remove()"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <form class="space-y-6" action="{% url 'verify_otp' %}" method="POST">
+                    {% csrf_token %}
+
+                    <div>
+                        <label for="otp"
+                            class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 ml-1 text-center">Secure
+                            6-Digit Code</label>
+                        <div class="relative mt-2">
+                            <input id="otp" name="otp" type="text" inputmode="numeric" pattern="[0-9]{6}" maxlength="6"
+                                required
+                                class="block w-full px-4 py-4 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 font-bold focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-shadow placeholder-gray-300 text-center text-3xl tracking-[0.75em]"
+                                placeholder="------">
+                        </div>
+                    </div>
+
+                    <div class="pt-4">
+                        <button type="submit"
+                            class="w-full flex justify-center items-center py-3.5 px-4 border border-transparent rounded-xl shadow-glow text-sm font-bold text-white bg-primary-500 hover:bg-primary-600 focus:outline-none transition-transform hover:-translate-y-1">
+                            Verify Code <i class="fa-solid fa-arrow-right ml-2"></i>
+                        </button>
+                    </div>
+                </form>
+
+                <div class="mt-8 text-center border-t border-gray-100 pt-6">
+                    <p class="text-sm font-medium text-gray-500">
+                        Didn't receive it?
+                        <a href="{% url 'forgot_password' %}"
+                            class="font-bold text-primary-500 hover:text-primary-600 ml-1 transition-colors">
+                            Try sending again
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block footer %}{% endblock %}

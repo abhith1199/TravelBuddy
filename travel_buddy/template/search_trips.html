@@ -1,0 +1,497 @@
+{% extends 'base_modern.html' %}
+{% load static %}
+
+{% block title %}Explore Adventures - Travel Buddy{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Hero background overlay pattern */
+    .hero-pattern {
+        background-color: #0a0a0a;
+        background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+        background-size: 30px 30px;
+    }
+
+    /* Glass Search Box */
+    .glass-search {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .glass-search:focus-within {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: #ff5e14;
+        box-shadow: 0 0 30px rgba(255, 94, 20, 0.2);
+    }
+
+    /* Vibe Filter Active State */
+    .vibe-item.active {
+        background-color: #171717 !important;
+        color: white !important;
+        border-color: #171717 !important;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        transform: translateX(4px);
+    }
+
+    .vibe-item.active i {
+        color: white !important;
+    }
+
+    /* Card Hover Image Scale */
+    .trip-card-image {
+        transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .group:hover .trip-card-image {
+        transform: scale(1.05);
+    }
+
+    /* Price Tag Polygon */
+    .price-tag-polygon {
+        clip-path: polygon(10px 0, 100% 0, 100% 100%, 0 100%);
+    }
+
+    /* Loading state transition */
+    #tripsContainer {
+        transition: opacity 0.3s ease;
+    }
+
+    .loading-opacity {
+        opacity: 0.4;
+        pointer-events: none;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Premium Hero Section -->
+<section class="relative min-h-[500px] flex items-center justify-center overflow-hidden">
+    <!-- Background Image -->
+    <div class="absolute inset-0 z-0 opacity-100">
+        <img src="{% static 'img/joshua-earle-7cAiUMWPjnY-unsplash.jpg' %}" alt="Adventure"
+            class="w-full h-full object-cover">
+        <div class="absolute inset-0 bg-gradient-to-b from-dark-900/80 via-dark-900/60 to-dark-900/80"></div>
+        <div class="absolute inset-0 hero-pattern opacity-10"></div>
+    </div>
+
+    <!-- Hero Content -->
+    <div class="relative z-10 w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center pt-16 pb-20 animate-slide-up">
+        <span
+            class="inline-block py-1.5 px-4 rounded-full bg-primary-500/20 text-primary-400 border border-primary-500/30 text-xs font-bold tracking-widest uppercase mb-6 backdrop-blur-sm">
+            Discover The World
+        </span>
+
+        <h1
+            class="font-display text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 tracking-tight leading-tight">
+            Find Your Next <br class="hidden md:block">
+            <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary-400 to-primary-600">Great
+                Adventure</span>
+        </h1>
+
+        <p class="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto mb-10 font-light">
+            Hand-picked group trips organized by professional travel hosts. Join like-minded travelers and share
+            unforgettable experiences.
+        </p>
+
+        <!-- Search Box -->
+        <form method="GET" action="{% url 'browse_trips' %}" id="searchForm" class="mx-auto w-full max-w-3xl">
+            <div class="glass-search rounded-2xl p-2 relative flex items-center transition-all duration-300">
+                <div class="pl-4 pr-3 text-gray-400">
+                    <i class="fa-solid fa-magnifying-glass text-lg"></i>
+                </div>
+                <input type="text" name="q" id="searchInput" placeholder="Search by destination, mountain, beach..."
+                    value="{{ search_query }}"
+                    class="w-full bg-transparent border-none text-white placeholder-gray-400 focus:outline-none focus:ring-0 py-3 text-lg font-medium">
+
+                <button type="submit"
+                    class="btn-modern bg-primary-500 hover:bg-primary-600 text-white font-bold py-3 px-8 rounded-xl shadow-glow uppercase tracking-wide text-sm ml-2 flex-shrink-0 transition-colors">
+                    Explore
+                </button>
+            </div>
+        </form>
+    </div>
+</section>
+
+<!-- Main Listing Section -->
+<section class="py-16 bg-[#fafafa]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col lg:flex-row gap-10">
+
+            <!-- Sidebar: Filters -->
+            <div class="lg:w-1/4 flex-shrink-0">
+                <div class="sticky top-28 space-y-6">
+                    <!-- Vibe Filter Card -->
+                    <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+                        <div class="flex items-center gap-3 mb-6">
+                            <div
+                                class="w-10 h-10 rounded-xl bg-primary-50 flex items-center justify-center text-primary-500">
+                                <i class="fa-solid fa-sliders text-xl"></i>
+                            </div>
+                            <h3 class="font-display font-bold text-xl text-gray-900">Filter Vibe</h3>
+                        </div>
+
+                        <div class="flex flex-col gap-2" id="vibeFilter">
+                            <a href="{% url 'browse_trips' %}"
+                                class="vibe-item group flex items-center justify-between px-5 py-3.5 rounded-2xl bg-gray-50 text-gray-700 font-semibold text-sm hover:bg-white hover:border-gray-200 border border-transparent transition-all {% if not current_vibe %}active{% endif %}"
+                                data-vibe="">
+                                <div class="flex items-center gap-3">
+                                    <i
+                                        class="fa-solid fa-layer-group text-gray-400 group-hover:text-primary-500 transition-colors"></i>
+                                    All Trips
+                                </div>
+                                <i class="fa-solid fa-chevron-right text-[10px] text-gray-400"></i>
+                            </a>
+
+                            <a href="?vibe=FREE"
+                                class="vibe-item group flex items-center justify-between px-5 py-3.5 rounded-2xl bg-gray-50 text-gray-700 font-semibold text-sm hover:bg-white hover:border-gray-200 border border-transparent transition-all {% if current_vibe == 'FREE' %}active{% endif %}"
+                                data-vibe="FREE">
+                                <div class="flex items-center gap-3">
+                                    <i
+                                        class="fa-solid fa-tag text-gray-400 group-hover:text-primary-500 transition-colors"></i>
+                                    Free Trips
+                                </div>
+                                <i class="fa-solid fa-chevron-right text-[10px] text-gray-400"></i>
+                            </a>
+
+                            {% for vibe_key, vibe_label in vibe_choices %}
+                            <a href="?vibe={{ vibe_key }}"
+                                class="vibe-item group flex items-center justify-between px-5 py-3.5 rounded-2xl bg-gray-50 text-gray-700 font-semibold text-sm hover:bg-white hover:border-gray-200 border border-transparent transition-all {% if current_vibe == vibe_key %}active{% endif %}"
+                                data-vibe="{{ vibe_key }}">
+                                <div class="flex items-center gap-3">
+                                    <i
+                                        class="fa-solid fa-hashtag text-gray-400 group-hover:text-primary-500 transition-colors"></i>
+                                    {{ vibe_label }}
+                                </div>
+                                <i class="fa-solid fa-chevron-right text-[10px] text-gray-400"></i>
+                            </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Trust Badge -->
+                    <div class="bg-dark-900 rounded-3xl p-6 text-white relative overflow-hidden shadow-xl mt-6">
+                        <div
+                            class="absolute top-0 right-0 w-32 h-32 bg-primary-500/20 rounded-full blur-3xl -mr-10 -mt-10">
+                        </div>
+                        <div class="relative z-10">
+                            <div class="flex flex-col xl:flex-row items-start xl:items-center gap-4 mb-4">
+                                <div
+                                    class="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center border border-white/20 flex-shrink-0">
+                                    <i class="fa-solid fa-shield-halved text-2xl text-yellow-400"></i>
+                                </div>
+                                <h4 class="font-display font-bold text-lg leading-tight">Verified Hosts</h4>
+                            </div>
+                            <p class="text-sm text-gray-400 leading-relaxed">
+                                Every trip host is strictly vetted for safety, reliability, and experience before they
+                                can list an adventure.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Results -->
+            <div class="lg:w-3/4">
+                <!-- Status Bar -->
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 mb-8"
+                    id="resultsHeader">
+                    <div>
+                        {% if search_query %}
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="w-8 h-[2px] bg-primary-500 rounded-full"></span>
+                            <p class="text-xs font-bold tracking-widest uppercase text-gray-500">Search Results</p>
+                        </div>
+                        <h2 class="font-display text-3xl font-bold text-gray-900">"{{ search_query }}"</h2>
+                        {% elif current_vibe %}
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="w-8 h-[2px] bg-primary-500 rounded-full"></span>
+                            <p class="text-xs font-bold tracking-widest uppercase text-gray-500">Vibe Category</p>
+                        </div>
+                        <h2 class="font-display text-3xl font-bold text-gray-900">
+                            {% for vibe_key, vibe_label in vibe_choices %}
+                            {% if current_vibe == vibe_key %}{{ vibe_label }}{% endif %}
+                            {% endfor %}
+                            {% if current_vibe == 'FREE' %}Free Trips{% endif %}
+                        </h2>
+                        {% else %}
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="w-8 h-[2px] bg-primary-500 rounded-full"></span>
+                            <p class="text-xs font-bold tracking-widest uppercase text-gray-500">Explore</p>
+                        </div>
+                        <h2 class="font-display text-3xl font-bold text-gray-900">All Featured Trips</h2>
+                        {% endif %}
+                    </div>
+
+                    <div
+                        class="bg-white border border-gray-200 shadow-sm rounded-full px-5 py-2 flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                        <span class="font-semibold text-gray-900">{{ trips.count }}</span>
+                        <span class="text-sm text-gray-500 font-medium">trips found</span>
+                    </div>
+                </div>
+
+                <!-- Trips Grid -->
+                <div id="tripsContainer">
+                    {% if trips %}
+                    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+                        {% for trip in trips %}
+                        <div class="group bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-xl hover:border-primary-100 transition-all duration-300 flex flex-col h-full animate-fade-in"
+                            style="animation-delay: {{ forloop.counter0|add:0 }}00ms;">
+
+                            <!-- Image Header -->
+                            <div class="relative h-64 overflow-hidden mask-image">
+                                {% with cover_image=trip.images.first %}
+                                {% if cover_image %}
+                                <img src="{{ cover_image.image.url }}" alt="{{ trip.title }}"
+                                    class="w-full h-full object-cover trip-card-image">
+                                {% else %}
+                                <img src="{% static 'img/acc.jpg' %}" alt="{{ trip.title }}"
+                                    class="w-full h-full object-cover trip-card-image">
+                                {% endif %}
+                                {% endwith %}
+
+                                <!-- Gradient Overlays -->
+                                <div
+                                    class="absolute inset-0 bg-gradient-to-t from-dark-900/80 via-transparent to-dark-900/30 group-hover:from-dark-900/90 transition-colors">
+                                </div>
+
+                                <!-- Vibe Badge -->
+                                <div
+                                    class="absolute top-4 left-4 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider text-dark-900 shadow-lg">
+                                    {{ trip.get_vibe_tag_display }}
+                                </div>
+
+                                <!-- Price Tag -->
+                                <div
+                                    class="absolute bottom-0 right-0 bg-primary-500 text-white pl-6 pr-5 py-3 price-tag-polygon">
+                                    <span class="font-display font-bold text-xl">
+                                        {% if trip.price == 0 %}
+                                        FREE
+                                        {% else %}
+                                        ₹{{ trip.price|floatformat:0 }}
+                                        {% endif %}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Card Body -->
+                            <div class="p-6 flex-grow flex flex-col">
+                                <div
+                                    class="flex items-center gap-2 text-primary-500 text-xs font-bold uppercase tracking-widest mb-3">
+                                    <i class="fa-solid fa-location-dot"></i> {{ trip.destination }}
+                                </div>
+
+                                <a href="{% url 'trip_detail' trip.id %}"
+                                    class="font-display font-bold text-2xl text-gray-900 mb-3 hover:text-primary-500 transition-colors line-clamp-2 leading-tight">
+                                    {{ trip.title }}
+                                </a>
+
+                                <p class="text-gray-500 text-sm leading-relaxed line-clamp-2 mb-6 flex-grow">
+                                    {{ trip.description|striptags }}
+                                </p>
+
+                                <!-- Divider -->
+                                <div class="h-px w-full bg-gray-100 mb-5"></div>
+
+                                <!-- Footer -->
+                                <div class="flex items-center justify-between">
+                                    <div class="flex gap-4">
+                                        <div class="flex items-center gap-2 text-sm font-medium text-gray-600">
+                                            <div
+                                                class="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400">
+                                                <i class="fa-regular fa-calendar"></i>
+                                            </div>
+                                            {{ trip.duration_days }} Days
+                                        </div>
+                                        <div class="flex items-center gap-2 text-sm font-medium text-gray-600">
+                                            <div
+                                                class="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400">
+                                                <i class="fa-solid fa-user-group text-xs"></i>
+                                            </div>
+                                            {{ trip.max_capacity }} Slots
+                                        </div>
+                                    </div>
+
+                                    <a href="{% url 'trip_detail' trip.id %}"
+                                        class="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center text-gray-900 hover:bg-primary-500 hover:text-white transition-all transform hover:-rotate-12 group-hover:shadow-lg">
+                                        <i
+                                            class="fa-solid fa-arrow-right transition-transform group-hover:translate-x-1"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Pagination Controls -->
+                    {% if page_obj.has_other_pages %}
+                    <div class="mt-12 flex justify-center">
+                        <nav class="inline-flex rounded-xl shadow-sm -space-x-px" aria-label="Pagination">
+                            {% if page_obj.has_previous %}
+                            <a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if current_vibe %}&vibe={{ current_vibe }}{% endif %}"
+                                class="relative inline-flex items-center px-4 py-2 rounded-l-xl border border-gray-200 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                <span class="sr-only">Previous</span>
+                                <i class="fa-solid fa-chevron-left"></i>
+                            </a>
+                            {% else %}
+                            <span
+                                class="relative inline-flex items-center px-4 py-2 rounded-l-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-400 cursor-not-allowed">
+                                <span class="sr-only">Previous</span>
+                                <i class="fa-solid fa-chevron-left"></i>
+                            </span>
+                            {% endif %}
+
+                            {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                            <span
+                                class="relative inline-flex items-center px-4 py-2 border border-primary-500 bg-primary-50 text-sm font-bold text-primary-600 z-10">
+                                {{ num }}
+                            </span>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %} <a
+                                href="?page={{ num }}{% if search_query %}&q={{ search_query }}{% endif %}{% if current_vibe %}&vibe={{ current_vibe }}{% endif %}"
+                                class="relative inline-flex items-center px-4 py-2 border border-gray-200 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+                                {{ num }}
+                                </a>
+                                {% endif %}
+                                {% endfor %}
+
+                                {% if page_obj.has_next %}
+                                <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if current_vibe %}&vibe={{ current_vibe }}{% endif %}"
+                                    class="relative inline-flex items-center px-4 py-2 rounded-r-xl border border-gray-200 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                    <span class="sr-only">Next</span>
+                                    <i class="fa-solid fa-chevron-right"></i>
+                                </a>
+                                {% else %}
+                                <span
+                                    class="relative inline-flex items-center px-4 py-2 rounded-r-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-400 cursor-not-allowed">
+                                    <span class="sr-only">Next</span>
+                                    <i class="fa-solid fa-chevron-right"></i>
+                                </span>
+                                {% endif %}
+                        </nav>
+                    </div>
+                    {% endif %}
+                    {% else %}
+                    <!-- Empty State -->
+                    <div class="bg-white rounded-3xl border border-dashed border-gray-300 p-16 text-center shadow-sm">
+                        <div class="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <i class="fa-regular fa-map text-4xl text-gray-300"></i>
+                        </div>
+                        <h3 class="font-display font-bold text-2xl text-gray-900 mb-3">No trips found</h3>
+                        <p class="text-gray-500 max-w-md mx-auto mb-8">
+                            We couldn't find any trips matching your criteria. Try adjusting your search query or
+                            exploring different vibes.
+                        </p>
+                        <a href="{% url 'browse_trips' %}"
+                            class="inline-flex items-center gap-2 bg-gray-900 hover:bg-gray-800 text-white px-6 py-3 rounded-xl font-bold transition-colors">
+                            <i class="fa-solid fa-rotate-left"></i> Reset Filters
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const searchInput = document.getElementById('searchInput');
+        const searchForm = document.getElementById('searchForm');
+        const tripsContainer = document.getElementById('tripsContainer');
+        const resultsHeader = document.getElementById('resultsHeader');
+        const vibeFilter = document.getElementById('vibeFilter');
+
+        let searchTimeout;
+
+        // Live search on input
+        if (searchInput) {
+            searchInput.addEventListener('input', function (e) {
+                clearTimeout(searchTimeout);
+                const query = e.target.value.trim();
+
+                searchTimeout = setTimeout(function () {
+                    // trigger search for anything >=2 chars or empty
+                    if (query.length >= 2 || query.length === 0) {
+                        performLiveSearch(query, getCurrentVibe());
+                    }
+                }, 400);
+            });
+        }
+
+        // Vibe filter logic
+        if (vibeFilter) {
+            vibeFilter.addEventListener('click', function (e) {
+                const vibeBtn = e.target.closest('.vibe-item');
+                if (vibeBtn) {
+                    e.preventDefault();
+                    const vibe = vibeBtn.dataset.vibe || '';
+
+                    // UI Update: Toggle active class immediately
+                    vibeFilter.querySelectorAll('.vibe-item').forEach(btn => btn.classList.remove('active'));
+                    vibeBtn.classList.add('active');
+
+                    performLiveSearch(searchInput ? searchInput.value.trim() : '', vibe);
+                }
+            });
+        }
+
+        function getCurrentVibe() {
+            if (!vibeFilter) return '';
+            const activeBtn = vibeFilter.querySelector('.vibe-item.active');
+            return activeBtn ? activeBtn.dataset.vibe || '' : '';
+        }
+
+        function performLiveSearch(query, vibe) {
+            if (!tripsContainer) return;
+            const params = new URLSearchParams();
+            if (query) params.set('q', query);
+            if (vibe) params.set('vibe', vibe);
+
+            tripsContainer.classList.add('loading-opacity');
+
+            fetch(`{% url 'browse_trips' %}?${params.toString()}`, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'text/html'
+                }
+            })
+                .then(response => response.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+
+                    // Update content
+                    const newHeader = doc.getElementById('resultsHeader');
+                    const newTrips = doc.getElementById('tripsContainer');
+
+                    if (newHeader && resultsHeader) resultsHeader.innerHTML = newHeader.innerHTML;
+                    if (newTrips && tripsContainer) tripsContainer.innerHTML = newTrips.innerHTML;
+
+                    // Handle browser history
+                    const newUrl = params.toString() ? `?${params.toString()}` : window.location.pathname;
+                    window.history.replaceState({}, '', newUrl);
+
+                    tripsContainer.classList.remove('loading-opacity');
+                })
+                .catch(error => {
+                    console.error('AJAX error:', error);
+                    tripsContainer.classList.remove('loading-opacity');
+                });
+        }
+
+        // Handle form submission
+        if (searchForm) {
+            searchForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+                performLiveSearch(searchInput ? searchInput.value.trim() : '', getCurrentVibe());
+            });
+        }
+    });
+</script>
+{% endblock %}

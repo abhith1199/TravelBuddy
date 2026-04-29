@@ -1,0 +1,514 @@
+{% extends 'base_modern.html' %}
+{% load static %}
+
+{% block title %}Travel Buddy - Find Your Perfect Group Travel Experience{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="relative pt-32 pb-40 lg:pt-48 lg:pb-56 overflow-hidden">
+	<!-- Background Image with Overlay -->
+	<div class="absolute inset-0 z-0">
+		<img src="{% static 'img/slider1.jpg' %}" alt="Travel Background"
+			class="w-full h-full object-cover object-center filter brightness-50" />
+		<div class="absolute inset-0 bg-gradient-to-t from-dark-900 via-dark-900/60 to-transparent"></div>
+		<div class="absolute inset-0 bg-gradient-to-r from-primary-900/40 to-transparent mix-blend-multiply"></div>
+	</div>
+
+	<div class="container mx-auto px-4 relative z-10 text-center animate-slide-up">
+		<span
+			class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/20 text-xs font-bold text-gray-200 uppercase tracking-widest mb-6 backdrop-blur-sm shadow-glow pulse-ring">
+			<span class="w-2 h-2 rounded-full bg-primary-400"></span> Discover the Colorful World
+		</span>
+		<h1
+			class="font-display font-black text-5xl md:text-7xl lg:text-8xl text-white tracking-tight mb-8 drop-shadow-lg leading-tight">
+			{{ site_settings.homepage_hero_title|default:"Find Your Perfect Group Adventure" }}
+		</h1>
+		<p class="text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto mb-12 drop-shadow-md">
+			Join like-minded travelers on unforgettable journeys. Curated trips, verified companies, and balanced group
+			dynamics.
+		</p>
+
+		<div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+			<a href="{% url 'browse_trips' %}"
+				class="w-full sm:w-auto px-10 py-4 bg-primary-500 hover:bg-primary-600 text-white rounded-xl font-bold text-lg shadow-glow-primary hover:-translate-y-1 transition-all duration-300">
+				Explore Trips <i class="fa-solid fa-arrow-right ml-2"></i>
+			</a>
+			{% if not user.is_authenticated %}
+			<a href="{% url 'register' %}"
+				class="w-full sm:w-auto px-10 py-4 bg-white/10 hover:bg-white/20 text-white backdrop-blur-md rounded-xl font-bold text-lg border border-white/20 shadow-lg hover:-translate-y-1 transition-all duration-300">
+				Start Your Journey
+			</a>
+			{% endif %}
+		</div>
+	</div>
+
+	<!-- Decorative floating elements -->
+	<div class="absolute top-1/4 left-10 w-24 h-24 bg-primary-500 rounded-full blur-[80px] opacity-40"></div>
+	<div class="absolute bottom-1/4 right-10 w-32 h-32 bg-blue-500 rounded-full blur-[100px] opacity-30"></div>
+</section>
+
+<!-- Stats Cards (Overlapping Hero) -->
+<section class="relative z-20 -mt-24 px-4">
+	<div class="container mx-auto max-w-6xl">
+		<div class="grid grid-cols-2 lg:grid-cols-4 gap-6">
+			<!-- Stat 1 -->
+			<div
+				class="bg-white/95 backdrop-blur-xl rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 p-8 text-center border border-white/40 hover:-translate-y-2 group">
+				<div
+					class="w-16 h-16 mx-auto bg-orange-100 rounded-2xl flex items-center justify-center text-orange-500 text-3xl mb-4 group-hover:scale-110 transition-transform shadow-inner">
+					<i class="fa-solid fa-suitcase-rolling"></i>
+				</div>
+				<div class="font-display font-black text-4xl text-gray-900 mb-1">{{ total_trips }}</div>
+				<div class="text-xs font-bold text-gray-400 uppercase tracking-widest mt-2">Active Trips</div>
+			</div>
+
+			<!-- Stat 2 -->
+			<div
+				class="bg-white/95 backdrop-blur-xl rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 p-8 text-center border border-white/40 hover:-translate-y-2 group">
+				<div
+					class="w-16 h-16 mx-auto bg-blue-100 rounded-2xl flex items-center justify-center text-blue-500 text-3xl mb-4 group-hover:scale-110 transition-transform shadow-inner">
+					<i class="fa-solid fa-users"></i>
+				</div>
+				<div class="font-display font-black text-4xl text-gray-900 mb-1">{{ total_travelers }}</div>
+				<div class="text-xs font-bold text-gray-400 uppercase tracking-widest mt-2">Happy Travelers</div>
+			</div>
+
+			<!-- Stat 3 -->
+			<div
+				class="bg-white/95 backdrop-blur-xl rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 p-8 text-center border border-white/40 hover:-translate-y-2 group">
+				<div
+					class="w-16 h-16 mx-auto bg-green-100 rounded-2xl flex items-center justify-center text-green-500 text-3xl mb-4 group-hover:scale-110 transition-transform shadow-inner">
+					<i class="fa-solid fa-building-circle-check"></i>
+				</div>
+				<div class="font-display font-black text-4xl text-gray-900 mb-1">{{ total_companies }}</div>
+				<div class="text-xs font-bold text-gray-400 uppercase tracking-widest mt-2">Verified Companies</div>
+			</div>
+
+			<!-- Stat 4 -->
+			<div
+				class="bg-white/95 backdrop-blur-xl rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 p-8 text-center border border-white/40 hover:-translate-y-2 group">
+				<div
+					class="w-16 h-16 mx-auto bg-yellow-100 rounded-2xl flex items-center justify-center text-yellow-500 text-3xl mb-4 group-hover:scale-110 transition-transform shadow-inner">
+					<i class="fa-solid fa-route"></i>
+				</div>
+				<div class="font-display font-black text-4xl text-gray-900 mb-1">{{ completed_bookings }}</div>
+				<div class="text-xs font-bold text-gray-400 uppercase tracking-widest mt-2">Successful Trips</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+<!-- Featured Adventures -->
+<section class="py-24 bg-gray-50">
+	<div class="container mx-auto px-4">
+		<div class="text-center max-w-2xl mx-auto mb-16">
+			<span class="text-primary-600 font-bold tracking-widest uppercase text-sm mb-2 block">Handpicked For
+				You</span>
+			<h2 class="font-display font-black text-4xl md:text-5xl text-gray-900 mb-4">Featured Adventures</h2>
+			<p class="text-gray-500 text-lg">Discover our most popular trips with balanced groups and verified
+				companies, ready for you to join.</p>
+		</div>
+
+		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+			{% for trip in featured_trips %}
+			<div
+				class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl border border-gray-100 transition-all duration-300 group flex flex-col hover:-translate-y-2">
+				<!-- Image Container -->
+				<div class="relative h-64 overflow-hidden">
+					{% if trip.images.exists and trip.images.first.image %}
+					<img src="{{ trip.images.first.image.url }}" alt="{{ trip.title }}"
+						class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+					{% else %}
+					<img src="{% static 'img/default-trip.jpg' %}" alt="{{ trip.title }}"
+						class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+					{% endif %}
+
+					<div
+						class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 group-hover:opacity-60 transition-opacity">
+					</div>
+
+					<div class="absolute top-4 left-4">
+						<span
+							class="px-3 py-1 bg-white/20 backdrop-blur-md border border-white/30 text-white text-xs font-bold rounded-full uppercase tracking-wider shadow-sm">
+							{{ trip.vibe_display }}
+						</span>
+					</div>
+
+					<div class="absolute bottom-4 left-4 right-4">
+						<h3 class="font-display font-black text-2xl text-white mb-1 shadow-sm">{{ trip.title }}</h3>
+						<p class="text-gray-200 text-sm font-medium flex items-center gap-2">
+							<i class="fa-solid fa-location-dot"></i> {{ trip.destination }}
+						</p>
+					</div>
+				</div>
+
+				<!-- Content -->
+				<div class="p-6 flex-1 flex flex-col">
+					<div class="flex justify-between items-end mb-6">
+						<div>
+							<p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Duration</p>
+							<p class="font-bold text-gray-900"><i class="fa-regular fa-clock text-primary-500 mr-1"></i>
+								{{ trip.duration_days }} Days</p>
+						</div>
+						<div class="text-right">
+							<p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Price</p>
+							<p class="font-black text-2xl text-primary-600">₹{{ trip.price }}</p>
+						</div>
+					</div>
+
+					<!-- Progress Bar -->
+					<div class="mb-6">
+						<div class="flex justify-between text-xs font-bold text-gray-500 mb-2">
+							<span>Capacity</span>
+							<span>{{ trip.current_bookings }}/{{ trip.max_capacity }} Filled</span>
+						</div>
+						<div class="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+							<div class="h-full bg-gradient-to-r from-primary-400 to-primary-600 rounded-full"
+								style="width: {{ trip.booking_percentage }}%"></div>
+						</div>
+					</div>
+
+					<div class="mt-auto pt-6 border-t border-gray-100 flex items-center justify-between">
+						<div class="flex gap-3 text-gray-500 text-sm">
+							<span title="Gender Restriction"
+								class="bg-gray-50 px-2 py-1 rounded border border-gray-100">
+								<i class="fa-solid fa-venus-mars text-gray-400 mr-1"></i>
+								<!-- djlint:off -->{{ trip.gender_restriction|title }}<!-- djlint:on -->
+							</span>
+							<span title="Age Range" class="bg-gray-50 px-2 py-1 rounded border border-gray-100">
+								<i class="fa-solid fa-id-card text-gray-400 mr-1"></i>
+								<!-- djlint:off -->{{ trip.age_min }}-{{ trip.age_max }}y<!-- djlint:on -->
+							</span>
+						</div>
+						<a href="{% url 'trip_detail' trip.id %}"
+							class="bg-gray-900 hover:bg-black text-white px-5 py-2.5 rounded-xl font-bold text-sm transition-colors shadow-md hover:shadow-lg">
+							View <i class="fa-solid fa-arrow-right ml-1 text-xs"></i>
+						</a>
+					</div>
+				</div>
+			</div>
+			{% empty %}
+			<div
+				class="col-span-1 md:col-span-2 lg:col-span-3 text-center py-20 bg-white rounded-3xl border border-gray-100 shadow-sm block w-full">
+				<i class="fa-solid fa-plane-slash text-6xl text-gray-300 mb-4 block"></i>
+				<h3 class="text-2xl font-bold text-gray-900 mb-2">No Featured Trips</h3>
+				<p class="text-gray-500">Check back soon for amazing adventures!</p>
+			</div>
+			{% endfor %}
+		</div>
+
+		<div class="text-center mt-12">
+			<a href="{% url 'browse_trips' %}"
+				class="inline-flex items-center gap-2 bg-white text-gray-900 hover:text-primary-600 border border-gray-200 px-8 py-4 rounded-xl font-bold shadow-sm transition-all hover:border-primary-200 hover:shadow-md">
+				View All Trips <i class="fa-solid fa-arrow-right"></i>
+			</a>
+		</div>
+	</div>
+</section>
+
+<!-- Find Your Tribe -->
+<section class="py-24 bg-white relative overflow-hidden">
+	<!-- Decorative background elements -->
+	<div class="absolute -top-40 -right-40 w-96 h-96 bg-primary-50 rounded-full blur-[100px] opacity-70"></div>
+	<div class="absolute top-40 -left-20 w-72 h-72 bg-blue-50 rounded-full blur-[80px] opacity-70"></div>
+
+	<div class="container mx-auto px-4 relative z-10">
+		<div class="flex flex-col lg:flex-row items-center gap-16">
+			<div class="lg:w-1/2">
+				<div class="relative rounded-3xl overflow-hidden shadow-2xl">
+					<img src="{% static 'img/bunly-hort-78XkyQfE5QU-unsplash.jpg' %}" alt="Find Your Tribe"
+						class="w-full h-auto object-cover transform hover:scale-105 transition-transform duration-700">
+					<div class="absolute inset-0 border-4 border-white/20 rounded-3xl pointer-events-none"></div>
+				</div>
+			</div>
+			<div class="lg:w-1/2 space-y-8">
+				<div>
+					<span class="text-blue-600 font-bold tracking-widest uppercase text-sm mb-2 block">Community
+						First</span>
+					<h2 class="font-display font-black text-4xl md:text-5xl text-gray-900 mb-6 leading-tight">Solo is
+						Great, But <br><span
+							class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">Groups
+							are Unforgettable</span></h2>
+					<p class="text-gray-600 text-lg leading-relaxed">
+						Traveling solo shouldn't mean traveling alone. <strong>Travel Buddy</strong> bridges the gap,
+						allowing solo travelers to join vibrant, like-minded groups in a safe and structured
+						environment.
+					</p>
+				</div>
+
+				<div class="space-y-6">
+					<div class="flex gap-4">
+						<div
+							class="flex-shrink-0 w-12 h-12 bg-green-100 rounded-2xl flex items-center justify-center text-green-600 text-xl shadow-sm">
+							<i class="fa-solid fa-shield-halved"></i>
+						</div>
+						<div>
+							<h4 class="font-bold text-gray-900 text-lg mb-1">Safety in Numbers</h4>
+							<p class="text-gray-500">Explore remote destinations and hidden gems with the security of a
+								verified company and a supportive cohort.</p>
+						</div>
+					</div>
+					<div class="flex gap-4">
+						<div
+							class="flex-shrink-0 w-12 h-12 bg-blue-100 rounded-2xl flex items-center justify-center text-blue-600 text-xl shadow-sm">
+							<i class="fa-solid fa-wallet"></i>
+						</div>
+						<div>
+							<h4 class="font-bold text-gray-900 text-lg mb-1">Split the Costs</h4>
+							<p class="text-gray-500">Reduce individual expenses for accommodation and transport by
+								sharing the load with your group members.</p>
+						</div>
+					</div>
+					<div class="flex gap-4">
+						<div
+							class="flex-shrink-0 w-12 h-12 bg-purple-100 rounded-2xl flex items-center justify-center text-purple-600 text-xl shadow-sm">
+							<i class="fa-solid fa-users-rays"></i>
+						</div>
+						<div>
+							<h4 class="font-bold text-gray-900 text-lg mb-1">Instant Connections</h4>
+							<p class="text-gray-500">Skip the awkward small talk—our "Vibe Tags" ensure you're paired
+								with people who share your travel style.</p>
+						</div>
+					</div>
+				</div>
+
+				<div class="pt-4">
+					{% if user.is_authenticated %}
+					<a href="{% url 'browse_trips' %}"
+						class="inline-block bg-gray-900 hover:bg-black text-white px-8 py-4 rounded-xl font-bold shadow-lg transition-transform hover:-translate-y-1">
+						Find Your Tribe Today
+					</a>
+					{% else %}
+					<a href="{% url 'login' %}"
+						class="inline-block bg-gray-900 hover:bg-black text-white px-8 py-4 rounded-xl font-bold shadow-lg transition-transform hover:-translate-y-1">
+						Join the Community
+					</a>
+					{% endif %}
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+<!-- How It Works (Steps) -->
+<section class="py-24 bg-gray-50 relative overflow-hidden">
+	<div class="container mx-auto px-4 relative z-10">
+		<div class="text-center max-w-2xl mx-auto mb-16">
+			<span class="text-primary-600 font-bold tracking-widest uppercase text-sm mb-2 block">Simple Process</span>
+			<h2 class="font-display font-black text-4xl md:text-5xl text-gray-900 mb-4">How Travel Buddy Works</h2>
+			<p class="text-gray-500 text-lg">Booking your next group adventure is easier than ever. Follow these simple
+				steps.</p>
+		</div>
+
+		<div class="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
+			<!-- Connecting Line -->
+			<div class="hidden md:block absolute top-1/2 left-0 right-0 h-0.5 bg-gray-200 -translate-y-12 z-0"></div>
+
+			<!-- Step 1 -->
+			<div class="relative z-10 text-center group">
+				<div
+					class="w-24 h-24 mx-auto bg-white rounded-3xl shadow-lg border border-gray-100 flex items-center justify-center mb-6 group-hover:-translate-y-2 transition-transform duration-300 relative border-b-4 border-b-primary-500">
+					<div
+						class="absolute -top-3 -right-3 w-8 h-8 bg-primary-500 text-white rounded-full font-bold flex items-center justify-center border-4 border-gray-50 shadow-sm">
+						1</div>
+					<i class="fa-solid fa-earth-americas text-4xl text-primary-500"></i>
+				</div>
+				<h3 class="font-bold text-2xl text-gray-900 mb-3 block">Discover</h3>
+				<p class="text-gray-500">Browse through hundreds of verified trips. Filter by destination, dates, vibe,
+					and your budget.</p>
+			</div>
+
+			<!-- Step 2 -->
+			<div class="relative z-10 text-center group">
+				<div
+					class="w-24 h-24 mx-auto bg-white rounded-3xl shadow-lg border border-gray-100 flex items-center justify-center mb-6 group-hover:-translate-y-2 transition-transform duration-300 relative border-b-4 border-b-blue-500">
+					<div
+						class="absolute -top-3 -right-3 w-8 h-8 bg-blue-500 text-white rounded-full font-bold flex items-center justify-center border-4 border-gray-50 shadow-sm">
+						2</div>
+					<i class="fa-solid fa-users text-4xl text-blue-500"></i>
+				</div>
+				<h3 class="font-bold text-2xl text-gray-900 mb-3 block">Connect</h3>
+				<p class="text-gray-500">Check the active crowd balance. Ensure the group matches your age, language,
+					and interests.</p>
+			</div>
+
+			<!-- Step 3 -->
+			<div class="relative z-10 text-center group">
+				<div
+					class="w-24 h-24 mx-auto bg-white rounded-3xl shadow-lg border border-gray-100 flex items-center justify-center mb-6 group-hover:-translate-y-2 transition-transform duration-300 relative border-b-4 border-b-green-500">
+					<div
+						class="absolute -top-3 -right-3 w-8 h-8 bg-green-500 text-white rounded-full font-bold flex items-center justify-center border-4 border-gray-50 shadow-sm">
+						3</div>
+					<i class="fa-solid fa-suitcase-rolling text-4xl text-green-500"></i>
+				</div>
+				<h3 class="font-bold text-2xl text-gray-900 mb-3 block">Book & Go</h3>
+				<p class="text-gray-500">Secure your spot with a verified travel company and pack your bags for the
+					adventure of a lifetime.</p>
+			</div>
+		</div>
+	</div>
+</section>
+
+<!-- About Section -->
+<section class="py-24 bg-gray-900 text-white relative">
+	<div
+		class="absolute inset-0 bg-[url('{% static 'img/about-img.jpg' %}')] bg-cover bg-center opacity-10 mix-blend-luminosity">
+	</div>
+	<div class="absolute inset-0 bg-gradient-to-r from-gray-900 via-gray-900/90 to-transparent"></div>
+
+	<div class="container mx-auto px-4 relative z-10">
+		<div class="flex flex-col lg:flex-row items-center gap-16">
+			<div class="lg:w-1/2">
+				<span class="text-primary-400 font-bold tracking-widest uppercase text-sm mb-4 block">Our
+					Philosophy</span>
+				<h2 class="font-display font-black text-4xl md:text-5xl lg:text-6xl mb-8 leading-tight">
+					We Believe in <br>
+					<span
+						class="text-transparent bg-clip-text bg-gradient-to-r from-primary-400 to-yellow-400">Meaningful</span>
+					<br>
+					Travel Experiences
+				</h2>
+
+				<div class="space-y-6 text-gray-300 text-lg">
+					<p class="leading-relaxed border-l-4 border-primary-500 pl-6">
+						Travel Buddy connects you with like-minded travelers and verified travel companies to create
+						unforgettable group experiences. We focus on balanced group dynamics and authentic local
+						experiences.
+					</p>
+					<p class="leading-relaxed">
+						Our platform ensures all travel companies are thoroughly verified, trips are reviewed for
+						quality, and groups are balanced for the best social experience. We monitor crowd balance to
+						maintain the perfect group atmosphere.
+					</p>
+					<p class="leading-relaxed">
+						Whether you're a solo traveler looking for group adventures or a travel company wanting to reach
+						more customers, we provide the tools and community to make it happen.
+					</p>
+				</div>
+			</div>
+
+			<div class="lg:w-1/2 hidden lg:block">
+				<!-- Empty div for spacing, background image handles the visual on the right -->
+			</div>
+		</div>
+	</div>
+</section>
+
+
+
+<!-- Testimonials -->
+<section class="py-24 bg-white relative">
+	<div class="absolute top-0 right-0 w-1/3 h-full bg-gray-50 rounded-l-[100px] opacity-50 hidden lg:block"></div>
+	<div class="container mx-auto px-4 relative z-10">
+		<div class="text-center max-w-2xl mx-auto mb-16">
+			<span class="text-blue-600 font-bold tracking-widest uppercase text-sm mb-2 block">Real Stories</span>
+			<h2 class="font-display font-black text-4xl md:text-5xl text-gray-900 mb-4">Traveler Reviews</h2>
+			<p class="text-gray-500 text-lg">Don't just take our word for it. Hear from travelers who found their tribe.
+			</p>
+		</div>
+
+		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+			<!-- Review 1 -->
+			<div
+				class="bg-white rounded-3xl p-8 border border-gray-100 shadow-xl shadow-gray-200/50 hover:-translate-y-1 transition-transform relative overflow-hidden">
+				<div
+					class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-primary-50 to-transparent rounded-bl-full">
+				</div>
+				<i class="fa-solid fa-quote-left text-4xl text-primary-100 absolute top-6 right-6"></i>
+				<div class="flex items-center gap-1 text-yellow-400 text-sm mb-6 relative z-10">
+					<i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
+						class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+				</div>
+				<p class="text-gray-700 mb-8 font-medium leading-relaxed relative z-10">"I was nervous about solo
+					traveling to Manali, but Travel Buddy connected me with a group of 8 amazing people. We are still
+					friends today and planning our next trip!"</p>
+				<div class="flex items-center gap-4 relative z-10">
+					<div
+						class="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center font-bold text-primary-600">
+						SJ</div>
+					<div>
+						<h4 class="font-bold text-gray-900 text-sm">Sarah Jenkins</h4>
+						<p class="text-xs text-gray-500 uppercase tracking-widest font-bold">Manali Trek, 2025</p>
+					</div>
+				</div>
+			</div>
+
+			<!-- Review 2 -->
+			<div
+				class="bg-white rounded-3xl p-8 border border-gray-100 shadow-xl shadow-gray-200/50 hover:-translate-y-1 transition-transform relative overflow-hidden">
+				<div
+					class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-blue-50 to-transparent rounded-bl-full">
+				</div>
+				<i class="fa-solid fa-quote-left text-4xl text-blue-50 absolute top-6 right-6"></i>
+				<div class="flex items-center gap-1 text-yellow-400 text-sm mb-6 relative z-10">
+					<i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
+						class="fa-solid fa-star"></i><i class="fa-solid fa-star-half-stroke"></i>
+				</div>
+				<p class="text-gray-700 mb-8 font-medium leading-relaxed relative z-10">"The crowd peek feature is
+					brilliant. I wanted a trip with people my age (20s) and a balance of guys/girls. The booking matched
+					perfectly. Total game changer."</p>
+				<div class="flex items-center gap-4 relative z-10">
+					<div
+						class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center font-bold text-blue-600">
+						MR</div>
+					<div>
+						<h4 class="font-bold text-gray-900 text-sm">Mark Roberts</h4>
+						<p class="text-xs text-gray-500 uppercase tracking-widest font-bold">Goa Retreat, 2026</p>
+					</div>
+				</div>
+			</div>
+
+			<!-- Review 3 -->
+			<div
+				class="bg-white rounded-3xl p-8 border border-gray-100 shadow-xl shadow-gray-200/50 hover:-translate-y-1 transition-transform relative overflow-hidden hidden md:block">
+				<div
+					class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-green-50 to-transparent rounded-bl-full">
+				</div>
+				<i class="fa-solid fa-quote-left text-4xl text-green-50 absolute top-6 right-6"></i>
+				<div class="flex items-center gap-1 text-yellow-400 text-sm mb-6 relative z-10">
+					<i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
+						class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+				</div>
+				<p class="text-gray-700 mb-8 font-medium leading-relaxed relative z-10">"As a travel agency, we
+					struggled to fill our trips. Since joining, we hit max capacity on 90% of our adventures reliably.
+					Best platform out there for group tours."</p>
+				<div class="flex items-center gap-4 relative z-10">
+					<div
+						class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center font-bold text-green-600">
+						AE</div>
+					<div>
+						<h4 class="font-bold text-gray-900 text-sm">Apex Explorers</h4>
+						<p class="text-xs text-green-600 uppercase tracking-widest font-bold"><i
+								class="fa-solid fa-circle-check"></i> Verified Company</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+<!-- For Companies CTA -->
+{% if not user.is_authenticated %}
+<section class="py-20 bg-primary-600 relative overflow-hidden">
+	<div
+		class="absolute inset-0 bg-[url('{% static 'img/slider2.jpg' %}')] bg-cover bg-center mix-blend-overlay opacity-20">
+	</div>
+	<div class="absolute -top-24 -right-24 w-64 h-64 bg-white/10 rounded-full blur-[40px]"></div>
+
+	<div class="container mx-auto px-4 relative z-10 text-center">
+		<h2 class="font-display font-black text-3xl md:text-4xl text-white mb-4">Are you a Travel Company?</h2>
+		<p class="text-primary-100 text-lg max-w-2xl mx-auto mb-8">
+			Reach thousands of travelers, manage bookings effortlessly, and grow your business with our specialized
+			tools.
+		</p>
+		{% if not user.is_authenticated %}
+		<a href="{% url 'company_register' %}"
+			class="inline-block bg-white text-primary-600 hover:bg-gray-50 px-8 py-4 rounded-xl font-bold shadow-lg transition-transform hover:-translate-y-1">
+			Register as a Partner
+		</a>
+		{% endif %}
+	</div>
+</section>
+{% endif %}
+
+{% endblock %}

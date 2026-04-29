@@ -1,0 +1,246 @@
+{% extends 'company/base_company.html' %}
+{% load static %}
+
+{% block title %}Trip Communication | {{ trip.title }}{% endblock %}
+
+{% block company_content %}
+<div class="row mb-5 align-items-center">
+    <div class="col-md-8">
+        <h2 class="font-weight-bold" style="color: #2b2b2b;">Trip Communication</h2>
+        <p class="text-muted">Manage updates and chat with travelers for <span
+                style="color: #ff7e5f; font-weight: 600;">{{ trip.title }}</span></p>
+    </div>
+    <div class="col-md-4 text-md-right">
+        <a href="{% url 'manage_trips' %}" class="btn px-4 text-white shadow-sm"
+            style="background: linear-gradient(135deg, #ff7e5f, #feb47b); border: none; border-radius: 20px; font-weight: 600;">
+            <i class="fa fa-arrow-left mr-2"></i>Back to Trips
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Left Side: Official Updates -->
+    <div class="col-lg-4">
+        <div class="card border-0 mb-4"
+            style="border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); background: rgba(255,255,255,0.85); backdrop-filter: blur(12px);">
+            <div class="card-body p-4">
+                <h5 class="mb-4 font-weight-bold" style="color: #ff7e5f;"><i class="fa fa-bullhorn mr-2"></i>Official
+                    Updates</h5>
+                <p class="text-muted small mb-4">Send critical info like meeting points, packing lists, and safety
+                    instructions directly to all travelers.</p>
+
+                <form action="{% url 'post_trip_update' trip.id %}" method="POST">
+                    {% csrf_token %}
+                    <div class="form-group mb-3">
+                        <label class="font-weight-bold small text-muted text-uppercase"
+                            style="letter-spacing: 0.5px;">Update Category</label>
+                        <select name="update_type" class="form-control border-0 bg-light" style="border-radius: 8px;"
+                            required>
+                            {% for val, label in update_types %}
+                            <option value="{{ val }}">{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group mb-4">
+                        <label class="font-weight-bold small text-muted text-uppercase"
+                            style="letter-spacing: 0.5px;">Instructions/Details</label>
+                        <textarea name="content" class="form-control border-0 bg-light" rows="5"
+                            placeholder="e.g. Meet at Terminal 3 Gate 4 at 10:00 AM..." style="border-radius: 8px;"
+                            required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-block w-100 shadow-sm text-white"
+                        style="background: linear-gradient(135deg, #ff7e5f, #feb47b); border: none; border-radius: 8px; font-weight: 600; padding: 12px;">
+                        Send Notification
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm"
+            style="border-radius: 16px; background: rgba(255,255,255,0.85); backdrop-filter: blur(12px);">
+            <div class="card-body p-4">
+                <h6 class="mb-4 d-flex justify-content-between align-items-center">
+                    <span class="font-weight-bold text-dark"><i class="fa fa-history mr-2"
+                            style="color: #ff7e5f;"></i>History</span>
+                    <span class="badge badge-light border" style="color: #ff7e5f;">{{ updates.count }} sent</span>
+                </h6>
+                <div class="updates-list pr-2" style="max-height: 400px; overflow-y: auto;">
+                    {% if updates %}
+                    {% for update in updates %}
+                    <div class="update-card p-3 mb-3 bg-white rounded shadow-sm border-left-orange">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="badge py-1 px-2 small text-white"
+                                style="background: #ff7e5f;">{{update.get_update_type_display}}</span>
+                            <small class="text-muted" style="font-size: 10px;">{{update.formatted_date}}</small>
+                        </div>
+                        <p class="mt-2 mb-0 small text-dark" style="line-height: 1.5;">{{update.clean_content}}</p>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="fa fa-info-circle fa-2x mb-2" style="color: #ff7e5f; opacity: 0.5;"></i>
+                        <p class="text-muted small italic mb-0">No official updates yet.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Side: Group Chat -->
+    <div class="col-lg-8">
+        <div class="card border-0 overflow-hidden d-flex flex-column"
+            style="height: 750px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); background: rgba(255,255,255,0.85); backdrop-filter: blur(12px);">
+            <div class="chat-header text-white p-3 d-flex justify-content-between align-items-center"
+                style="background: linear-gradient(135deg, #ff7e5f, #feb47b);">
+                <div class="d-flex align-items-center">
+                    <div class="trip-thumb mr-3 shadow-sm"
+                        style="width: 45px; height: 45px; border-radius: 50%; background: #fff; display: flex; align-items: center; justify-content: center;">
+                        <i class="fa fa-plane" style="color: #ff7e5f;"></i>
+                    </div>
+                    <div>
+                        <h6 class="mb-0 text-white font-weight-bold">{{ trip.title }}</h6>
+                        <small class="text-white" style="font-size: 11px; opacity: 0.9;"><i
+                                class="fa fa-circle mr-1 {% if trip.status == 'APPROVED' or trip.status == 'ONGOING' %}text-success{% else %}text-danger{% endif %}"></i>Active
+                            Group Chat</small>
+                    </div>
+                </div>
+                <div class="chat-stats text-right">
+                    <small class="d-block text-white" style="font-size: 10px; opacity: 0.9;">MESSAGES</small>
+                    <strong id="msg-count-total" class="h5 mb-0 text-white">{{ chat_messages.count }}</strong>
+                </div>
+            </div>
+
+            <div class="chat-messages p-4 flex-grow-1" id="chat-box" style="overflow-y: auto; background: #fafafa;">
+                {% for msg in chat_messages %}
+                <div class="message-wrapper mb-3 {% if msg.sender == request.user %}text-right{% endif %}">
+                    <div class="message-info mb-1" style="font-size: 0.75rem;">
+                        <span class="font-weight-bold"
+                            style="{% if msg.sender == request.user %}color: #ff7e5f;{% else %}color: #6c757d;{% endif %}">
+                            {{ msg.sender.username }}
+                            {% if msg.sender == trip.company %}
+                            <small class="badge badge-light border ml-1 text-muted">Organizer</small>
+                            {% endif %}
+                        </span>
+                        <span class="text-muted ml-2">{{ msg.created_at|date:"H:i" }}</span>
+                    </div>
+                    <div class="message-bubble d-inline-block p-2 px-3 rounded shadow-sm text-dark bg-white"
+                        style="max-width: 75%; text-align: left; {% if msg.sender == request.user %}background: linear-gradient(135deg, #ff7e5f, #feb47b) !important; color: white !important;{% endif %}">
+                        {{ msg.message }}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="chat-input p-1 border-top" style="background: #fff;">
+                <form id="chat-form" class="d-flex p-3 align-items-center">
+                    {% csrf_token %}
+                    <input type="text" id="msg-input" class="form-control border-0 bg-light py-4 px-4 h-100 mr-3"
+                        style="border-radius: 30px;" placeholder="Type a message to travelers..." autocomplete="off">
+                    <button type="submit"
+                        class="btn text-white rounded-circle shadow-sm d-flex align-items-center justify-content-center"
+                        style="background: linear-gradient(135deg, #ff7e5f, #feb47b); border: none; width: 50px; height: 50px; flex-shrink: 0;">
+                        <i class="fa fa-paper-plane"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .border-left-orange {
+        border-left: 4px solid #ff7e5f !important;
+    }
+
+    .message-bubble {
+        border-radius: 18px !important;
+        line-height: 1.5;
+        font-size: 0.95rem;
+    }
+
+    .text-right .message-bubble {
+        border-bottom-right-radius: 4px !important;
+    }
+
+    .message-wrapper:not(.text-right) .message-bubble {
+        border-bottom-left-radius: 4px !important;
+    }
+
+    .chat-messages::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .chat-messages::-webkit-scrollbar-thumb {
+        background: #e0e0e0;
+        border-radius: 10px;
+    }
+
+    .updates-list::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    .updates-list::-webkit-scrollbar-thumb {
+        background: #f1f1f1;
+        border-radius: 10px;
+    }
+
+    .form-control:focus {
+        box-shadow: 0 0 0 0.2rem rgba(255, 126, 95, 0.25);
+        border-color: #ff7e5f !important;
+        background-color: #fff !important;
+    }
+</style>
+
+<script>
+    const chatBox = document.getElementById('chat-box');
+    const chatForm = document.getElementById('chat-form');
+    const msgInput = document.getElementById('msg-input');
+    const msgCountTotal = document.getElementById('msg-count-total');
+
+    // Scroll to bottom on load
+    if (chatBox) chatBox.scrollTop = chatBox.scrollHeight;
+
+    if (chatForm) {
+        chatForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            const msg = msgInput.value.trim();
+            if (!msg) return;
+
+            const formData = new FormData();
+            formData.append('message', msg);
+            formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+
+            fetch("{% url 'send_trip_message' trip.id %}", {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        const msgHtml = `
+                        <div class="message-wrapper mb-3 text-right">
+                            <div class="message-info mb-1" style="font-size: 0.75rem;">
+                                <span class="font-weight-bold" style="color: #ff7e5f;">
+                                    ${data.sender} <small class="badge badge-light border ml-1 text-muted">Organizer</small>
+                                </span>
+                                <span class="text-muted ml-2">${data.time}</span>
+                            </div>
+                            <div class="message-bubble d-inline-block p-2 px-3 rounded shadow-sm" style="max-width: 75%; text-align: left; background: linear-gradient(135deg, #ff7e5f, #feb47b) !important; color: white !important;">
+                                ${data.message}
+                            </div>
+                        </div>
+                    `;
+                        chatBox.insertAdjacentHTML('beforeend', msgHtml);
+                        msgInput.value = '';
+                        chatBox.scrollTop = chatBox.scrollHeight;
+
+                        // Update count
+                        let count = parseInt(msgCountTotal.innerText);
+                        msgCountTotal.innerText = count + 1;
+                    }
+                });
+        });
+    }
+</script>
+{% endblock %}

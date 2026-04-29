@@ -1,0 +1,528 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Travel Buddy - Modern Adventure{% endblock %}</title>
+
+    <!-- Modern Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700;800;900&display=swap"
+        rel="stylesheet">
+
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Tailwind CSS (via CDN for simplicity, usually best bundled, but requested for modern aesthetic) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: {
+                            50: '#fff5f1',
+                            100: '#ffe8e0',
+                            200: '#ffd6c7',
+                            300: '#ffbc9f',
+                            400: '#ff9466',
+                            500: '#ff5e14', // Brand Accent
+                            600: '#ed4800',
+                            700: '#c53400',
+                            800: '#9c2a08',
+                            900: '#7e260b',
+                        },
+                        dark: {
+                            900: '#0a0a0a',
+                            800: '#171717',
+                            700: '#262626',
+                        }
+                    },
+                    boxShadow: {
+                        'glass': '0 8px 32px 0 rgba(0, 0, 0, 0.05)',
+                        'glow': '0 0 20px rgba(255, 94, 20, 0.3)',
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-out',
+                        'slide-down': 'slideDown 0.4s ease-out',
+                        'slide-up': 'slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideDown: {
+                            '0%': { opacity: '0', transform: 'translateY(-20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        slideUp: {
+                            '0%': { opacity: '0', transform: 'translateY(40px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Utilities & Overrides */
+        body {
+            background-color: #fafafa;
+            color: #171717;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Glassmorphism Navbar */
+        .nav-glass {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .nav-scrolled {
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        /* Clean Dropdown */
+        .group:hover .group-hover\:block {
+            display: block;
+            animation: slideDown 0.2s ease-out forwards;
+        }
+
+        /* Nav Link Hover Effect */
+        .nav-link {
+            position: relative;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 50%;
+            background-color: #ff5e14;
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        /* Hide scrollbar for clean aesthetic */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* Modern Button */
+        .btn-modern {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            z-index: 1;
+        }
+
+        .btn-modern::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            z-index: -1;
+        }
+
+        .btn-modern:hover::before {
+            width: 100%;
+        }
+
+        /* Messages Toast */
+        .toast-enter {
+            animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+    </style>
+
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body class="flex flex-col min-h-screen">
+
+    <!-- Premium Navigation Bar -->
+    <header id="main-nav" class="fixed w-full top-0 z-50 transition-all duration-300 nav-glass">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <!-- Logo -->
+                <div class="flex-shrink-0 flex items-center gap-3">
+                    <a href="{% url 'index' %}" class="flex items-center gap-2 group">
+                        <div
+                            class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white shadow-glow transition-transform duration-300 group-hover:scale-110">
+                            <i class="fa-solid fa-suitcase-rolling text-lg"></i>
+                        </div>
+                        <span class="font-display font-bold text-2xl tracking-tight text-dark-900">
+                            {{ site_settings.platform_name|default:"Travel Buddy" }}
+                        </span>
+                    </a>
+                </div>
+
+                <!-- Desktop Navigation -->
+                <nav class="hidden md:flex items-center gap-8">
+                    <a href="{% url 'index' %}"
+                        class="nav-link font-medium text-sm {% if request.path == '/' %}text-primary-500{% else %}text-gray-600 hover:text-primary-500{% endif %} transition-colors uppercase tracking-wider">Home</a>
+                    <a href="{% url 'browse_trips' %}"
+                        class="nav-link font-medium text-sm {% if '/browse-trips/' in request.path or '/trip/' in request.path %}text-primary-500{% else %}text-gray-600 hover:text-primary-500{% endif %} transition-colors uppercase tracking-wider">Browse
+                        Trips</a>
+
+                    {% if user.is_authenticated %}
+                    {% if user.usertype == 'traveler' %}
+                    <a href="{% url 'my_bookings' %}"
+                        class="nav-link font-medium text-sm {% if '/my-bookings/' in request.path %}text-primary-500{% else %}text-gray-600 hover:text-primary-500{% endif %} transition-colors uppercase tracking-wider">My
+                        Bookings</a>
+                    {% elif user.usertype == 'company' %}
+                    <!-- Company Dropdown -->
+                    <div class="relative group">
+                        <button
+                            class="flex items-center gap-1 nav-link font-medium text-sm text-gray-600 hover:text-primary-500 transition-colors uppercase tracking-wider py-2">
+                            Company <i
+                                class="fa-solid fa-chevron-down text-[10px] ml-1 opacity-70 transition-transform group-hover:rotate-180"></i>
+                        </button>
+                        <div
+                            class="absolute right-0 top-full pt-2 w-56 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top translate-y-2 group-hover:translate-y-0 hidden group-hover:block z-50">
+                            <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+                                <div class="p-2 space-y-1">
+                                    <a href="{% url 'company_dashboard' %}"
+                                        class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-primary-50 hover:text-primary-600 rounded-xl transition-colors"><i
+                                            class="fa-solid fa-chart-line w-4 opacity-70"></i> Dashboard</a>
+                                    <a href="{% url 'create_trip' %}"
+                                        class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-primary-50 hover:text-primary-600 rounded-xl transition-colors"><i
+                                            class="fa-solid fa-plus w-4 opacity-70"></i> Create Trip</a>
+                                    <a href="{% url 'manage_trips' %}"
+                                        class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-primary-50 hover:text-primary-600 rounded-xl transition-colors"><i
+                                            class="fa-solid fa-list-check w-4 opacity-70"></i> Manage Trips</a>
+                                    <a href="{% url 'view_bookings' %}"
+                                        class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-primary-50 hover:text-primary-600 rounded-xl transition-colors"><i
+                                            class="fa-solid fa-ticket w-4 opacity-70"></i> View Bookings</a>
+                                    <div class="h-px bg-gray-100 my-1"></div>
+                                    <a href="{% url 'company_profile' %}"
+                                        class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-primary-50 hover:text-primary-600 rounded-xl transition-colors"><i
+                                            class="fa-solid fa-building w-4 opacity-70"></i> Profile</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% elif user.is_superuser or user.usertype == 'admin' %}
+                    <!-- Admin Dropdown -->
+                    <div class="relative group">
+                        <button
+                            class="flex items-center gap-1 nav-link font-medium text-sm text-gray-600 hover:text-primary-500 transition-colors uppercase tracking-wider py-2">
+                            Admin <i
+                                class="fa-solid fa-chevron-down text-[10px] ml-1 opacity-70 transition-transform group-hover:rotate-180"></i>
+                        </button>
+                        <div
+                            class="absolute right-0 top-full pt-2 w-56 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top translate-y-2 group-hover:translate-y-0 hidden group-hover:block z-50">
+                            <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+                                <div class="p-2 space-y-1">
+                                    <a href="{% url 'admin_dashboard' %}"
+                                        class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-primary-50 hover:text-primary-600 rounded-xl transition-colors"><i
+                                            class="fa-solid fa-gauge-high w-4 opacity-70"></i> Dashboard</a>
+                                    <a href="{% url 'admin_trip_management' %}"
+                                        class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-primary-50 hover:text-primary-600 rounded-xl transition-colors"><i
+                                            class="fa-solid fa-map-location-dot w-4 opacity-70"></i> Trips</a>
+                                    <a href="{% url 'admin_verification_management' %}"
+                                        class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-primary-50 hover:text-primary-600 rounded-xl transition-colors"><i
+                                            class="fa-solid fa-shield-check w-4 opacity-70"></i> Verifications</a>
+                                    <a href="{% url 'admin_user_management' %}"
+                                        class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-primary-50 hover:text-primary-600 rounded-xl transition-colors"><i
+                                            class="fa-solid fa-users w-4 opacity-70"></i> Users</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- User Profile Dropdown -->
+                    <div class="relative group ml-4 border-l border-gray-200 pl-4">
+                        <button class="flex items-center gap-2 focus:outline-none">
+                            <div
+                                class="w-10 h-10 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-600 hover:bg-primary-50 hover:text-primary-500 transition-colors shadow-sm">
+                                <i class="fa-solid fa-user"></i>
+                            </div>
+                        </button>
+                        <div
+                            class="absolute right-0 top-full pt-2 w-64 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top translate-y-2 group-hover:translate-y-0 hidden group-hover:block z-50">
+                            <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+                                <div class="p-4 bg-gray-50 border-b border-gray-100">
+                                    <p class="text-sm font-medium text-gray-500 mb-1">Signed in as</p>
+                                    <p class="font-display font-bold text-gray-900 truncate">
+                                        {% if user.usertype == 'company' and user.company_name %}
+                                        {{ user.company_name }}
+                                        {% else %}
+                                        {{ user.username }}
+                                        {% endif %}
+                                    </p>
+                                    <span
+                                        class="inline-block px-2.5 py-1 mt-2 text-xs font-semibold uppercase tracking-wider rounded-lg {% if user.usertype == 'traveler' %}bg-blue-100 text-blue-700{% elif user.usertype == 'company' %}bg-green-100 text-green-700{% else %}bg-purple-100 text-purple-700{% endif %}">
+                                        {{ user.usertype }}
+                                    </span>
+                                </div>
+                                <div class="p-2 space-y-1">
+                                    <a href="{% url 'profile' %}"
+                                        class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 rounded-xl transition-colors"><i
+                                            class="fa-regular fa-id-badge w-4 opacity-70"></i> My Profile</a>
+                                    {% if user.usertype == 'traveler' %}
+                                    <a href="{% url 'user_settings' %}"
+                                        class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 rounded-xl transition-colors"><i
+                                            class="fa-solid fa-gear w-4 opacity-70"></i> Settings</a>
+                                    {% endif %}
+                                    <div class="h-px bg-gray-100 my-1"></div>
+                                    <a href="{% url 'logout' %}"
+                                        class="flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 rounded-xl transition-colors font-medium"><i
+                                            class="fa-solid fa-arrow-right-from-bracket w-4 opacity-80"></i> Sign
+                                        out</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <!-- Login / Register -->
+                    <div class="flex items-center gap-3 ml-4">
+                        <a href="{% url 'login' %}"
+                            class="text-sm font-semibold text-gray-700 hover:text-primary-500 transition-colors uppercase tracking-wider px-2">Login</a>
+                        <a href="{% url 'register' %}"
+                            class="btn-modern bg-primary-500 text-white text-sm font-semibold uppercase tracking-wider px-6 py-2.5 rounded-xl shadow-glow">Start
+                            Journey</a>
+                    </div>
+                    {% endif %}
+                </nav>
+
+                <!-- Mobile menu button -->
+                <div class="md:hidden flex items-center">
+                    <button class="mobile-menu-btn text-gray-600 hover:text-primary-500 focus:outline-none p-2">
+                        <i class="fa-solid fa-bars text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu (Hidden by default) -->
+        <div
+            class="mobile-menu hidden md:hidden bg-white border-t border-gray-100 shadow-xl absolute w-full left-0 origin-top animate-slide-down">
+            <div class="px-4 py-6 space-y-4 shadow-inner">
+                <a href="{% url 'index' %}"
+                    class="block text-base font-semibold {% if request.path == '/' %}text-primary-500{% else %}text-gray-800 hover:text-primary-500{% endif %} uppercase tracking-wide">Home</a>
+                <a href="{% url 'browse_trips' %}"
+                    class="block text-base font-semibold {% if '/browse-trips/' in request.path or '/trip/' in request.path %}text-primary-500{% else %}text-gray-800 hover:text-primary-500{% endif %} uppercase tracking-wide">Browse
+                    Trips</a>
+
+                {% if user.is_authenticated %}
+                {% if user.usertype == 'traveler' %}
+                <a href="{% url 'my_bookings' %}"
+                    class="block text-base font-semibold {% if '/my-bookings/' in request.path %}text-primary-500{% else %}text-gray-800 hover:text-primary-500{% endif %} uppercase tracking-wide">My
+                    Bookings</a>
+                {% endif %}
+
+                <div class="pt-4 border-t border-gray-100">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div
+                            class="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center text-primary-600">
+                            <i class="fa-solid fa-user"></i>
+                        </div>
+                        <div>
+                            <p class="font-bold text-gray-900">{{ user.username }}</p>
+                            <p class="text-xs font-semibold text-primary-600 uppercase">{{ user.usertype }}</p>
+                        </div>
+                    </div>
+                    <a href="{% url 'profile' %}" class="block py-2 text-gray-600 hover:text-primary-500"><i
+                            class="fa-solid fa-user-circle w-6"></i> Profile</a>
+                    {% if user.usertype == 'traveler' %}
+                    <a href="{% url 'user_settings' %}" class="block py-2 text-gray-600 hover:text-primary-500"><i
+                            class="fa-solid fa-gear w-6"></i> Settings</a>
+                    {% endif %}
+                    <a href="{% url 'logout' %}" class="block py-2 text-red-500 hover:text-red-600 font-medium"><i
+                            class="fa-solid fa-sign-out-alt w-6"></i> Logout</a>
+                </div>
+                {% else %}
+                <div class="pt-4 border-t border-gray-100 flex flex-col gap-3">
+                    <a href="{% url 'login' %}"
+                        class="w-full text-center py-3 rounded-xl border border-gray-200 font-semibold text-gray-700 hover:bg-gray-50">Login</a>
+                    <a href="{% url 'register' %}"
+                        class="w-full text-center py-3 rounded-xl bg-primary-500 text-white font-semibold shadow-md">Register
+                        Now</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <!-- Global Toast Messages -->
+    {% if messages %}
+    <div class="fixed top-24 right-4 z-[60] flex flex-col gap-3 max-w-md w-full pointer-events-none">
+        {% for message in messages %}
+        <div class="pointer-events-auto bg-white rounded-2xl p-4 shadow-xl border border-gray-100 flex items-start gap-4 toast-enter"
+            role="alert">
+            <div class="flex-shrink-0 mt-0.5">
+                {% if message.tags == 'success' %}
+                <i class="fa-solid fa-circle-check text-green-500 text-xl"></i>
+                {% elif message.tags == 'danger' or message.tags == 'error' %}
+                <i class="fa-solid fa-circle-xmark text-red-500 text-xl"></i>
+                {% elif message.tags == 'warning' %}
+                <i class="fa-solid fa-triangle-exclamation text-yellow-500 text-xl"></i>
+                {% else %}
+                <i class="fa-solid fa-circle-info text-blue-500 text-xl"></i>
+                {% endif %}
+            </div>
+            <div class="flex-1">
+                <p class="text-sm font-medium text-gray-900">{{ message }}</p>
+            </div>
+            <button class="text-gray-400 hover:text-gray-600 transition-colors"
+                onclick="this.parentElement.style.display='none'">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Main Content Area -->
+    <main class="flex-grow pt-20"> <!-- pt-20 offsets the fixed 80px header -->
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Modern Minimal Footer -->
+    {% block footer %}
+    <footer class="bg-gray-50 border-t border-gray-200 mt-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <!-- Brand Col -->
+                <div class="col-span-1 md:col-span-2 space-y-4">
+                    <a href="{% url 'index' %}" class="flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-lg bg-primary-500 flex items-center justify-center text-white">
+                            <i class="fa-solid fa-suitcase-rolling text-sm"></i>
+                        </div>
+                        <span class="font-display font-bold text-xl tracking-tight text-gray-900">
+                            {{ site_settings.platform_name|default:"Travel Buddy" }}
+                        </span>
+                    </a>
+                    <p class="text-gray-500 text-sm max-w-md">
+                        Connecting passionate travelers with verified companions & companies for unforgettable,
+                        perfectly balanced group adventures.
+                    </p>
+                    <div class="flex gap-4 pt-2">
+                        <a href="#"
+                            class="w-10 h-10 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-400 hover:text-primary-500 hover:border-primary-200 hover:shadow-md transition-all"><i
+                                class="fa-brands fa-twitter"></i></a>
+                        <a href="#"
+                            class="w-10 h-10 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-400 hover:text-primary-500 hover:border-primary-200 hover:shadow-md transition-all"><i
+                                class="fa-brands fa-instagram"></i></a>
+                        <a href="#"
+                            class="w-10 h-10 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-400 hover:text-primary-500 hover:border-primary-200 hover:shadow-md transition-all"><i
+                                class="fa-brands fa-linkedin"></i></a>
+                    </div>
+                </div>
+
+                <!-- Links Col 1 -->
+                <div>
+                    <h3 class="font-display font-bold text-gray-900 mb-4 uppercase text-xs tracking-wider">Platform</h3>
+                    <ul class="space-y-3">
+                        <li><a href="{% url 'browse_trips' %}"
+                                class="text-sm text-gray-500 hover:text-primary-500 transition-colors">Explore Trips</a>
+                        </li>
+                        <li><a href="#" class="text-sm text-gray-500 hover:text-primary-500 transition-colors">How it
+                                works</a></li>
+                        <li><a href="#" class="text-sm text-gray-500 hover:text-primary-500 transition-colors">Trust &
+                                Safety</a></li>
+                    </ul>
+                </div>
+
+                <!-- Links Col 2 -->
+                <div>
+                    <h3 class="font-display font-bold text-gray-900 mb-4 uppercase text-xs tracking-wider">Support</h3>
+                    <ul class="space-y-3">
+                        <li><a href="#" class="text-sm text-gray-500 hover:text-primary-500 transition-colors">Help
+                                Center</a></li>
+                        <li><a href="mailto:support@travelbuddy.com" class="text-sm text-gray-500 hover:text-primary-500 transition-colors">Contact
+                                Us</a></li>
+                        <li><a href="#" class="text-sm text-gray-500 hover:text-primary-500 transition-colors">Privacy
+                                Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div
+                class="mt-12 pt-8 border-t border-gray-200 flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="text-sm text-gray-400">
+                    &copy;
+                    <script>document.write(new Date().getFullYear())</script> Travel Buddy. All rights reserved.
+                </p>
+                <div class="flex items-center gap-2 text-sm text-gray-400">
+                    Made with <i class="fa-solid fa-heart text-red-500"></i> for travelers
+                </div>
+            </div>
+        </div>
+    </footer>
+    {% endblock %}
+
+    <!-- Scripts -->
+    <script>
+        // Mobile Menu Toggle
+        document.querySelector('.mobile-menu-btn').addEventListener('click', function () {
+            const menu = document.querySelector('.mobile-menu');
+            menu.classList.toggle('hidden');
+        });
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', function () {
+            const nav = document.getElementById('main-nav');
+            if (window.scrollY > 10) {
+                nav.classList.add('nav-scrolled');
+                nav.classList.remove('nav-glass');
+            } else {
+                nav.classList.remove('nav-scrolled');
+                nav.classList.add('nav-glass');
+            }
+        });
+
+        // Auto-hide toasts after 5 seconds
+        setTimeout(() => {
+            const toasts = document.querySelectorAll('.toast-enter');
+            toasts.forEach(toast => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(-20px)';
+                toast.style.transition = 'all 0.5s ease';
+                setTimeout(() => toast.remove(), 500);
+            });
+        }, 5000);
+    </script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+
+</html>

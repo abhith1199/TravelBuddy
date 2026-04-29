@@ -1,0 +1,295 @@
+{% extends 'base_modern.html' %}
+{% load static %}
+
+{% block title %}Verify Your Email - Travel Buddy{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Transparent navbar for auth pages */
+    #main-nav {
+        background: transparent !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        border-bottom: none !important;
+        box-shadow: none !important;
+    }
+
+    #main-nav .text-dark-900,
+    #main-nav .text-gray-600 {
+        color: rgba(255, 255, 255, 0.9) !important;
+    }
+
+    #main-nav .text-gray-600:hover {
+        color: #ff5e14 !important;
+    }
+
+    /* OTP digit boxes */
+    .otp-boxes {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+    }
+
+    .otp-box {
+        width: 52px;
+        height: 64px;
+        font-size: 1.75rem;
+        font-weight: 700;
+        text-align: center;
+        border: 2px solid #e5e7eb;
+        border-radius: 14px;
+        background: #f9fafb;
+        color: #111827;
+        transition: border-color 0.2s, box-shadow 0.2s;
+        outline: none;
+    }
+
+    .otp-box:focus {
+        border-color: #ff5e14;
+        box-shadow: 0 0 0 3px rgba(255, 94, 20, 0.15);
+        background: #fff;
+    }
+
+    .otp-box.filled {
+        border-color: #ff5e14;
+        background: #fff5f0;
+    }
+
+    /* Pulse animation on icon */
+    @keyframes pulse-glow {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(255,94,20,0.4); }
+        50% { box-shadow: 0 0 0 10px rgba(255,94,20,0); }
+    }
+
+    .icon-pulse {
+        animation: pulse-glow 2s ease-in-out infinite;
+    }
+
+    /* Timer bar */
+    .timer-bar {
+        height: 4px;
+        border-radius: 2px;
+        background: linear-gradient(90deg, #ff5e14, #ff8c55);
+        transition: width 1s linear;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="relative min-h-screen flex items-center justify-center overflow-hidden bg-dark-900 py-12 -mt-20">
+    <!-- Background Image -->
+    <div class="absolute inset-0 z-0 opacity-100">
+        <img src="{% static 'img/slider2.jpg' %}" alt="Verification Background"
+            class="w-full h-full object-cover filter saturate-150">
+        <div class="absolute inset-0 bg-gradient-to-b from-dark-900/90 via-dark-900/70 to-dark-900/95"></div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="relative z-10 w-full max-w-md px-4 sm:px-6">
+
+        <!-- Header -->
+        <div class="text-center mb-8 animate-slide-up">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 mb-4 text-primary-400 icon-pulse">
+                <i class="fa-solid fa-envelope-circle-check text-2xl"></i>
+            </div>
+            <h2 class="font-display text-3xl md:text-4xl font-bold text-white mb-2 tracking-tight">Check Your Email</h2>
+            <p class="text-gray-300 text-sm font-medium">
+                We sent a <strong class="text-white">6-digit code</strong> to<br>
+                <strong class="text-primary-400">{{ email }}</strong>
+            </p>
+            <p class="text-gray-400 text-xs mt-1">Check your inbox (or spam folder)</p>
+        </div>
+
+        <!-- Card -->
+        <div class="bg-white rounded-[2rem] shadow-glass border border-gray-100 overflow-hidden animate-slide-up"
+            style="animation-delay: 100ms;">
+            <div class="p-8 sm:p-10">
+
+                {% if messages %}
+                <div class="mb-6 space-y-3">
+                    {% for message in messages %}
+                    <div class="flex items-start gap-3 p-4 rounded-xl border
+                        {% if message.tags == 'error' %}bg-red-50 border-red-200 text-red-800
+                        {% elif message.tags == 'warning' %}bg-yellow-50 border-yellow-200 text-yellow-800
+                        {% else %}bg-green-50 border-green-200 text-green-800{% endif %}">
+                        <i class="fa-solid {% if message.tags == 'error' %}fa-circle-xmark text-red-500{% elif message.tags == 'warning' %}fa-triangle-exclamation text-yellow-500{% else %}fa-circle-check text-green-500{% endif %} text-xl mt-0.5"></i>
+                        <p class="font-medium text-sm">{{ message }}</p>
+                        <button type="button" class="ml-auto text-gray-400 hover:text-gray-600"
+                            onclick="this.parentElement.remove()"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <!-- Timer bar -->
+                <div class="mb-6">
+                    <div class="flex justify-between text-xs text-gray-400 mb-1">
+                        <span>Code expires in</span>
+                        <span id="timer-text" class="font-bold text-primary-500">15:00</span>
+                    </div>
+                    <div class="w-full bg-gray-100 rounded-full overflow-hidden" style="height:4px;">
+                        <div id="timer-bar" class="timer-bar" style="width:100%;"></div>
+                    </div>
+                </div>
+
+                <!-- OTP Form -->
+                <form id="otp-form" action="{% url 'verify_email_otp' %}" method="POST">
+                    {% csrf_token %}
+
+                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-4 text-center">
+                        Enter 6-Digit Code
+                    </label>
+
+                    <!-- Digit boxes -->
+                    <div class="otp-boxes mb-6" id="otp-display-boxes">
+                        <input class="otp-box" type="text" inputmode="numeric" maxlength="1" data-index="0" autocomplete="off">
+                        <input class="otp-box" type="text" inputmode="numeric" maxlength="1" data-index="1" autocomplete="off">
+                        <input class="otp-box" type="text" inputmode="numeric" maxlength="1" data-index="2" autocomplete="off">
+                        <input class="otp-box" type="text" inputmode="numeric" maxlength="1" data-index="3" autocomplete="off">
+                        <input class="otp-box" type="text" inputmode="numeric" maxlength="1" data-index="4" autocomplete="off">
+                        <input class="otp-box" type="text" inputmode="numeric" maxlength="1" data-index="5" autocomplete="off">
+                    </div>
+
+                    <!-- Hidden full OTP input -->
+                    <input type="hidden" name="otp" id="otp-hidden">
+
+                    <button type="submit" id="verify-btn"
+                        class="w-full flex justify-center items-center py-3.5 px-4 border border-transparent rounded-xl shadow-glow text-sm font-bold text-white bg-primary-500 hover:bg-primary-600 focus:outline-none transition-transform hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed"
+                        disabled>
+                        <i class="fa-solid fa-shield-check mr-2"></i> Verify Email
+                    </button>
+                </form>
+
+                <!-- Resend -->
+                <div class="mt-6 text-center border-t border-gray-100 pt-6">
+                    <p class="text-sm text-gray-500">Didn't receive the code?</p>
+                    <a href="{% url 'resend_verification_otp' %}"
+                        class="inline-block mt-2 font-bold text-primary-500 hover:text-primary-600 transition-colors text-sm">
+                        <i class="fa-solid fa-rotate-right mr-1"></i> Resend Code
+                    </a>
+                    <p class="text-xs text-gray-400 mt-3">
+                        Wrong email?
+                        <a href="{% url 'register' %}" class="text-gray-500 hover:text-primary-500 font-medium">Register again</a>
+                        <span class="mx-1 text-gray-300">|</span>
+                        <a href="{% url 'login' %}" class="text-gray-500 hover:text-primary-500 font-medium italic">Back to Login</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block footer %}{% endblock %}
+
+{% block extra_js %}
+<script>
+    // ── OTP Box Logic ──────────────────────────────────────────
+    const boxes = document.querySelectorAll('.otp-box');
+    const hiddenInput = document.getElementById('otp-hidden');
+    const verifyBtn = document.getElementById('verify-btn');
+
+    function updateHidden() {
+        const val = Array.from(boxes).map(b => b.value).join('');
+        hiddenInput.value = val;
+        verifyBtn.disabled = val.length < 6;
+        boxes.forEach(b => {
+            b.classList.toggle('filled', b.value !== '');
+        });
+    }
+
+    boxes.forEach((box, i) => {
+        box.addEventListener('input', (e) => {
+            // Only allow digits
+            box.value = box.value.replace(/\D/g, '').slice(-1);
+            updateHidden();
+            if (box.value && i < boxes.length - 1) {
+                boxes[i + 1].focus();
+            }
+        });
+
+        box.addEventListener('keydown', (e) => {
+            if (e.key === 'Backspace' && !box.value && i > 0) {
+                boxes[i - 1].focus();
+                boxes[i - 1].value = '';
+                updateHidden();
+            }
+        });
+
+        // Handle paste
+        box.addEventListener('paste', (e) => {
+            e.preventDefault();
+            const pasted = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '');
+            if (pasted.length >= 6) {
+                boxes.forEach((b, idx) => { b.value = pasted[idx] || ''; });
+                boxes[5].focus();
+                updateHidden();
+            }
+        });
+    });
+
+    // Auto-focus first box
+    boxes[0].focus();
+
+    // ── Countdown Timer ──────────────────────────────────────────
+    const totalSeconds = 15 * 60; // 15 minutes
+    let remaining = totalSeconds;
+    const timerText = document.getElementById('timer-text');
+    const timerBar = document.getElementById('timer-bar');
+
+    const countdown = setInterval(() => {
+        remaining--;
+        if (remaining <= 0) {
+            clearInterval(countdown);
+            timerText.textContent = 'Expired';
+            timerText.classList.remove('text-primary-500');
+            timerText.classList.add('text-red-500');
+            timerBar.style.width = '0%';
+            timerBar.style.background = '#ef4444';
+            verifyBtn.disabled = true;
+            verifyBtn.textContent = 'Code Expired — Resend';
+            return;
+        }
+        const m = Math.floor(remaining / 60).toString().padStart(2, '0');
+        const s = (remaining % 60).toString().padStart(2, '0');
+        timerText.textContent = `${m}:${s}`;
+        timerBar.style.width = `${(remaining / totalSeconds) * 100}%`;
+
+        // Turn orange-red when < 2 mins
+        if (remaining < 120) {
+            timerBar.style.background = 'linear-gradient(90deg,#ef4444,#f97316)';
+            timerText.classList.remove('text-primary-500');
+            timerText.classList.add('text-red-500');
+        }
+    }, 1000);
+    // ── Resend Cooldown Logic ────────────────────────────────────
+    const resendBtn = document.querySelector('a[href*="resend_verification_otp"]');
+    let resendCooldown = 60;
+    let resendInterval;
+
+    function startResendCooldown() {
+        resendBtn.style.pointerEvents = 'none';
+        resendBtn.style.opacity = '0.5';
+        resendInterval = setInterval(() => {
+            resendCooldown--;
+            if (resendCooldown <= 0) {
+                clearInterval(resendInterval);
+                resendBtn.style.pointerEvents = 'auto';
+                resendBtn.style.opacity = '1';
+                resendBtn.innerHTML = '<i class="fa-solid fa-rotate-right mr-1"></i> Resend Code';
+            } else {
+                resendBtn.innerHTML = `<i class="fa-solid fa-clock mr-1"></i> Resend (${resendCooldown}s)`;
+            }
+        }, 1000);
+    }
+
+    // Start cooldown on click (optional as page reloads, but good for SPA feel)
+    resendBtn.addEventListener('click', () => {
+        // Since it's a link, the page will reload, but we'll show it immediately
+    });
+
+    // Check if we should start it on load (from server message or just default)
+    // For now, let's just make it a standard 60s wait whenever they land here
+    // startResendCooldown();
+</script>
+{% endblock %}

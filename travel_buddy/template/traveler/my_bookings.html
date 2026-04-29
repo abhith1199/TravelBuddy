@@ -1,0 +1,230 @@
+{% extends 'base_modern.html' %}
+{% load static %}
+
+{% block title %}My Bookings - Travel Buddy{% endblock %}
+
+{% block content %}
+<!-- Dashboard Hero Header -->
+<section class="relative min-h-[400px] flex items-center justify-center overflow-hidden bg-dark-900">
+    <!-- Background Gradient & Image -->
+    <div class="absolute inset-0 z-0 opacity-100">
+        <img src="{% static 'img/yuqi-liu-GOBVg5PgIuU-unsplash.jpg' %}" alt="My Journeys"
+            class="w-full h-full object-cover">
+        <div class="absolute inset-0 bg-gradient-to-t from-dark-900 via-dark-900/60 to-dark-900/60"></div>
+    </div>
+
+    <!-- Content -->
+    <div class="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-white">
+        <div class="flex flex-col md:flex-row items-start md:items-end justify-between gap-8">
+            <div class="animate-slide-up" style="animation-delay: 100ms;">
+                <span
+                    class="inline-block py-1.5 px-4 rounded-full bg-white/10 backdrop-blur-md text-white border border-white/20 text-xs font-bold tracking-widest uppercase mb-6 shadow-xl">
+                    Traveler Dashboard
+                </span>
+                <h1 class="font-display text-5xl md:text-6xl font-extrabold mb-4 tracking-tight drop-shadow-xl">My
+                    Journeys</h1>
+                <p class="text-lg md:text-xl text-gray-300 max-w-2xl font-light">
+                    Track your adventures and manage your upcoming trips in one place.
+                </p>
+            </div>
+
+            <!-- Stats Badge -->
+            <div class="flex items-center gap-6 animate-slide-up" style="animation-delay: 300ms;">
+                <div class="text-right">
+                    <div class="font-display text-5xl font-black text-white drop-shadow-lg">{{ bookings.count }}</div>
+                    <div class="text-xs font-bold tracking-widest text-primary-400 mt-1 uppercase">Total Trips</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Main Bookings Section -->
+<section class="py-16 bg-[#fafafa] relative z-20 -mt-10 rounded-t-[3rem]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+        <!-- Alerts & Messages -->
+        {% if messages %}
+        <div class="mb-10 space-y-4">
+            {% for message in messages %}
+            <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex items-start justify-between gap-4 animate-fade-in"
+                role="alert">
+                <div class="flex items-center gap-4">
+                    <div
+                        class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 {% if message.tags == 'success' %}bg-green-50 text-green-500{% else %}bg-primary-50 text-primary-500{% endif %}">
+                        <i
+                            class="fa-solid {% if message.tags == 'success' %}fa-check{% else %}fa-info{% endif %} text-xl"></i>
+                    </div>
+                    <div>
+                        <strong class="block text-sm font-bold text-gray-900 mb-1">System Notification</strong>
+                        <p class="text-sm text-gray-600">{{ message }}</p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if bookings %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% for booking in bookings %}
+            <!-- Modern Booking Card -->
+            <div class="group bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 flex flex-col h-full animate-fade-in"
+                style="animation-delay: {{ forloop.counter0|add:0 }}00ms;">
+
+                <!-- Card Image Area -->
+                <div class="relative h-56 overflow-hidden mask-image">
+                    {% if booking.trip.images.all %}
+                    <img src="{{ booking.trip.images.first.image.url }}" alt="{{ booking.trip.title }}"
+                        class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                    {% else %}
+                    <img src="{% static 'img/slider1.jpg' %}" alt="{{ booking.trip.title }}"
+                        class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                    {% endif %}
+
+                    <div class="absolute inset-0 bg-gradient-to-t from-dark-900/60 to-transparent"></div>
+
+                    <!-- Dynamic Status Badge -->
+                    {% if booking.status == 'CONFIRMED' %}
+                    <div
+                        class="absolute top-4 right-4 bg-green-500/90 backdrop-blur-md text-white px-4 py-2 rounded-full text-xs font-bold uppercase tracking-widest shadow-lg border border-green-400/50">
+                        Confirmed
+                    </div>
+                    {% elif booking.status == 'PENDING' %}
+                    <div
+                        class="absolute top-4 right-4 bg-yellow-500/90 backdrop-blur-md text-white px-4 py-2 rounded-full text-xs font-bold uppercase tracking-widest shadow-lg border border-yellow-400/50">
+                        Pending
+                    </div>
+                    {% else %}
+                    <div
+                        class="absolute top-4 right-4 bg-red-500/90 backdrop-blur-md text-white px-4 py-2 rounded-full text-xs font-bold uppercase tracking-widest shadow-lg border border-red-400/50">
+                        {{ booking.status }}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Card Content -->
+                <div class="p-6 flex-grow flex flex-col">
+                    <div
+                        class="flex items-center gap-4 text-xs font-semibold text-gray-500 mb-4 uppercase tracking-wider">
+                        <div class="flex items-center gap-1.5"><i class="fa-solid fa-location-dot text-primary-500"></i>
+                            {{ booking.trip.destination }}</div>
+                        <div class="flex items-center gap-1.5"><i class="fa-regular fa-calendar text-primary-500"></i>
+                            {{ booking.trip.start_date|date:"d M Y" }}</div>
+                    </div>
+
+                    <a href="{% url 'trip_detail' booking.trip.id %}"
+                        class="font-display font-bold text-2xl text-gray-900 mb-4 hover:text-primary-500 transition-colors line-clamp-2 leading-tight">
+                        {{ booking.trip.title }}
+                    </a>
+
+                    <div
+                        class="mt-auto bg-gray-50 rounded-2xl p-4 flex items-center justify-between border border-gray-100">
+                        <div class="flex items-center gap-2 text-sm font-semibold text-gray-700">
+                            <i class="fa-solid fa-users text-primary-500"></i>
+                            {{ booking.num_people }} Traveler{{ booking.num_people|pluralize }}
+                        </div>
+
+                        {% if booking.num_males or booking.num_females %}
+                        <div class="flex gap-3 text-xs font-bold text-gray-500 items-center">
+                            {% if booking.num_males %}
+                            <span class="flex items-center gap-1">
+                                <i class="fa-solid fa-person text-blue-500 text-sm"></i>
+                                {{ booking.num_males }}
+                            </span>
+                            {% endif %}
+                            {% if booking.num_females %}
+                            <span class="flex items-center gap-1">
+                                <i class="fa-solid fa-person-dress text-pink-500 text-sm"></i>
+                                {{ booking.num_females }}
+                            </span>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Card Footer (Pricing & Actions) -->
+                <div class="bg-white px-6 py-5 border-t border-gray-100 flex items-center justify-between">
+                    <div>
+                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">Total Paid</p>
+                        <p class="font-display font-black text-2xl text-primary-500">
+                            ₹{{ booking.total_price|floatformat:0 }}
+                        </p>
+                    </div>
+
+                    <div class="flex gap-2">
+                        {% if booking.status == 'CONFIRMED' %}
+                        <a href="{% url 'trip_communication' booking.trip.id %}"
+                            class="relative w-10 h-10 rounded-xl bg-gray-50 hover:bg-primary-50 border border-gray-200 hover:border-primary-200 flex items-center justify-center text-gray-600 hover:text-primary-500 transition-all"
+                            title="Group Chat">
+                            <i class="fa-solid fa-comments"></i>
+                            {% if booking.has_unread_messages %}
+                            <span class="absolute -top-1 -right-1 flex h-3 w-3">
+                                <span
+                                    class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                <span
+                                    class="relative inline-flex rounded-full h-3 w-3 bg-red-500 shadow-sm border border-white"></span>
+                            </span>
+                            {% endif %}
+                        </a>
+                        {% if booking.review %}
+                        <span
+                            class="w-10 h-10 rounded-xl bg-yellow-50 border border-yellow-200 flex items-center justify-center text-yellow-500"
+                            title="Reviewed">
+                            <i class="fa-solid fa-star"></i>
+                        </span>
+                        {% else %}
+                        <a href="{% url 'submit_review' booking.id %}"
+                            class="w-10 h-10 rounded-xl bg-gray-50 hover:bg-yellow-50 border border-gray-200 hover:border-yellow-200 flex items-center justify-center text-gray-600 hover:text-yellow-500 transition-all"
+                            title="Submit Review">
+                            <i class="fa-solid fa-star"></i>
+                        </a>
+                        {% endif %}
+                        {% elif booking.status == 'PENDING' %}
+                        <a href="{% url 'payment_mock' booking.id %}"
+                            class="px-4 py-2 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-bold text-sm transition-colors shadow-glow flex items-center gap-2">
+                            <i class="fa-solid fa-credit-card"></i> Pay Now
+                        </a>
+                        {% endif %}
+
+                        <!-- Download Receipt Button -->
+                        <a href="{% url 'download_receipt' booking.id %}" target="_blank"
+                            class="w-10 h-10 rounded-xl bg-white hover:bg-gray-50 border border-gray-200 hover:border-gray-300 flex items-center justify-center text-gray-600 hover:text-gray-900 transition-all font-bold"
+                            title="Download Receipt">
+                            <i class="fa-solid fa-file-invoice"></i>
+                        </a>
+
+                        <!-- Forward Button -->
+                        <a href="{% url 'trip_detail' booking.trip.id %}"
+                            class="w-10 h-10 rounded-xl bg-gray-900 border border-gray-900 hover:bg-primary-500 hover:border-primary-500 flex items-center justify-center text-white transition-all transform hover:-rotate-12">
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+            {% endfor %}
+        </div>
+
+        {% else %}
+        <!-- Empty State -->
+        <div
+            class="bg-white rounded-[3rem] border border-dashed border-gray-300 p-16 md:p-24 text-center shadow-sm max-w-3xl mx-auto mt-10">
+            <div class="w-32 h-32 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-8 shadow-inner">
+                <i class="fa-solid fa-suitcase-rolling text-5xl text-gray-300"></i>
+            </div>
+            <h2 class="font-display font-black text-4xl text-gray-900 mb-4 tracking-tight">No bookings yet</h2>
+            <p class="text-gray-500 text-lg mb-10 max-w-md mx-auto">
+                Life is short and the world is wide. Start your next adventure today!
+            </p>
+            <a href="{% url 'browse_trips' %}"
+                class="inline-block bg-primary-500 hover:bg-primary-600 text-white px-10 py-4 rounded-xl font-bold text-lg transition-transform hover:-translate-y-1 shadow-glow tracking-wide">
+                Find My First Trip
+            </a>
+        </div>
+        {% endif %}
+
+    </div>
+</section>
+{% endblock %}

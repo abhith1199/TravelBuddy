@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maintenance - Travel Buddy</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/your-code.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Outfit', 'sans-serif'] },
+                    colors: { primary: '#ff5e14' }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 flex items-center justify-center min-h-screen p-4">
+    <div class="max-w-md w-full text-center">
+        <div class="mb-8 relative inline-block">
+            <div class="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center animate-pulse">
+                <i class="fa-solid fa-screwdriver-wrench text-primary text-4xl"></i>
+            </div>
+            <div class="absolute -top-1 -right-1 w-6 h-6 bg-yellow-400 rounded-full border-4 border-white"></div>
+        </div>
+        
+        <h1 class="text-3xl font-extrabold text-gray-900 mb-4 tracking-tight">System Under Maintenance</h1>
+        <p class="text-gray-600 mb-8 leading-relaxed">
+            We're currently upgrading the Travel Buddy platform to bring you a better adventure experience. We'll be back online shortly.
+        </p>
+
+        <div class="bg-white p-6 rounded-2xl shadow-xl shadow-gray-200/50 border border-gray-100 mb-8">
+            <div class="flex items-center justify-center gap-3 text-sm font-bold text-primary uppercase tracking-widest mb-1">
+                <span class="w-2 h-2 bg-primary rounded-full animate-ping"></span>
+                Current Status
+            </div>
+            <p class="text-gray-500 text-xs">Estimated downtime: ~15 minutes</p>
+        </div>
+
+        <p class="text-gray-400 text-xs font-medium uppercase tracking-widest">
+            Travel Buddy &bull; Global Operations Command
+        </p>
+    </div>
+</body>
+</html>

@@ -1,0 +1,395 @@
+{% extends 'admin/base.html' %}
+{% load static %}
+
+{% block title %}Trip Audit - {{ trip.title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .dashboard-content {
+        padding: 30px;
+    }
+
+    .welcome-header {
+        background: linear-gradient(135deg, #f39c12, #d35400);
+        color: white;
+        padding: 25px;
+        border-radius: 8px;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 15px rgba(243, 156, 18, 0.2);
+    }
+
+    .info-card {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 3px 15px rgba(0, 0, 0, 0.08);
+        border: none;
+        margin-bottom: 25px;
+        transition: transform 0.2s;
+    }
+
+    .info-card:hover {
+        transform: translateY(-2px);
+    }
+
+    .info-header {
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        padding: 20px;
+        background: transparent;
+    }
+
+    .info-body {
+        padding: 25px;
+    }
+
+    .status-badge {
+        font-size: 0.9rem;
+        padding: 0.5em 1em;
+        border-radius: 50rem;
+    }
+
+    .img-preview {
+        height: 200px;
+        object-fit: cover;
+        border-radius: 8px;
+        width: 100%;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-content">
+    <div class="welcome-header d-flex justify-content-between align-items-center">
+        <div>
+            <h1 class="h3 mb-1"><i class="fas fa-clipboard-check me-2"></i>Trip Audit</h1>
+            <p class="mb-0 opacity-75">Reviewing trip: <strong>{{ trip.title }}</strong></p>
+        </div>
+        <div>
+            <a href="{% url 'admin_trip_management' %}" class="btn btn-light bg-white text-dark shadow-sm">
+                <i class="fas fa-arrow-left me-2"></i>Back to List
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card info-card">
+                <div class="card-header info-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 fw-bold"><i class="fas fa-info-circle me-2 text-primary"></i>Trip Overview</h5>
+                    <span class="badge bg-secondary">{{ trip.trip_type }}</span>
+                </div>
+                <div class="card-body info-body">
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <label class="text-muted small text-uppercase fw-bold mb-1">Destination</label>
+                            <p class="fs-5 fw-medium"><i class="fas fa-map-marker-alt me-2 text-danger"></i>{{ trip.destination }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="text-muted small text-uppercase fw-bold mb-1">Price per Person</label>
+                            <p class="fs-5 fw-medium text-success">₹{{ trip.price }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="text-muted small text-uppercase fw-bold mb-1">Duration</label>
+                            <p class="fs-5">{{ trip.duration_days }} Days</p>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="text-muted small text-uppercase fw-bold mb-1">Capacity</label>
+                            <p class="fs-5"><i class="fas fa-users me-2 text-info"></i>{{ trip.max_capacity }} People
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="text-muted small text-uppercase fw-bold mb-1">Start Date</label>
+                            <p class="fs-5"><i class="fas fa-calendar-alt me-2 text-primary"></i>{{ trip.start_date|date:"M d, Y" }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="text-muted small text-uppercase fw-bold mb-1">End Date</label>
+                            <p class="fs-5"><i class="fas fa-calendar-alt me-2 text-primary"></i>{{ trip.end_date|date:"M d, Y" }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {% if trip.images.all %}
+            <div class="card info-card">
+                <div class="card-header info-header">
+                    <h5 class="mb-0 fw-bold"><i class="fas fa-images me-2 text-primary"></i>Trip Gallery</h5>
+                </div>
+                <div class="card-body info-body">
+                    <div class="row g-3">
+                        {% for img in trip.images.all %}
+                        <div class="col-md-4">
+                            <div class="position-relative">
+                                <a href="{{ img.image.url }}" target="_blank">
+                                    <img src="{{ img.image.url }}" class="img-preview" alt="Trip Image">
+                                </a>
+                                {% if img.is_cover %}
+                                <span class="position-absolute top-0 start-0 badge bg-primary m-2 shadow">Cover</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="card info-card">
+                <div class="card-header info-header">
+                    <h5 class="mb-0 fw-bold"><i class="fas fa-align-left me-2 text-primary"></i>Content Details</h5>
+                </div>
+                <div class="card-body info-body">
+                    <div class="mb-4">
+                        <h6 class="fw-bold mb-2">Description</h6>
+                        <p class="text-muted">{{ trip.description|linebreaks }}</p>
+                    </div>
+                    <div class="mb-4">
+                        <h6 class="fw-bold mb-2">Itinerary</h6>
+                        <div class="bg-light p-3 rounded border font-monospace" style="white-space: pre-wrap;">{{ trip.itinerary_details }}</div>
+                    </div>
+                    {% if trip.social_activities %}
+                    <div>
+                        <h6 class="fw-bold mb-2">Social Activities</h6>
+                        <p class="text-muted">{{ trip.social_activities|linebreaks }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="card info-card">
+                <div class="card-header info-header">
+                    <h5 class="mb-0 fw-bold"><i class="fas fa-user-friends me-2 text-primary"></i>Audience &
+                        Restrictions</h5>
+                </div>
+                <div class="card-body info-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Age Range:</strong> {{ trip.age_min }} - {{ trip.age_max }} years</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Gender Restriction:</strong> {{ trip.get_gender_restriction_display }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Current Bookings:</strong> {{ trip.current_bookings }} / {{ trip.max_capacity }}
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Vibe:</strong> {{ trip.get_vibe_tag_display }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card info-card">
+                <div class="card-header info-header">
+                    <h5 class="mb-0 fw-bold"><i class="fas fa-building me-2 text-secondary"></i>Company Details</h5>
+                </div>
+                <div class="card-body info-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p class="mb-2"><strong>Organization Entity:</strong> <span
+                                    class="badge bg-indigo-subtle text-indigo rounded px-2">{{ trip.company.company_name }}</span></p>
+                            <p class="mb-2"><strong>Lead Liaison:</strong> <span class="text-dark fw-medium small">{{ trip.company.contact_first_name }} {{ trip.company.contact_last_name }}</span></p>
+                            <p class="mb-2"><strong>Secure Channel:</strong> <span
+                                    class="bg-light border rounded px-2 py-1 small text-dark"><i
+                                        class="fa-solid fa-envelope me-2 opacity-50"></i>{{ trip.company.email }}</span>
+                            </p>
+                            <p class="mb-0"><strong>Direct Line:</strong> <span
+                                    class="bg-light border rounded px-2 py-1 small text-dark"><i
+                                        class="fa-solid fa-phone me-2 opacity-50"></i>{{ trip.company.company_phone }}</span></p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Company Tier:</strong> {{ trip.company.get_tier_display }}</p>
+                            <p><strong>Verification Status:</strong> {{ trip.company.get_verification_status_display }}
+                            </p>
+                            <p><strong>Registered:</strong> {{ trip.company.date_joined|date:"M d, Y" }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card info-card">
+                <div class="card-header info-header">
+                    <h5 class="mb-0 fw-bold"><i class="fas fa-shield-alt me-2 text-warning"></i>Audit Status</h5>
+                </div>
+                <div class="card-body info-body text-center">
+                    <div class="mb-3">
+                        {% if trip.status == 'PENDING_REVIEW' %}
+                        <span class="badge bg-warning text-dark status-badge">Pending Review</span>
+                        {% elif trip.status == 'APPROVED' %}
+                        <span class="badge bg-success status-badge">Live / Approved</span>
+                        {% elif trip.status == 'REJECTED' %}
+                        <span class="badge bg-danger status-badge">Rejected</span>
+                        {% elif trip.status == 'PAUSED' %}
+                        <span class="badge bg-info status-badge">Paused</span>
+                        {% elif trip.status == 'SUSPENDED' %}
+                        <span class="badge bg-secondary status-badge">Suspended</span>
+                        {% endif %}
+                    </div>
+                    <p class="small text-muted mb-0">
+                        <strong>Start Date:</strong> {{ trip.start_date|date:"M d, Y" }}<br>
+                        <strong>End Date:</strong> {{ trip.end_date|date:"M d, Y" }}
+                    </p>
+                    <hr>
+                    <div class="mt-3">
+                        <p class="mb-1"><strong>Created:</strong> {{ trip.created_at|date:"M d, Y H:i" }}</p>
+                        <p class="mb-0"><strong>Last Updated:</strong> {{ trip.updated_at|date:"M d, Y H:i" }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card info-card">
+                <div class="card-header info-header">
+                    <h5 class="mb-0 fw-bold"><i class="fas fa-chart-bar me-2 text-primary"></i>Trip Statistics</h5>
+                </div>
+                <div class="card-body info-body">
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Capacity Usage:</span>
+                            <span>{{ trip.current_bookings }} / {{ trip.max_capacity }}</span>
+                        </div>
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar bg-{% if capacity_percentage > 90 %}danger{% elif capacity_percentage > 70 %}warning{% else %}success{% endif %}"
+                                style="width: {{ capacity_percentage }}%" role="progressbar"></div>
+                        </div>
+                        <small class="text-muted">{{ capacity_percentage }}% booked</small>
+                    </div>
+                    <div class="mb-3">
+                        <p class="mb-1"><strong>View Count:</strong> {{ trip.view_count }}</p>
+                        <p class="mb-1"><strong>Total Revenue:</strong> ₹{{ total_revenue }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card info-card">
+                <div class="card-header info-header">
+                    <h5 class="mb-0 fw-bold"><i class="fas fa-building me-2 text-secondary"></i>Organizer</h5>
+                </div>
+                <div class="card-body info-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="bg-light rounded-circle p-3 me-3 text-secondary">
+                            <i class="fas fa-user-tie fa-lg"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-0 fw-bold">{{ trip.company.company_name }}</h6>
+                            <small class="text-muted">Username: {{ trip.company.username }}</small>
+                        </div>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <a href="mailto:{{ trip.company.email }}" class="btn btn-outline-secondary btn-sm">
+                            <i class="fas fa-envelope me-2"></i>Contact Organizer
+                        </a>
+                        <a href="{% url 'document_review' trip.company.id %}" class="btn btn-outline-info btn-sm">
+                            <i class="fas fa-file-contract me-2"></i>View Company Docs
+                        </a>
+                        <a href="{% url 'admin_user_management' %}?user_type=company&q={{ trip.company.company_name }}"
+                            class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-external-link-alt me-2"></i>View Company Profile
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card info-card border-warning">
+                <div class="card-header info-header bg-warning bg-opacity-10">
+                    <h5 class="mb-0 fw-bold text-dark"><i class="fas fa-gavel me-2"></i>Actions</h5>
+                </div>
+                <div class="card-body info-body">
+                    {% if trip.status == 'PENDING_REVIEW' %}
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'approve_trip' trip.id %}" class="btn btn-success"
+                            onclick="return confirm('Approve this trip to go LIVE?');">
+                            <i class="fas fa-check me-2"></i>Approve & Publish
+                        </a>
+                        <button type="button" class="btn btn-danger" data-bs-toggle="modal"
+                            data-bs-target="#rejectTripModal">
+                            <i class="fas fa-times me-2"></i>Reject Trip
+                        </button>
+                    </div>
+                    {% elif trip.status == 'APPROVED' %}
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'suspend_trip' trip.id %}" class="btn btn-warning"
+                            onclick="return confirm('Suspend this trip? It will be hidden.');">
+                            <i class="fas fa-ban me-2"></i>Suspend Trip
+                        </a>
+                        <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal"
+                            data-bs-target="#rejectTripModal">
+                            <i class="fas fa-times me-2"></i>Reject & Remove
+                        </button>
+                        <a href="{% url 'reverse_approval' trip.id %}" class="btn btn-outline-secondary"
+                            onclick="return confirm('Send back to pending review?');">
+                            <i class="fas fa-undo me-2"></i>Send for Re-review
+                        </a>
+                    </div>
+                    {% elif trip.status == 'REJECTED' %}
+                    {% if trip.rejection_reason %}
+                    <div class="alert alert-danger mb-3">
+                        <strong>Rejection Reason:</strong> {{ trip.rejection_reason }}
+                    </div>
+                    {% endif %}
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'rereview_trip' trip.id %}" class="btn btn-primary"
+                            onclick="return confirm('Send back to review pool?');">
+                            <i class="fas fa-redo me-2"></i>Re-open Review
+                        </a>
+                        <a href="{% url 'admin_delete_trip' trip.id %}" class="btn btn-danger"
+                            onclick="return confirm('PERMANENTLY DELETE? This is irreversible.');">
+                            <i class="fas fa-trash-alt me-2"></i>Delete Permanently
+                        </a>
+                    </div>
+                    {% elif trip.status == 'SUSPENDED' %}
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'unsuspend_trip' trip.id %}" class="btn btn-success"
+                            onclick="return confirm('Unsuspend this trip? It will be live again.');">
+                            <i class="fas fa-check me-2"></i>Unsuspend Trip
+                        </a>
+                        <a href="{% url 'admin_delete_trip' trip.id %}" class="btn btn-danger"
+                            onclick="return confirm('PERMANENTLY DELETE? This is irreversible.');">
+                            <i class="fas fa-trash-alt me-2"></i>Delete Permanently
+                        </a>
+                    </div>
+                    {% elif trip.is_pause_requested %}
+                    <div class="alert alert-info border-info">
+                        <i class="fas fa-info-circle me-1"></i>Pause Requested by Company
+                    </div>
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'admin_approve_pause' trip.id %}" class="btn btn-info text-white">
+                            <i class="fas fa-check me-2"></i>Approve Pause
+                        </a>
+                        <a href="{% url 'admin_reject_pause' trip.id %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-times me-2"></i>Deny Pause
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="rejectTripModal" tabindex="-1">
+    <div class="modal-dialog">
+        <form action="{% url 'reject_trip' trip.id %}" method="post">
+            {% csrf_token %}
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title text-danger">Reject Trip</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Reason for Rejection *</label>
+                        <textarea name="rejection_reason" class="form-control" rows="4" required
+                            placeholder="Explain why this trip violates policy..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">Confirm Rejection</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

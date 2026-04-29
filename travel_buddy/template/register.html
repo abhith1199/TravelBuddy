@@ -1,0 +1,514 @@
+{% extends 'base_modern.html' %}
+{% load static %}
+
+{% block title %}Register - Travel Buddy{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css">
+<style>
+    /* Flatpickr Customization for Glassmorphism */
+    .flatpickr-calendar {
+        background: rgba(30, 41, 59, 0.95) !important;
+        backdrop-filter: blur(12px) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5) !important;
+        border-radius: 16px !important;
+    }
+
+    .flatpickr-day.selected,
+    .flatpickr-day.startRange,
+    .flatpickr-day.endRange,
+    .flatpickr-day.selected.inRange,
+    .flatpickr-day.startRange.inRange,
+    .flatpickr-day.endRange.inRange,
+    .flatpickr-day.selected:focus,
+    .flatpickr-day.startRange:focus,
+    .flatpickr-day.endRange:focus,
+    .flatpickr-day.selected:hover,
+    .flatpickr-day.startRange:hover,
+    .flatpickr-day.endRange:hover,
+    .flatpickr-day.selected.prevMonthDay,
+    .flatpickr-day.startRange.prevMonthDay,
+    .flatpickr-day.endRange.prevMonthDay,
+    .flatpickr-day.selected.nextMonthDay,
+    .flatpickr-day.startRange.nextMonthDay,
+    .flatpickr-day.endRange.nextMonthDay {
+        background: #ff5e14 !important;
+        border-color: #ff5e14 !important;
+    }
+
+    .flatpickr-months .flatpickr-month {
+        background: transparent !important;
+        color: #fff !important;
+        fill: #fff !important;
+    }
+
+    .flatpickr-current-month .flatpickr-monthDropdown-months {
+        background: rgba(30, 41, 59, 1) !important;
+    }
+
+    .flatpickr-day {
+        color: #cbd5e1 !important;
+        border-radius: 8px !important;
+    }
+
+    .flatpickr-day:hover {
+        background: rgba(255, 255, 255, 0.1) !important;
+    }
+
+    /* Transparent navbar for auth pages */
+    #main-nav {
+        background: transparent !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        border-bottom: none !important;
+        box-shadow: none !important;
+    }
+
+    #main-nav .text-dark-900,
+    #main-nav .text-gray-600 {
+        color: rgba(255, 255, 255, 0.9) !important;
+    }
+
+    #main-nav .text-gray-600:hover {
+        color: #ff5e14 !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="min-h-screen relative flex items-center justify-center py-24 px-4 overflow-hidden -mt-20">
+    <!-- Background elements -->
+    <div class="absolute inset-0 z-0">
+        <img src="{% static 'img/slider1.jpg' %}" alt="Background" class="w-full h-full object-cover">
+        <div
+            class="absolute inset-0 bg-gradient-to-br from-gray-900/95 via-gray-900/80 to-primary-900/90 mix-blend-multiply">
+        </div>
+    </div>
+
+    <!-- Decorative floating elements -->
+    <div id="pulse-bg-1"
+        class="absolute top-1/4 left-1/4 w-96 h-96 bg-primary-500 rounded-full blur-[120px] opacity-20 z-0">
+    </div>
+    <div id="pulse-bg-2"
+        class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-500 rounded-full blur-[120px] opacity-20 z-0"></div>
+
+    <div class="container mx-auto max-w-3xl relative z-10 w-full animate-fade-in-up mt-12 md:mt-6">
+        <!-- Logo/Header area -->
+        <div class="text-center mb-8">
+            <h1 class="font-display font-black text-4xl text-white mb-2 drop-shadow-lg">Create Your Account</h1>
+            <p class="text-gray-300 text-lg">Start your adventure journey with us today</p>
+        </div>
+
+        <!-- Glassmorphism Card -->
+        <div
+            class="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-6 md:p-10 shadow-2xl relative overflow-hidden">
+            <!-- Subtle inner glow -->
+            <div class="absolute inset-0 bg-gradient-to-tr from-white/5 to-transparent pointer-events-none"></div>
+
+            <div class="register-form-area relative z-10 w-full">
+                <form method="post" id="registerForm" class="space-y-6">
+                    {% csrf_token %}
+
+                    <!-- Personal Information Row -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-2 group">
+                            <label
+                                class="text-xs font-bold text-gray-300 uppercase tracking-widest block group-focus-within:text-white transition-colors">First
+                                Name</label>
+                            <input name="firstName" placeholder="John"
+                                class="w-full bg-black/20 border border-white/10 rounded-xl py-3 px-4 text-white placeholder-gray-500 focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all shadow-inner"
+                                required type="text">
+                        </div>
+                        <div class="space-y-2 group">
+                            <label
+                                class="text-xs font-bold text-gray-300 uppercase tracking-widest block group-focus-within:text-white transition-colors">Last
+                                Name</label>
+                            <input name="lastName" placeholder="Doe"
+                                class="w-full bg-black/20 border border-white/10 rounded-xl py-3 px-4 text-white placeholder-gray-500 focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all shadow-inner"
+                                required type="text">
+                        </div>
+                    </div>
+
+                    <!-- Username -->
+                    <div class="space-y-2 group">
+                        <label
+                            class="text-xs font-bold text-gray-300 uppercase tracking-widest block group-focus-within:text-white transition-colors">Username</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                <i
+                                    class="fa-solid fa-user text-gray-400 group-focus-within:text-primary-500 transition-colors"></i>
+                            </div>
+                            <input name="username" placeholder="johndoe123"
+                                class="w-full bg-black/20 border border-white/10 rounded-xl py-3 pl-11 pr-4 text-white placeholder-gray-500 focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all shadow-inner"
+                                required type="text">
+                        </div>
+                    </div>
+
+                    <!-- Contact Information Row -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-2 group">
+                            <label
+                                class="text-xs font-bold text-gray-300 uppercase tracking-widest block group-focus-within:text-white transition-colors">Email
+                                Address</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                    <i
+                                        class="fa-solid fa-envelope text-gray-400 group-focus-within:text-primary-500 transition-colors"></i>
+                                </div>
+                                <input name="email" placeholder="you@example.com"
+                                    class="w-full bg-black/20 border border-white/10 rounded-xl py-3 pl-11 pr-4 text-white placeholder-gray-500 focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all shadow-inner"
+                                    required type="email">
+                            </div>
+                        </div>
+                        <div class="space-y-2 group">
+                            <label
+                                class="text-xs font-bold text-gray-300 uppercase tracking-widest block group-focus-within:text-white transition-colors">Phone
+                                Number</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                    <i
+                                        class="fa-solid fa-phone text-gray-400 group-focus-within:text-primary-500 transition-colors"></i>
+                                </div>
+                                <input name="phone" placeholder="9876543210"
+                                    class="w-full bg-black/20 border border-white/10 rounded-xl py-3 pl-11 pr-4 text-white placeholder-gray-500 focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all shadow-inner"
+                                    required type="tel" pattern="[0-9]{10}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Password Row -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-2 group">
+                            <label
+                                class="text-xs font-bold text-gray-300 uppercase tracking-widest block group-focus-within:text-white transition-colors">Password</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                    <i
+                                        class="fa-solid fa-lock text-gray-400 group-focus-within:text-primary-500 transition-colors"></i>
+                                </div>
+                                <input name="password" id="passwordInput" placeholder="••••••••"
+                                    class="w-full bg-black/20 border border-white/10 rounded-xl py-3 pl-11 pr-10 text-white placeholder-gray-500 focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all shadow-inner"
+                                    required type="password">
+                                <button type="button" id="togglePasswordBtn"
+                                    class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-white transition-colors">
+                                    <i class="fa-solid fa-eye" id="togglePasswordIcon"></i>
+                                </button>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1">Min 8 chars, 1 uppercase, 1 number, 1 special char</p>
+                        </div>
+                        <div class="space-y-2 group">
+                            <label
+                                class="text-xs font-bold text-gray-300 uppercase tracking-widest block group-focus-within:text-white transition-colors">Confirm
+                                Password</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                    <i
+                                        class="fa-solid fa-lock text-gray-400 group-focus-within:text-primary-500 transition-colors"></i>
+                                </div>
+                                <input name="confirm_password" id="confirmPasswordInput" placeholder="••••••••"
+                                    class="w-full bg-black/20 border border-white/10 rounded-xl py-3 pl-11 pr-10 text-white placeholder-gray-500 focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all shadow-inner"
+                                    required type="password">
+                                <button type="button" id="toggleConfirmPasswordBtn"
+                                    class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-white transition-colors">
+                                    <i class="fa-solid fa-eye" id="toggleConfirmPasswordIcon"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hidden usertype field -->
+                    <input type="hidden" name="usertype" value="traveler">
+
+                    <!-- Demographics Row -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-2 group">
+                            <label
+                                class="text-xs font-bold text-gray-300 uppercase tracking-widest block group-focus-within:text-white transition-colors">Gender</label>
+                            <div class="relative">
+                                <select name="gender"
+                                    class="w-full bg-black/20 border border-white/10 rounded-xl py-3 px-4 text-white appearance-none focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all shadow-inner"
+                                    required>
+                                    <option value="" disabled selected class="text-gray-900 bg-white">Select Gender
+                                    </option>
+                                    <option value="MALE" class="text-gray-900 bg-white">Male</option>
+                                    <option value="FEMALE" class="text-gray-900 bg-white">Female</option>
+                                    <option value="OTHER" class="text-gray-900 bg-white">Other</option>
+                                </select>
+                                <div
+                                    class="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-white">
+                                    <i class="fa-solid fa-chevron-down text-sm text-gray-400"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="space-y-2 group">
+                            <label
+                                class="text-xs font-bold text-gray-300 uppercase tracking-widest block group-focus-within:text-white transition-colors">Date
+                                of Birth</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                    <i
+                                        class="fa-solid fa-calendar text-gray-400 group-focus-within:text-primary-500 transition-colors z-10"></i>
+                                </div>
+                                <input name="birth_date"
+                                    class="flatpickr w-full bg-black/20 border border-white/10 rounded-xl py-3 pl-11 pr-4 text-white placeholder-gray-500 focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all shadow-inner relative z-0"
+                                    required type="text" placeholder="YYYY-MM-DD">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Terms and Newsletter -->
+                    <div class="space-y-4 pt-2">
+                        <div class="flex items-start">
+                            <div class="flex items-center h-5">
+                                <input type="checkbox" id="terms" name="terms" required
+                                    class="w-4 h-4 rounded border-gray-600 bg-black/20 text-primary-500 focus:ring-primary-500 focus:ring-offset-gray-900 border border-white/20 mt-1">
+                            </div>
+                            <label for="terms" class="ml-3 text-sm text-gray-300">
+                                I agree to the <a href="#"
+                                    class="text-primary-400 hover:text-primary-300 hover:underline transition-colors font-medium">Terms
+                                    of Service</a> and <a href="#"
+                                    class="text-primary-400 hover:text-primary-300 hover:underline transition-colors font-medium">Privacy
+                                    Policy</a>
+                            </label>
+                        </div>
+
+                        <div class="flex items-start">
+                            <div class="flex items-center h-5">
+                                <input type="checkbox" id="newsletter" name="newsletter"
+                                    class="w-4 h-4 rounded border-gray-600 bg-black/20 text-primary-500 focus:ring-primary-500 focus:ring-offset-gray-900 border border-white/20 mt-1">
+                            </div>
+                            <label for="newsletter" class="ml-3 text-sm text-gray-300">
+                                Send me travel deals and updates (optional)
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit"
+                        class="w-full bg-gradient-to-r from-primary-600 to-primary-500 hover:from-primary-500 hover:to-primary-400 text-white font-bold py-4 px-6 rounded-xl shadow-lg shadow-primary-500/30 transform transition-all active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-gray-900 flex justify-center items-center gap-2 group mt-6">
+                        <span>Create Account</span>
+                        <i
+                            class="fa-solid fa-arrow-right text-sm transform transition-transform group-hover:translate-x-1"></i>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Links -->
+            <div class="mt-8 text-center relative z-10 border-t border-white/10 pt-6">
+                <p class="text-gray-400 text-sm mb-3">
+                    Already have an account?
+                    <a href="{% url 'login' %}"
+                        class="text-white hover:text-primary-400 font-bold transition-colors underline decoration-primary-500/30 decoration-2 underline-offset-4 hover:decoration-primary-400">Sign
+                        In</a>
+                </p>
+                <p class="text-gray-500 text-xs">
+                    Are you a Travel Company?
+                    <a href="{% url 'company_register' %}"
+                        class="text-primary-400 hover:text-primary-300 font-bold transition-colors">Register here</a>
+                </p>
+            </div>
+        </div>
+
+        <!-- Quick Nav back home -->
+        <div class="text-center mt-6">
+            <a href="{% url 'index' %}"
+                class="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors text-sm font-medium">
+                <i class="fa-solid fa-arrow-left"></i> Back to Home
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Initialize Flatpickr
+        flatpickr(".flatpickr", {
+            dateFormat: "Y-m-d",
+            maxDate: "today",
+            disableMobile: true,
+            theme: "dark"
+        });
+
+        // Password toggle visibility
+        const togglePasswordBtn = document.getElementById('togglePasswordBtn');
+        const passwordInput = document.getElementById('passwordInput');
+        const togglePasswordIcon = document.getElementById('togglePasswordIcon');
+
+        if (togglePasswordBtn && passwordInput && togglePasswordIcon) {
+            togglePasswordBtn.addEventListener('click', function () {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+
+                if (type === 'text') {
+                    togglePasswordIcon.classList.remove('fa-eye');
+                    togglePasswordIcon.classList.add('fa-eye-slash');
+                } else {
+                    togglePasswordIcon.classList.remove('fa-eye-slash');
+                    togglePasswordIcon.classList.add('fa-eye');
+                }
+            });
+        }
+
+        const toggleConfirmPasswordBtn = document.getElementById('toggleConfirmPasswordBtn');
+        const confirmPasswordInput = document.getElementById('confirmPasswordInput');
+        const toggleConfirmPasswordIcon = document.getElementById('toggleConfirmPasswordIcon');
+
+        if (toggleConfirmPasswordBtn && confirmPasswordInput && toggleConfirmPasswordIcon) {
+            toggleConfirmPasswordBtn.addEventListener('click', function () {
+                const type = confirmPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                confirmPasswordInput.setAttribute('type', type);
+
+                if (type === 'text') {
+                    toggleConfirmPasswordIcon.classList.remove('fa-eye');
+                    toggleConfirmPasswordIcon.classList.add('fa-eye-slash');
+                } else {
+                    toggleConfirmPasswordIcon.classList.remove('fa-eye-slash');
+                    toggleConfirmPasswordIcon.classList.add('fa-eye');
+                }
+            });
+        }
+
+        // Show alert function using Tailwind classes
+        function showAlert(message, type) {
+            // Remove existing alerts
+            document.querySelectorAll('.dynamic-alert').forEach(el => el.remove());
+
+            const alertClass = type === 'danger'
+                ? 'bg-red-500/20 border border-red-500/30 text-red-100'
+                : 'bg-green-500/20 border border-green-500/30 text-green-100';
+
+            const iconClass = type === 'danger' ? 'fa-circle-exclamation text-red-400' : 'fa-circle-check text-green-400';
+
+            const alertHtml = `
+                <div class="dynamic-alert p-4 mb-6 rounded-xl backdrop-blur-md ${alertClass} flex items-center justify-between shadow-lg relative z-20 animate-fade-in-up">
+                    <div class="flex items-center gap-3">
+                        <i class="fa-solid ${iconClass}"></i>
+                        <p class="text-sm font-medium">${message}</p>
+                    </div>
+                    <button type="button" class="text-white/70 hover:text-white" onclick="this.parentElement.remove()">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+            `;
+
+            const formArea = document.querySelector('.register-form-area');
+            if (formArea) {
+                formArea.insertAdjacentHTML('afterbegin', alertHtml);
+            }
+
+            // Auto close after 5 seconds
+            setTimeout(function () {
+                const alerts = document.querySelectorAll('.dynamic-alert');
+                alerts.forEach(alert => {
+                    alert.style.transition = 'opacity 0.5s ease';
+                    alert.style.opacity = '0';
+                    setTimeout(() => alert.remove(), 500);
+                });
+            }, 5000);
+        }
+
+        // Password confirmation validation
+        const registerForm = document.getElementById('registerForm');
+        if (registerForm) {
+            registerForm.addEventListener('submit', function (e) {
+                const password = document.querySelector('input[name="password"]').value;
+                const confirmPassword = document.querySelector('input[name="confirm_password"]').value;
+                const terms = document.getElementById('terms').checked;
+
+                // Check if passwords match
+                if (password !== confirmPassword) {
+                    e.preventDefault();
+                    showAlert('Passwords do not match', 'danger');
+                    return false;
+                }
+
+                // Check if terms are accepted
+                if (!terms) {
+                    e.preventDefault();
+                    showAlert('Please accept the Terms of Service', 'danger');
+                    return false;
+                }
+
+                // Check for spaces
+                const firstName = document.querySelector('input[name="firstName"]').value;
+                const lastName = document.querySelector('input[name="lastName"]').value;
+                const username = document.querySelector('input[name="username"]').value;
+
+                if ((firstName && firstName.indexOf(' ') >= 0) || (lastName && lastName.indexOf(' ') >= 0) || (username && username.indexOf(' ') >= 0)) {
+                    e.preventDefault();
+                    showAlert('Username, First Name and Last Name must not contain spaces', 'danger');
+                    return false;
+                }
+
+                // Check password strength
+                if (password.length < 8) {
+                    e.preventDefault();
+                    showAlert('Password must be at least 8 characters long', 'danger');
+                    return false;
+                }
+                if (!/[0-9]/.test(password)) {
+                    e.preventDefault();
+                    showAlert('Password must contain at least one number', 'danger');
+                    return false;
+                }
+                if (!/[A-Z]/.test(password)) {
+                    e.preventDefault();
+                    showAlert('Password must contain at least one uppercase letter', 'danger');
+                    return false;
+                }
+                if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+                    e.preventDefault();
+                    showAlert('Password must contain at least one special character', 'danger');
+                    return false;
+                }
+
+                // If all validations pass, disable submit to prevent double-submission
+                const submitBtn = this.querySelector('button[type="submit"]');
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.classList.add('opacity-75', 'cursor-not-allowed');
+                    submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Creating Account...';
+                }
+            });
+        }
+
+        // Focus on first input field
+        const firstInput = document.querySelector('input[name="firstName"]');
+        if (firstInput) {
+            firstInput.focus();
+        }
+
+        // JavaScript Pulse Effect
+        const pulseElement = (id, delay) => {
+            const el = document.getElementById(id);
+            if (!el) return;
+
+            let scale = 1;
+            let growing = true;
+
+            setInterval(() => {
+                if (growing) {
+                    scale += 0.005;
+                    if (scale >= 1.2) growing = false;
+                } else {
+                    scale -= 0.005;
+                    if (scale <= 1) growing = true;
+                }
+                el.style.transform = `scale(${scale})`;
+                el.style.opacity = 0.1 + (scale - 1);
+            }, 50);
+        };
+
+        // Start pulse after a small delay
+        setTimeout(() => pulseElement('pulse-bg-1', 0), 500);
+        setTimeout(() => pulseElement('pulse-bg-2', 1000), 1500);
+    });
+</script>
+{% endblock %}
+
+{% block footer %}{% endblock %}

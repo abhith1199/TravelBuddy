@@ -1,0 +1,108 @@
+{% extends 'company/base_company.html' %}
+{% load static %}
+
+{% block title %}Trip Group Chats - Travel Buddy{% endblock %}
+
+{% block company_content %}
+<div class="row mb-5 align-items-center">
+    <div class="col-md-12">
+        <h2 class="font-weight-bold" style="color: #2b2b2b;">
+            <i class="fa fa-comments mr-2" style="color: #ff7e5f;"></i>Trip Group Chats
+        </h2>
+        <p class="text-muted">Engage with your travelers and share important trip logistics.</p>
+    </div>
+</div>
+
+{% if trips %}
+<div class="row">
+    {% for trip in trips %}
+    {% with start_date=trip.start_date current=trip.current_bookings max=trip.max_capacity %}
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card h-100 border-0 chat-trip-card"
+            style="border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); background: rgba(255,255,255,0.85); backdrop-filter: blur(12px); overflow: hidden;">
+            <div class="position-relative">
+                {% if trip.images.all %}
+                <img src="{{ trip.images.first.image.url }}" class="card-img-top" alt="{{ trip.title }}"
+                    style="height: 180px; object-fit: cover;">
+                {% else %}
+                <div class="bg-light d-flex align-items-center justify-content-center" style="height: 180px;">
+                    <i class="fas fa-image fa-3x text-muted opacity-25"></i>
+                </div>
+                {% endif %}
+                <div class="position-absolute p-3 w-100"
+                    style="bottom: 0; left: 0; background: linear-gradient(to top, rgba(0,0,0,0.85), transparent);">
+                    <span class="badge badge-{{ trip.status_class }} mb-2 px-2 py-1" style="font-weight: 600;">
+                        {{ trip.status_text }}
+                    </span>
+                    <h5 class="text-white mb-0 text-truncate font-weight-bold">{{ trip.title }}</h5>
+                </div>
+            </div>
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between mb-4 small">
+                    <span class="text-muted font-weight-bold">
+                        <i class="fas fa-calendar-alt mr-1" style="color: #ff7e5f;"></i> {{ trip.formatted_start_date }}
+                    </span>
+                    <span class="text-muted font-weight-bold">
+                        <i class="fas fa-users mr-1" style="color: #ff7e5f;"></i>
+                        {{ trip.current_bookings }}/{{ trip.max_capacity }} booked
+                    </span>
+                </div>
+
+                <div class="stats-row d-flex py-3 mb-4 rounded" style="background: rgba(255, 126, 95, 0.05);">
+                    <div class="flex-grow-1 text-center border-right">
+                        <small class="d-block text-muted text-uppercase font-weight-bold"
+                            style="font-size: 0.7rem; letter-spacing: 0.5px;">Messages</small>
+                        <span class="font-weight-bold text-dark" style="font-size: 1.25rem;">
+                            {{ trip.chat_messages.count }}
+                        </span>
+                    </div>
+                    <div class="flex-grow-1 text-center">
+                        <small class="d-block text-muted text-uppercase font-weight-bold"
+                            style="font-size: 0.7rem; letter-spacing: 0.5px;">Updates</small>
+                        <span class="font-weight-bold" style="color: #ff7e5f; font-size: 1.25rem;">
+                            {{ trip.updates.count }}
+                        </span>
+                    </div>
+                </div>
+
+                <a href="{% url 'trip_communication' trip.id %}"
+                    class="btn btn-block text-white shadow-sm position-relative"
+                    style="background: linear-gradient(135deg, #ff7e5f, #feb47b); border: none; border-radius: 8px; font-weight: 600; padding: 12px;">
+                    <i class="fa fa-paper-plane mr-2"></i>Enter Chat Hub
+                    {% if trip.has_unread_company_messages %}
+                    <span class="position-absolute translate-middle p-2 bg-danger border border-light rounded-circle"
+                        style="top: 0; right: -5px;">
+                        <span class="visually-hidden">New messages</span>
+                    </span>
+                    {% endif %}
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endwith %}
+    {% endfor %}
+</div>
+{% else %}
+<div class="text-center py-5 bg-white shadow-sm border-0" style="border-radius: 16px;">
+    <div class="mb-4">
+        <i class="fas fa-comments fa-5x text-muted" style="opacity: 0.1;"></i>
+    </div>
+    <h3 class="font-weight-bold text-dark">No active group chats</h3>
+    <p class="text-muted mb-4">Once your trips are approved, you can start coordinating with travelers here.</p>
+    <a href="{% url 'manage_trips' %}" class="btn text-white px-4 py-2"
+        style="background: linear-gradient(135deg, #ff7e5f, #feb47b); border: none; border-radius: 8px; font-weight: 600;">Manage
+        My Trips</a>
+</div>
+{% endif %}
+
+<style>
+    .chat-trip-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .chat-trip-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 35px rgba(255, 126, 95, 0.15) !important;
+    }
+</style>
+{% endblock %}

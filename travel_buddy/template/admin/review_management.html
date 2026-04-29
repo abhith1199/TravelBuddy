@@ -1,0 +1,230 @@
+{% extends 'admin/base.html' %}
+{% load static %}
+
+{% block title %}Sentiment Analysis - Travel Buddy{% endblock %}
+
+{% block breadcrumb %}Review Management{% endblock %}
+
+{% block content %}
+<div class="dashboard-content">
+    <!-- Sentiment Header -->
+    <div class="row align-items-center mb-4">
+        <div class="col">
+            <h1 class="h2 fw-bold mb-1">Sentiment Analysis</h1>
+            <p class="text-muted mb-0">Platform Reputation Monitoring and Feedback Moderation Stream</p>
+        </div>
+        <div class="col-auto">
+            <button class="btn btn-light border" onclick="location.reload()">
+                <i class="fa-solid fa-rotate me-2"></i>Sync Stream
+            </button>
+        </div>
+    </div>
+
+    <!-- Feedback Stream -->
+    <div class="card border-0 shadow-sm animate-in"
+        style="border-radius: 12px; overflow: hidden; animation-delay: 0.1s;">
+        <div class="card-header bg-white border-bottom-0 py-3 d-flex justify-content-between align-items-center">
+            <h5 class="fw-bold mb-0">Platform Feedback Stream</h5>
+            <div class="badge bg-indigo-subtle text-indigo fw-bold px-3 py-2 rounded-pill" style="font-size: 0.7rem;">
+                Live Moderation Queue</div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0" id="reviewsTable">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="ps-4 border-0 text-muted small fw-bold py-3">SENTIMENT TARGET</th>
+                        <th class="border-0 text-muted small fw-bold py-3">REVIEWER IDENTITY</th>
+                        <th class="border-0 text-muted small fw-bold py-3 text-center">INTENSITY</th>
+                        <th class="border-0 text-muted small fw-bold py-3">FEEDBACK TELEMETRY</th>
+                        <th class="pe-4 border-0 text-muted small fw-bold text-end py-3">MODERATION</th>
+                    </tr>
+                </thead>
+                <tbody class="border-top-0">
+                    {% for review in reviews %}
+                    <tr class="review-row border-bottom">
+                        <td class="ps-4 py-3">
+                            <div class="fw-bold text-dark" style="font-size: 0.95rem;">{{ review.trip.title }}</div>
+                            <div class="text-muted x-small">ORGANIZER: {{ review.trip.company.company_name }}</div>
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center me-2"
+                                    style="width: 32px; height: 32px; font-size: 0.8rem;">
+                                    {{ review.reviewer.username|slice:":1"|upper }}
+                                </div>
+                                <div>
+                                    <div class="text-dark small fw-medium">@{{ review.reviewer.username }}</div>
+                                    <div class="text-muted x-small">{{ review.created_at|date:"d M Y" }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <div class="d-flex flex-column align-items-center">
+                                <span class="h5 mb-0 fw-bold text-dark">{{ review.rating_overall }}</span>
+                                <div class="text-warning small" style="letter-spacing: -2px;">
+                                    {% for i in "12345"|make_list %}<i
+                                        class="{% if forloop.counter <= review.rating_overall %}fa-solid{% else %}fa-regular{% endif %} fa-star x-small"></i>{% endfor %}
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="bg-light p-2 rounded-3 small text-muted text-truncate italic"
+                                style="max-width: 300px; font-style: italic;" title="{{ review.comment }}">
+                                "{{ review.comment|default:"No verbal telemetry provided." }}"
+                            </div>
+                        </td>
+                        <td class="pe-4 text-end">
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-sm btn-light border view-review-btn"
+                                    data-bs-toggle="modal" data-bs-target="#viewReviewModal"
+                                    data-reviewer="{{ review.reviewer.username }}"
+                                    data-trip="{{ review.trip.title|escapejs }}"
+                                    data-rating="{{ review.rating_overall }}"
+                                    data-comment="{{ review.comment|default:'No comment provided.'|escapejs }}"
+                                    data-date="{{ review.created_at|date:'d M Y' }}" title="Inspect Feedback">
+                                    <i class="fa-solid fa-eye text-primary"></i>
+                                </button>
+                                <a href="{% url 'delete_review' review.id %}" class="btn btn-sm btn-light border"
+                                    onclick="return confirm('CRITICAL: Purge this feedback entry?')"
+                                    title="Purge Record">
+                                    <i class="fa-solid fa-trash-can text-danger"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center py-5 text-muted">
+                            <div class="mb-3"><i class="fa-solid fa-comment-slash opacity-25"
+                                    style="font-size: 3rem;"></i></div>
+                            <h5 class="fw-normal">No feedback telemetry detected</h5>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Sentiment Inspection Modal -->
+<div class="modal fade" id="viewReviewModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
+            <div class="modal-header bg-indigo text-white border-0 py-3 px-4" style="border-radius: 16px 16px 0 0;">
+                <h5 class="modal-title fw-bold">
+                    <i class="fa-solid fa-magnifying-glass-chart me-2"></i>Feedback Sentiment Audit
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4" id="reviewDetailsBody">
+                <!-- Content injected via JS -->
+            </div>
+            <div class="modal-footer border-0 p-4 pt-0">
+                <button type="button" class="btn btn-light rounded-pill px-4 fw-bold" data-bs-dismiss="modal">Close
+                    Terminal</button>
+                <div class="ms-auto">
+                    <button class="btn btn-indigo rounded-pill px-4 fw-bold shadow-sm">Verified Entry</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .bg-indigo {
+        background: #4f46e5 !important;
+    }
+
+    .text-indigo {
+        color: #4f46e5 !important;
+    }
+
+    .bg-indigo-subtle {
+        background: rgba(79, 70, 229, 0.1) !important;
+    }
+
+    .review-row {
+        transition: all 0.2s;
+    }
+
+    .review-row:hover {
+        background-color: rgba(79, 70, 229, 0.02) !important;
+    }
+
+    .x-small {
+        font-size: 0.75rem;
+    }
+
+    .animate-in {
+        animation: fadeInSlideUp 0.5s ease forwards;
+        opacity: 0;
+    }
+
+    @keyframes fadeInSlideUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .btn-group .btn {
+        border-radius: 8px !important;
+        margin: 0 2px;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const viewModal = new bootstrap.Modal(document.getElementById('viewReviewModal'));
+        const bodyEl = document.getElementById('reviewDetailsBody');
+
+        document.querySelectorAll('.view-review-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const data = this.dataset;
+                let stars = '';
+                for (let i = 1; i <= 5; i++) {
+                    stars += `<i class="${i <= data.rating ? 'fa-solid' : 'fa-regular'} fa-star text-warning me-1"></i>`;
+                }
+
+                bodyEl.innerHTML = `
+                <div class="row g-4 text-start">
+                    <div class="col-md-6 text-start">
+                        <label class="text-muted small fw-bold text-uppercase mb-2 d-block">Sentiment Target</label>
+                        <div class="bg-light p-3 rounded-3">
+                            <div class="fw-bold text-dark">${data.trip}</div>
+                            <div class="text-muted x-small">Recorded on ${data.date}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 text-start">
+                        <label class="text-muted small fw-bold text-uppercase mb-2 d-block">Source Intensity</label>
+                        <div class="bg-light p-3 rounded-3">
+                            <div class="h4 mb-0 fw-bold text-dark">${data.rating} / 5</div>
+                            <div class="mt-1">${stars}</div>
+                        </div>
+                    </div>
+                    <div class="col-12 text-start">
+                        <label class="text-muted small fw-bold text-uppercase mb-2 d-block">Verbal Telemetry</label>
+                        <div class="bg-light p-3 rounded-3">
+                            <p class="text-dark mb-0 fs-6 italic" style="font-style: italic; white-space: pre-wrap;">"${data.comment}"</p>
+                        </div>
+                        <div class="mt-3 text-muted x-small"><i class="fa-solid fa-user-check me-2"></i>Source Integrity Verified for @${data.reviewer}</div>
+                    </div>
+                </div>`;
+
+                viewModal.show();
+            });
+        });
+    });
+</script>
+{% endblock %}

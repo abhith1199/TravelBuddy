@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Receipt #TB-{{ booking.id|add:1000 }}</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .receipt-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px;
+            border-radius: 12px;
+            background: white;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 2px solid #ff7e5f;
+            padding-bottom: 25px;
+            margin-bottom: 35px;
+        }
+
+        .header h1 {
+            color: #ff7e5f;
+            margin: 0;
+            font-size: 28px;
+        }
+
+        .header p {
+            margin: 5px 0 0 0;
+            color: #777;
+        }
+
+        .details-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 35px;
+            background: #fafafa;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #eee;
+        }
+
+        .details-col {
+            width: 48%;
+        }
+
+        .details-col h3 {
+            margin-top: 0;
+            color: #ff7e5f;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .details-col p {
+            margin: 8px 0;
+            font-size: 15px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 35px;
+        }
+
+        th,
+        td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background-color: #fafafa;
+            color: #555;
+            text-transform: uppercase;
+            font-size: 13px;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        td {
+            font-size: 15px;
+        }
+
+        .total-row td {
+            font-weight: bold;
+            font-size: 1.25em;
+            border-top: 2px solid #333;
+            padding-top: 20px;
+        }
+
+        .footer {
+            text-align: center;
+            color: #888;
+            font-size: 14px;
+            margin-top: 50px;
+            border-top: 1px solid #eee;
+            padding-top: 25px;
+        }
+
+        .print-btn {
+            background: linear-gradient(135deg, #ff7e5f, #feb47b);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            box-shadow: 0 4px 10px rgba(255, 126, 95, 0.3);
+            transition: transform 0.2s;
+        }
+
+        .print-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        @media print {
+            body {
+                background-color: white;
+                padding: 0;
+            }
+
+            .print-btn {
+                display: none;
+            }
+
+            .receipt-container {
+                box-shadow: none;
+                padding: 0;
+                width: 100%;
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    {% if not is_email %}
+    <button class="print-btn" onclick="window.print()">
+        <svg style="width:16px;height:16px;margin-right:8px;vertical-align:middle;" fill="none" stroke="currentColor"
+            viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z">
+            </path>
+        </svg>
+        Print / Save to PDF
+    </button>
+    {% endif %}
+    <div class="receipt-container">
+        <div class="header">
+            <div>
+                <h1>Travel Buddy</h1>
+                <p>Adventure & Travel Experiences</p>
+            </div>
+            <div style="text-align: right;">
+                <h2 style="margin: 0; color: #333; font-size: 24px; letter-spacing: 2px;">RECEIPT</h2>
+                <p style="margin-top: 10px; font-weight: 600;">Receipt #:
+                    <span style="color: #ff7e5f;">TB-{{ booking.id|add:1000 }}</span>
+                </p>
+                <p>Date: {{ booking.booking_date|date:"F d, Y" }}</p>
+                <p>Status:
+                    <strong
+                        style="{% if booking.status == 'CONFIRMED' %}color: #28a745;{% elif booking.status == 'PENDING' %}color: #ffc107;{% else %}color: #dc3545;{% endif %}">
+                        {{ booking.status }}
+                    </strong>
+                </p>
+            </div>
+        </div>
+
+        <div class="details-row">
+            <div class="details-col">
+                <h3>Billed To</h3>
+                <p><strong>{{ booking.traveler.username }}</strong></p>
+                <p>{{ booking.traveler.email }}</p>
+                {% if booking.traveler.phone %}
+                <p>{{ booking.traveler.phone }}</p>
+                {% endif %}
+            </div>
+            <div class="details-col">
+                <h3>Trip Provider</h3>
+                <p><strong>{{ booking.trip.company.username }}</strong></p>
+                <p>{{ booking.trip.company.email }}</p>
+                {% if booking.trip.company.phone %}
+                <p>{{ booking.trip.company.phone }}</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 50%;">Description</th>
+                    <th>Price/Person</th>
+                    <th>Participants</th>
+                    <th style="text-align: right;">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <strong style="font-size: 16px;">{{ booking.trip.title }}</strong><br>
+                        <div style="color: #777; font-size: 14px; margin-top: 8px; line-height: 1.4;">
+                            <strong>Destination:</strong> {{ booking.trip.destination }}<br>
+                            <strong>Dates:</strong> {{ booking.trip.start_date|date:"d M Y" }} to
+                            {{ booking.trip.end_date|date:"d M Y" }}
+                        </div>
+                    </td>
+                    <td>₹{{ booking.trip.price }}</td>
+                    <td>{{ booking.num_people }}</td>
+                    <td style="text-align: right;">₹{{ booking.total_price }}</td>
+                </tr>
+                <tr class="total-row">
+                    <td colspan="3" style="text-align: right;">Grand Total:</td>
+                    <td style="text-align: right; color: #ff7e5f;">₹{{ booking.total_price }}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="footer">
+            <p style="font-weight: 600; color: #555; font-size: 16px;">Thank you for choosing Travel Buddy for your
+                adventure!</p>
+            <p>For any inquiries, please contact support or the trip provider directly via the group chat.</p>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,143 @@
+{% extends 'company/base_company.html' %}
+{% load static %}
+
+{% block title %}Manage Bookings - Travel Buddy{% endblock %}
+
+{% block company_content %}
+<div class="row mb-5 align-items-center">
+    <div class="col-md-8">
+        <h2 class="font-weight-bold" style="color: #2b2b2b;">Customer Bookings</h2>
+        <p class="text-muted">Track and manage traveler reservations for your adventure packages.</p>
+    </div>
+    <div class="col-md-4 d-flex justify-content-end mt-3 mt-md-0">
+        <div class="stats-badge bg-white shadow-sm px-4 py-2 rounded-pill d-inline-flex align-items-center"
+            style="border: 1px solid rgba(255, 126, 95, 0.2);">
+            <span class="text-muted small font-weight-bold text-uppercase mr-2" style="letter-spacing: 0.5px;">Total
+                Bookings:</span>
+            <strong style="color: #ff7e5f; font-size: 1.1rem;">{{ bookings|length }}</strong>
+        </div>
+    </div>
+</div>
+
+{% if bookings %}
+<div class="card border-0 overflow-hidden"
+    style="border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); background: rgba(255,255,255,0.85); backdrop-filter: blur(12px);">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead style="background: rgba(255, 126, 95, 0.05);">
+                    <tr>
+                        <th class="border-0 px-4 py-3 text-uppercase small font-weight-bold"
+                            style="color: #2b2b2b; letter-spacing: 0.5px;">Booking ID</th>
+                        <th class="border-0 py-3 text-uppercase small font-weight-bold"
+                            style="color: #2b2b2b; letter-spacing: 0.5px;">Customer</th>
+                        <th class="border-0 py-3 text-uppercase small font-weight-bold"
+                            style="color: #2b2b2b; letter-spacing: 0.5px;">Trip</th>
+                        <th class="border-0 py-3 text-uppercase small font-weight-bold"
+                            style="color: #2b2b2b; letter-spacing: 0.5px;">Date</th>
+                        <th class="border-0 py-3 text-uppercase small font-weight-bold text-center"
+                            style="color: #2b2b2b; letter-spacing: 0.5px;">Travelers</th>
+                        <th class="border-0 py-3 text-uppercase small font-weight-bold"
+                            style="color: #2b2b2b; letter-spacing: 0.5px;">Revenue</th>
+                        <th class="border-0 py-3 text-uppercase small font-weight-bold text-center"
+                            style="color: #2b2b2b; letter-spacing: 0.5px;">Status</th>
+                        <th class="border-0 px-4 py-3 text-uppercase small font-weight-bold text-right"
+                            style="color: #2b2b2b; letter-spacing: 0.5px;">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for booking in bookings %}
+                    <tr>
+                        <td class="px-4 py-3">
+                            <span class="font-weight-bold" style="color: #ff7e5f;">#TB-{{ booking.id|add:"1000" }}</span>
+                        </td>
+                        <td class="py-3">
+                            <div class="d-flex align-items-center">
+                                <div class="avatar rounded-circle mr-3 d-flex align-items-center justify-content-center font-weight-bold text-white shadow-sm"
+                                    style="width: 40px; height: 40px; min-width: 40px; font-size: 16px; background: linear-gradient(135deg, #ff7e5f, #feb47b);">
+                                    {{ booking.traveler_initial|default:"?" }}
+                                </div>
+                                <div class="text-truncate" style="max-width: 150px;">
+                                    <span class="d-block font-weight-bold small text-dark">
+                                        {{ booking.traveler_name|default:"User" }}
+                                    </span>
+                                    <span class="text-muted d-block" style="font-size: 11px;">
+                                        {{ booking.traveler_email|default:"No Email" }}
+                                    </span>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="py-3">
+                            <span class="d-block font-weight-bold small text-dark">{{ booking.trip.title }}</span>
+                            <span class="text-muted" style="font-size: 11px;">
+                                <i class="fa fa-map-marker mr-1" style="color: #ff7e5f;"></i>{{ booking.trip.destination }}
+                            </span>
+                        </td>
+                        <td class="py-3 small text-muted font-weight-bold">{{ booking.booking_date|date:"d M Y" }}</td>
+                        <td class="py-3 text-center">
+                            <span class="badge rounded-pill px-3 py-2 text-white shadow-sm"
+                                style="background: linear-gradient(135deg, #ff7e5f, #feb47b); font-size: 12px;">{{ booking.num_people }}</span>
+                        </td>
+                        <td class="py-3">
+                            <span class="font-weight-bold text-dark" style="font-size: 15px;">₹{{ booking.total_price }}</span>
+                        </td>
+                        <td class="py-3 text-center">
+                            {% if booking.status == 'CONFIRMED' %}
+                            <span class="badge badge-pill badge-success px-3 py-2">Confirmed</span>
+                            {% elif booking.status == 'PENDING' %}
+                            <span class="badge badge-pill badge-warning px-3 py-2">Pending</span>
+                            {% else %}
+                            <span class="badge badge-pill badge-danger px-3 py-2">Cancelled</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-4 py-3 text-right">
+                            <a href="{% url 'booking_detail' booking.id %}" class="btn-premium-outline btn-sm"
+                                style="padding: 6px 16px;">
+                                <i class="fa fa-eye mr-1"></i>Details
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="text-center py-5 bg-white shadow-sm border-0 rounded-lg">
+    <div class="mb-4">
+        <i class="fa fa-ticket fa-5x text-light"></i>
+    </div>
+    <h4 class="font-weight-bold text-dark">No Bookings Yet</h4>
+    <p class="text-muted mb-4">You haven't received any bookings for your trips yet.<br>Promote your trips to attract
+        more travelers.</p>
+    <a href="{% url 'manage_trips' %}" class="btn-premium">
+        <i class="fa fa-bullhorn mr-2"></i>Promote Trips
+    </a>
+</div>
+{% endif %}
+
+<style>
+    .bg-primary-light {
+        background: rgba(0, 123, 255, 0.1);
+    }
+
+    .table td {
+        vertical-align: middle;
+    }
+
+    .font-weight-bold {
+        font-weight: 600 !important;
+    }
+
+    .badge-pill {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .rounded-lg {
+        border-radius: 1.5rem !important;
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,86 @@
+{% extends 'base_modern.html' %}
+{% load static %}
+
+{% block title %}Booking Confirmed - {{ booking.trip.title }}{% endblock %}
+
+{% block content %}
+<section class="min-h-screen bg-[#fafafa] pt-20 pb-24 relative overflow-hidden flex items-center justify-center">
+    <!-- Decorative background elements -->
+    <div
+        class="absolute top-1/4 left-1/4 w-96 h-96 bg-green-200 rounded-full mix-blend-multiply filter blur-[100px] opacity-40 animate-pulse pointer-events-none">
+    </div>
+    <div class="absolute bottom-1/4 right-1/4 w-80 h-80 bg-blue-200 rounded-full mix-blend-multiply filter blur-[100px] opacity-40 animate-pulse pointer-events-none"
+        style="animation-delay: 2s;"></div>
+
+    <div class="container max-w-2xl mx-auto px-4 relative z-10 w-full">
+
+        <div
+            class="bg-white rounded-[2rem] shadow-xl border border-gray-100 overflow-hidden text-center p-10 md:p-14 transform transition-all duration-500 hover:shadow-2xl hover:-translate-y-1 animate-slide-up">
+
+            <!-- Success Icon Animation -->
+            <div class="mb-8 relative inline-block">
+                <div class="absolute inset-0 bg-green-100 rounded-full blur-xl scale-150 opacity-70 animate-pulse">
+                </div>
+                <div
+                    class="w-24 h-24 bg-green-500 rounded-full flex items-center justify-center mx-auto shadow-lg shadow-green-500/30 relative z-10 animate-[bounce_1s_ease-out]">
+                    <i class="fa-solid fa-check text-4xl text-white drop-shadow-sm"></i>
+                </div>
+            </div>
+
+            <h1 class="font-display font-black text-4xl text-gray-900 mb-2 tracking-tight">Booking Secured!</h1>
+            <p class="text-gray-500 font-medium text-lg mb-8">You're all set for <span
+                    class="text-primary-500 font-bold">{{ booking.trip.title }}</span>.</p>
+
+            <div
+                class="inline-flex items-center gap-2 bg-gray-50 border border-gray-200 px-5 py-2.5 rounded-xl mb-10 shadow-sm">
+                <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">Booking Ref</span>
+                <span class="font-mono font-bold text-gray-900">#TB-{{ booking.id|add:"1000" }}</span>
+            </div>
+
+            <!-- Itinerary Summary -->
+            <div class="bg-gray-50 rounded-2xl p-6 md:p-8 text-left border border-gray-100 mb-10">
+                <div class="grid grid-cols-2 gap-y-6 gap-x-4">
+                    <div>
+                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1"><i
+                                class="fa-solid fa-location-dot text-primary-400 mr-1"></i> Destination</p>
+                        <p class="font-bold text-gray-900">{{ booking.trip.destination }}</p>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1"><i
+                                class="fa-solid fa-users text-blue-400 mr-1"></i> Party Size</p>
+                        <p class="font-bold text-gray-900">{{ booking.num_people }} <span
+                                class="text-xs text-gray-500 font-medium">Travelers</span></p>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1"><i
+                                class="fa-regular fa-calendar-check text-purple-400 mr-1"></i> Departure</p>
+                        <p class="font-bold text-gray-900">{{ booking.trip.start_date|date:"d M Y" }}</p>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1"><i
+                                class="fa-solid fa-file-invoice-dollar text-green-500 mr-1"></i> Amount Paid</p>
+                        <p class="font-bold text-green-600 text-lg">₹{{ booking.total_price|floatformat:0 }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <p class="text-sm text-gray-500 mb-10 bg-blue-50/50 p-4 rounded-xl border border-blue-100 font-medium">
+                <i class="fa-solid fa-envelope-circle-check text-blue-500 mr-1.5"></i> A confirmation itinerary has been
+                sent to <strong class="text-gray-900">{{ request.user.email }}</strong>.
+            </p>
+
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <a href="{% url 'browse_trips' %}"
+                    class="w-full sm:w-auto bg-white border-2 border-primary-500 text-primary-500 hover:bg-primary-50 px-8 py-3.5 rounded-xl font-bold text-sm transition-all text-center">
+                    Explore More
+                </a>
+                <a href="{% url 'my_bookings' %}"
+                    class="w-full sm:w-auto bg-primary-500 hover:bg-primary-600 text-white px-8 py-3.5 rounded-xl font-bold text-sm shadow-glow transition-all hover:-translate-y-1 text-center">
+                    View My Bookings <i class="fa-solid fa-arrow-right ml-1"></i>
+                </a>
+            </div>
+
+        </div>
+    </div>
+</section>
+{% endblock %}

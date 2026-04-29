@@ -1,0 +1,254 @@
+{% extends 'base_modern.html' %}
+{% load static %}
+
+{% block title %}User Dashboard - Travel Buddy{% endblock %}
+
+{% block content %}
+<!-- Premium Header -->
+<section
+    class="relative pt-32 pb-24 flex items-center justify-center overflow-hidden bg-dark-900 border-b border-gray-800">
+    <!-- Abstract Background Pattern -->
+    <div class="absolute inset-0 z-0 opacity-30">
+        <div class="absolute inset-0 bg-gradient-to-br from-primary-900 via-dark-900 to-indigo-900"></div>
+        <div
+            class="absolute top-0 right-0 w-96 h-96 bg-primary-500 rounded-full mix-blend-multiply filter blur-[100px] opacity-20">
+        </div>
+        <div
+            class="absolute bottom-0 left-0 w-96 h-96 bg-indigo-500 rounded-full mix-blend-multiply filter blur-[100px] opacity-20">
+        </div>
+    </div>
+
+    <div class="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 animate-slide-up">
+        <div class="flex flex-col md:flex-row items-center justify-between gap-8">
+            <div class="text-center md:text-left">
+                <span
+                    class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-xs font-bold text-gray-300 uppercase tracking-widest mb-4 backdrop-blur-sm">
+                    <span class="w-1.5 h-1.5 rounded-full bg-green-400"></span> Traveler Account
+                </span>
+                <h1 class="font-display text-4xl md:text-5xl font-bold text-white mb-2 tracking-tight">Welcome back,
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary-400 to-primary-600">
+                        {% if user.first_name %}
+                        {{ user.first_name }} {{ user.last_name }}
+                        {% else %}
+                        {{ user.username }}
+                        {% endif %}
+                    </span>
+                </h1>
+                <p class="text-gray-400 text-lg">Your adventures, bookings, and activity at a glance.</p>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <a href="{% url 'browse_trips' %}"
+                    class="bg-primary-500 hover:bg-primary-600 text-white px-8 py-3 rounded-xl font-bold text-sm shadow-glow transition-all">
+                    Find Trips
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Dashboard Content -->
+<section class="py-12 bg-[#fafafa] min-h-[50vh]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10 -mt-20 relative z-20">
+            <!-- Stat 1 -->
+            <div
+                class="bg-white rounded-2xl p-6 shadow-xl border border-gray-100 flex items-center gap-4 group hover:-translate-y-1 transition-transform cursor-default">
+                <div
+                    class="w-14 h-14 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform shadow-sm">
+                    <i class="fa-solid fa-route"></i>
+                </div>
+                <div>
+                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Total Trips</p>
+                    <h3 class="font-display font-black text-2xl text-gray-900 leading-none">{{ total_trips }}</h3>
+                </div>
+            </div>
+
+            <!-- Stat 2 -->
+            <a href="{% url 'my_bookings' %}"
+                class="bg-white rounded-2xl p-6 shadow-xl border border-gray-100 flex items-center gap-4 group hover:-translate-y-1 transition-transform cursor-pointer block">
+                <div
+                    class="w-14 h-14 rounded-full bg-green-50 text-green-500 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform shadow-sm">
+                    <i class="fa-regular fa-calendar-check"></i>
+                </div>
+                <div>
+                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Upcoming</p>
+                    <h3 class="font-display font-black text-2xl text-gray-900 leading-none">{{ upcoming_trips }}</h3>
+                </div>
+            </a>
+
+            <!-- Stat 3 -->
+            <div
+                class="bg-white rounded-2xl p-6 shadow-xl border border-gray-100 flex items-center gap-4 group hover:-translate-y-1 transition-transform cursor-default">
+                <div
+                    class="w-14 h-14 rounded-full bg-yellow-50 text-yellow-500 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform shadow-sm">
+                    <i class="fa-solid fa-star"></i>
+                </div>
+                <div>
+                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Reviews</p>
+                    <h3 class="font-display font-black text-2xl text-gray-900 leading-none">{{ reviews_given }}</h3>
+                </div>
+            </div>
+
+            <!-- Stat 4 -->
+            <div
+                class="bg-white rounded-2xl p-6 shadow-xl border border-gray-100 flex items-center gap-4 group hover:-translate-y-1 transition-transform cursor-default">
+                <div
+                    class="w-14 h-14 rounded-full bg-purple-50 text-purple-500 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform shadow-sm">
+                    <i class="fa-solid fa-users"></i>
+                </div>
+                <div>
+                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Buddies</p>
+                    <h3 class="font-display font-black text-2xl text-gray-900 leading-none">{{ buddies_count }}</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+            <!-- Left Column: User Data -->
+            <div class="lg:col-span-2 space-y-8">
+
+                <div class="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
+                    <div class="flex items-center justify-between pb-6 border-b border-gray-100 mb-6">
+                        <h2 class="font-display font-bold text-xl text-gray-900 flex items-center gap-2"><i
+                                class="fa-regular fa-id-card text-primary-500"></i> Traver Profile</h2>
+                        <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">ID #{{ user.id }}</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-8">
+                        <div>
+                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Full Name</p>
+                            <p class="font-semibold text-gray-900">{{ user.get_full_name|default:user.username }}</p>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Username</p>
+                            <p class="font-semibold text-gray-900">@{{ user.username }}</p>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Email Address
+                            </p>
+                            <p class="font-semibold text-gray-900">{{ user.email }}</p>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Phone Number
+                            </p>
+                            <p class="font-semibold text-gray-900">{{ user.phone|default:"Not provided" }}</p>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Gender</p>
+                            <p class="font-semibold text-gray-900">{{ user.get_gender_display|default:"Not specified" }}
+                            </p>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Member Since
+                            </p>
+                            <p class="font-semibold text-gray-900">{{ user.date_joined|date:"F Y" }}</p>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 pt-6 border-t border-gray-100">
+                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">Travel Interests
+                        </p>
+                        <div class="flex flex-wrap gap-2">
+                            {% if user.interests %}
+                            {% for interest in user.get_interests_list %}
+                            <span
+                                class="px-3 py-1.5 bg-gray-50 border border-gray-200 text-gray-700 text-xs font-bold rounded-lg">{{ interest }}</span>
+                            {% endfor %}
+                            {% else %}
+                            <span class="text-sm text-gray-500 italic">No interests listed. Configure them in
+                                settings.</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity Feed -->
+                <div class="bg-white rounded-3xl p-8 shadow-sm border border-gray-100 relative overflow-hidden">
+                    <h2 class="font-display font-bold text-xl text-gray-900 flex items-center gap-2 mb-8"><i
+                            class="fa-solid fa-bolt text-yellow-500"></i> Recent Activity</h2>
+
+                    <div
+                        class="relative border-l border-gray-200 ml-3 space-y-8 opacity-70 max-h-80 overflow-y-auto pr-2">
+                        {% if recent_activity %}
+                        {% for activity in recent_activity %}
+                        <!-- Activity Item -->
+                        <div class="relative pl-6">
+                            <span
+                                class="absolute -left-[5px] top-1 w-2.5 h-2.5 rounded-full {{ activity.color_cls|default:'bg-gray-300' }} ring-4 ring-white"></span>
+                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
+                                {{ activity.date|timesince }} ago
+                            </p>
+                            <h4
+                                class="font-bold {% if forloop.first %}text-gray-900{% else %}text-gray-500{% endif %} text-sm mb-1">
+                                {{ activity.title }}</h4>
+                            {% if activity.description %}
+                            <p class="text-sm text-gray-500">{{ activity.description }}</p>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                        {% else %}
+                        <p class="text-sm text-gray-500 italic pl-6">No recent activity found.</p>
+                        {% endif %}
+                    </div>
+                    <!-- Fade out bottom -->
+                    <div class="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-white to-transparent"></div>
+                </div>
+            </div>
+
+            <!-- Right Column: Sidebar -->
+            <div class="space-y-6">
+
+                <!-- Quick Navigation -->
+                <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+                    <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Quick Links</h3>
+                    <div class="space-y-2">
+                        <a href="{% url 'my_bookings' %}"
+                            class="flex items-center justify-between p-3 rounded-xl hover:bg-gray-50 text-gray-700 font-bold text-sm transition-colors group border border-transparent hover:border-gray-100">
+                            <span class="flex items-center gap-3"><i
+                                    class="fa-solid fa-suitcase-rolling text-primary-500 w-5 text-center"></i> My
+                                Bookings</span>
+                            <i class="fa-solid fa-chevron-right text-gray-300 text-xs group-hover:text-primary-500"></i>
+                        </a>
+                        <a href="{% url 'browse_trips' %}"
+                            class="flex items-center justify-between p-3 rounded-xl hover:bg-gray-50 text-gray-700 font-bold text-sm transition-colors group border border-transparent hover:border-gray-100">
+                            <span class="flex items-center gap-3"><i
+                                    class="fa-solid fa-magnifying-glass-location text-blue-500 w-5 text-center"></i>
+                                Browse Trips</span>
+                            <i class="fa-solid fa-chevron-right text-gray-300 text-xs group-hover:text-blue-500"></i>
+                        </a>
+                        <a href="{% url 'user_settings' %}"
+                            class="flex items-center justify-between p-3 rounded-xl hover:bg-gray-50 text-gray-700 font-bold text-sm transition-colors group border border-transparent hover:border-gray-100">
+                            <span class="flex items-center gap-3"><i
+                                    class="fa-solid fa-shield-halved text-green-500 w-5 text-center"></i> Security
+                                Settings</span>
+                            <i class="fa-solid fa-chevron-right text-gray-300 text-xs group-hover:text-green-500"></i>
+                        </a>
+                    </div>
+                </div>
+
+
+
+                <!-- Support Card -->
+                <div class="bg-blue-50/50 rounded-3xl p-6 border border-blue-100 text-center">
+                    <div
+                        class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-blue-500 shadow-sm mx-auto mb-3">
+                        <i class="fa-solid fa-headset text-xl"></i>
+                    </div>
+                    <h3 class="font-bold text-gray-900 mb-1">Need Help?</h3>
+                    <p class="text-xs text-gray-500 mb-4 px-2">Our support team is available 24/7 to assist with your
+                        journey.</p>
+                    <a href="mailto:support@travelbuddy.com"
+                        class="text-sm font-bold text-blue-600 hover:text-blue-800 transition-colors">Contact Support
+                        &rarr;</a>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</section>
+{% endblock %}

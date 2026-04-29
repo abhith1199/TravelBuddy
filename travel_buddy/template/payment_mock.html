@@ -1,0 +1,504 @@
+{% extends 'base_modern.html' %}
+{% load static %}
+
+{% block title %}Secure Checkout - Travel Buddy{% endblock %}
+
+{% block content %}
+<section class="min-h-screen bg-[#fafafa] pt-12 pb-24 relative overflow-hidden">
+    <!-- Decorative blobs -->
+    <div
+        class="absolute top-0 right-0 w-96 h-96 bg-primary-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse pointer-events-none">
+    </div>
+    <div class="absolute top-40 -left-10 w-72 h-72 bg-purple-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse pointer-events-none"
+        style="animation-delay: 2s;"></div>
+
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 relative z-10 animate-fade-in">
+
+        <div class="text-center mb-10">
+            <h1 class="font-display font-black text-3xl md:text-4xl text-gray-900 tracking-tight mb-3">Secure Checkout
+            </h1>
+            <p class="text-gray-500 font-medium flex items-center justify-center gap-1.5"><i
+                    class="fa-solid fa-lock text-green-500"></i> 256-bit SSL encrypted transaction</p>
+        </div>
+
+        <div
+            class="bg-white rounded-[2rem] shadow-xl border border-gray-100 overflow-hidden flex flex-col lg:flex-row shadow-glass">
+
+            <!-- Left Sidebar - Summary Card -->
+            <div
+                class="lg:w-1/3 bg-gray-50 p-8 border-b lg:border-b-0 lg:border-r border-gray-200 flex flex-col justify-between relative overflow-hidden">
+                <div
+                    class="absolute top-0 right-0 w-32 h-32 bg-primary-100 rounded-full blur-2xl opacity-50 transform translate-x-1/2 -translate-y-1/2">
+                </div>
+
+                <div class="relative z-10">
+                    <h6 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-6">Order Summary</h6>
+
+                    <div
+                        class="text-center bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8 transform hover:-translate-y-1 transition-transform duration-300">
+                        <p class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Total to Pay</p>
+                        <h2 class="font-display font-black text-4xl text-primary-500 flex justify-center items-start">
+                            <span class="text-2xl mt-1 mr-1">₹</span>{{ booking.total_price|floatformat:0 }}
+                        </h2>
+                        <p class="text-xs font-bold text-gray-400 mt-2 bg-gray-50 inline-block px-2 py-1 rounded">ID:
+                            #TB-{{ booking.id|add:"1000" }}</p>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div class="flex items-start gap-4">
+                            <div
+                                class="w-10 h-10 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center shrink-0 shadow-sm border border-blue-100">
+                                <i class="fa-solid fa-map-location-dot"></i>
+                            </div>
+                            <div>
+                                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">Trip
+                                    Designation</p>
+                                <p class="font-bold text-gray-900 text-sm leading-snug">{{ booking.trip.title }}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4">
+                            <div
+                                class="w-10 h-10 rounded-xl bg-purple-50 text-purple-500 flex items-center justify-center shrink-0 shadow-sm border border-purple-100">
+                                <i class="fa-solid fa-users"></i>
+                            </div>
+                            <div>
+                                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">Party
+                                    Setup</p>
+                                <p class="font-bold text-gray-900 text-sm">{{ booking.num_people }} Person(s)</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-12 text-center pt-6 border-t border-gray-200 relative z-10">
+                    <div class="flex justify-center gap-3 opacity-50 mb-3 grayscale">
+                        <img src="https://static.cdnlogo.com/logos/v/34/visa.svg" alt="Visa" class="h-6">
+                        <img src="https://static.cdnlogo.com/logos/m/8/mastercard.svg" alt="Mastercard" class="h-6">
+                        <img src="https://static.cdnlogo.com/logos/p/25/phonepe.svg" alt="UPI" class="h-6">
+                    </div>
+                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Powered by Razorpay</p>
+                </div>
+            </div>
+
+            <!-- Right Main - Payment Options -->
+            <div class="lg:w-2/3 p-8 md:p-12">
+                <h4
+                    class="font-display font-bold text-2xl text-gray-900 mb-8 border-b-2 border-primary-500 inline-block pb-1 pr-4">
+                    Select Payment Method</h4>
+
+                <!-- Tabs Container -->
+                <div class="mb-8">
+                    <ul class="flex flex-wrap gap-2 bg-gray-50 p-2 rounded-xl border border-gray-100" id="payment-tabs"
+                        role="tablist">
+                        <li class="flex-1" role="presentation">
+                            <button
+                                class="w-full py-3 px-4 font-bold text-sm rounded-lg transition-all focus:outline-none flex items-center justify-center gap-2 active-tab"
+                                id="upi-tab" data-target="pills-upi">
+                                <i class="fa-solid fa-mobile-screen"></i> <span class="hidden sm:inline">UPI
+                                    Gateway</span><span class="sm:hidden">UPI</span>
+                            </button>
+                        </li>
+                        <li class="flex-1" role="presentation">
+                            <button
+                                class="w-full py-3 px-4 font-bold text-sm rounded-lg transition-all focus:outline-none text-gray-500 hover:text-gray-900 hover:bg-white flex items-center justify-center gap-2"
+                                id="card-tab" data-target="pills-card">
+                                <i class="fa-regular fa-credit-card"></i> <span class="hidden sm:inline">Credit /
+                                    Debit</span><span class="sm:hidden">Card</span>
+                            </button>
+                        </li>
+                        <li class="flex-1" role="presentation">
+                            <button
+                                class="w-full py-3 px-4 font-bold text-sm rounded-lg transition-all focus:outline-none text-gray-500 hover:text-gray-900 hover:bg-white flex items-center justify-center gap-2"
+                                id="net-tab" data-target="pills-net">
+                                <i class="fa-solid fa-building-columns"></i> <span class="hidden sm:inline">Net
+                                    Banking</span><span class="sm:hidden">Bank</span>
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+
+                <form action="{% url 'payment_mock' booking.id %}" method="POST" id="main-payment-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="payment_method" id="selected_method" value="upi">
+
+                    <div id="tab-content" class="min-h-[220px]">
+                        <!-- UPI Pane -->
+                        <div id="pills-upi" class="tab-pane block">
+                            <div class="grid grid-cols-3 gap-4 mb-6">
+                                <label
+                                    class="border-2 border-primary-500 bg-primary-50 rounded-xl p-4 flex items-center justify-center cursor-pointer transition-all hover:shadow-md h-[4.5rem] upi-option relative overflow-hidden">
+                                    <div
+                                        class="absolute inset-0 bg-primary-100 opacity-0 hover:opacity-100 transition-opacity">
+                                    </div>
+                                    <input type="radio" name="upi_app" checked class="hidden">
+                                    <img src="https://static.cdnlogo.com/logos/g/33/google-pay.svg" alt="GPay"
+                                        class="h-6 object-contain mix-blend-multiply relative z-10">
+                                </label>
+                                <label
+                                    class="border-2 border-gray-200 bg-white rounded-xl p-4 flex items-center justify-center cursor-pointer transition-all hover:border-gray-300 hover:shadow-md h-[4.5rem] upi-option filter grayscale hover:grayscale-0 relative overflow-hidden">
+                                    <div
+                                        class="absolute inset-0 bg-gray-50 opacity-0 hover:opacity-100 transition-opacity">
+                                    </div>
+                                    <input type="radio" name="upi_app" class="hidden">
+                                    <img src="https://static.cdnlogo.com/logos/p/25/phonepe.svg" alt="PhonePe"
+                                        class="h-6 object-contain mix-blend-multiply relative z-10">
+                                </label>
+                                <label
+                                    class="border-2 border-gray-200 bg-white rounded-xl p-4 flex items-center justify-center cursor-pointer transition-all hover:border-gray-300 hover:shadow-md h-[4.5rem] upi-option filter grayscale hover:grayscale-0 relative overflow-hidden">
+                                    <div
+                                        class="absolute inset-0 bg-gray-50 opacity-0 hover:opacity-100 transition-opacity">
+                                    </div>
+                                    <input type="radio" name="upi_app" class="hidden">
+                                    <img src="https://static.cdnlogo.com/logos/p/6/paytm.svg" alt="Paytm"
+                                        class="h-5 object-contain mix-blend-multiply relative z-10">
+                                </label>
+                            </div>
+                            <div class="bg-gray-50 rounded-2xl p-6 border border-gray-200 shadow-inner">
+                                <label
+                                    class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Virtual
+                                    Payment Address (UPI ID)</label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                        <i class="fa-solid fa-qrcode text-primary-400"></i>
+                                    </div>
+                                    <input type="text"
+                                        class="w-full bg-white border border-gray-300 rounded-xl pl-11 pr-4 py-3.5 text-sm font-medium focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-all required-input text-gray-900"
+                                        placeholder="e.g. username@okaxis" required>
+                                </div>
+                                <p class="text-[11px] font-bold text-gray-400 mt-3 flex items-center gap-1.5"><i
+                                        class="fa-solid fa-info-circle text-blue-400"></i> A payment request will be
+                                    sent to your app immediately.</p>
+                            </div>
+                        </div>
+
+                        <!-- Card Pane -->
+                        <div id="pills-card" class="tab-pane hidden">
+                            <div class="space-y-6">
+                                <div>
+                                    <label
+                                        class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Card
+                                        Number</label>
+                                    <div class="relative">
+                                        <input type="text"
+                                            class="w-full bg-gray-50 border border-gray-200 rounded-xl pl-4 pr-12 py-3.5 text-sm font-bold text-gray-900 tracking-widest focus:outline-none focus:border-primary-500 focus:bg-white focus:ring-2 focus:ring-primary-100 transition-all required-input"
+                                            placeholder="0000 0000 0000 0000" maxlength="19">
+                                        <div
+                                            class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none opacity-40">
+                                            <i class="fa-brands fa-cc-visa text-2xl"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex gap-5">
+                                    <div class="flex-1">
+                                        <label
+                                            class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Valid
+                                            Thru</label>
+                                        <input type="text"
+                                            class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 text-sm font-bold text-gray-900 tracking-widest focus:outline-none focus:border-primary-500 focus:bg-white focus:ring-2 focus:ring-primary-100 transition-all text-center required-input"
+                                            placeholder="MM/YY" maxlength="5">
+                                    </div>
+                                    <div class="flex-1">
+                                        <label
+                                            class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">CVV
+                                            / CVC</label>
+                                        <div class="relative">
+                                            <input type="password"
+                                                class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 text-sm font-bold text-gray-900 tracking-widest focus:outline-none focus:border-primary-500 focus:bg-white focus:ring-2 focus:ring-primary-100 transition-all text-center required-input"
+                                                placeholder="•••" maxlength="4">
+                                            <div
+                                                class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-gray-300">
+                                                <i class="fa-regular fa-credit-card"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label
+                                        class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Cardholder
+                                        Name</label>
+                                    <input type="text"
+                                        class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 text-sm font-bold text-gray-900 focus:outline-none focus:border-primary-500 focus:bg-white focus:ring-2 focus:ring-primary-100 transition-all uppercase required-input"
+                                        placeholder="NAME AS PRINTED ON CARD">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Net Banking Pane -->
+                        <div id="pills-net" class="tab-pane hidden">
+                            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Popular
+                                Banks</label>
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+                                <div
+                                    class="bank-option border-2 border-primary-500 bg-primary-50 rounded-xl p-4 text-center cursor-pointer transition-all hover:shadow-sm">
+                                    <div
+                                        class="w-10 h-10 rounded-lg bg-white shadow-sm flex items-center justify-center mx-auto mb-2 text-primary-500 text-lg">
+                                        <i class="fa-solid fa-building-columns"></i>
+                                    </div>
+                                    <span class="text-xs font-bold text-gray-700 tracking-wider">SBI</span>
+                                </div>
+                                <div
+                                    class="bank-option border-2 border-gray-200 bg-white rounded-xl p-4 text-center cursor-pointer transition-all hover:border-gray-300 hover:shadow-sm">
+                                    <div
+                                        class="w-10 h-10 rounded-lg bg-gray-50 flex items-center justify-center mx-auto mb-2 text-gray-400 text-lg">
+                                        <i class="fa-solid fa-building-columns"></i>
+                                    </div>
+                                    <span class="text-xs font-bold text-gray-700 tracking-wider">HDFC</span>
+                                </div>
+                                <div
+                                    class="bank-option border-2 border-gray-200 bg-white rounded-xl p-4 text-center cursor-pointer transition-all hover:border-gray-300 hover:shadow-sm">
+                                    <div
+                                        class="w-10 h-10 rounded-lg bg-gray-50 flex items-center justify-center mx-auto mb-2 text-gray-400 text-lg">
+                                        <i class="fa-solid fa-building-columns"></i>
+                                    </div>
+                                    <span class="text-xs font-bold text-gray-700 tracking-wider">ICICI</span>
+                                </div>
+                                <div
+                                    class="bank-option border-2 border-gray-200 bg-white rounded-xl p-4 text-center cursor-pointer transition-all hover:border-gray-300 hover:shadow-sm">
+                                    <div
+                                        class="w-10 h-10 rounded-lg bg-gray-50 flex items-center justify-center mx-auto mb-2 text-gray-400 text-lg">
+                                        <i class="fa-solid fa-building-columns"></i>
+                                    </div>
+                                    <span class="text-xs font-bold text-gray-700 tracking-wider">AXIS</span>
+                                </div>
+                            </div>
+                            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Other
+                                Banks</label>
+                            <select
+                                class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 text-sm font-bold text-gray-700 focus:outline-none focus:border-primary-500 focus:bg-white focus:ring-2 focus:ring-primary-100 transition-all appearance-none cursor-pointer">
+                                <option value="" disabled selected>Select from all supported banks...</option>
+                                <option>Canara Bank</option>
+                                <option>Punjab National Bank</option>
+                                <option>Bank of Baroda</option>
+                                <option>Kotak Mahindra Bank</option>
+                                <option>Union Bank of India</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button type="submit" id="pay-button"
+                        class="w-full bg-dark-900 hover:bg-black text-white py-4 rounded-xl mt-10 font-bold text-lg shadow-xl shadow-dark-900/20 transition-all hover:-translate-y-1 relative overflow-hidden group border border-gray-800">
+                        <div
+                            class="absolute inset-0 bg-gradient-to-r from-primary-500 to-primary-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        </div>
+                        <span id="button-text" class="flex items-center justify-center gap-2 relative z-10">
+                            Pay Securely ₹{{ booking.total_price|floatformat:0 }} <i
+                                class="fa-solid fa-arrow-right ml-1"></i>
+                        </span>
+                        <div id="loader"
+                            class="hidden absolute inset-0 bg-primary-600 items-center justify-center gap-3 text-sm font-bold relative z-10">
+                            <i class="fa-solid fa-circle-notch fa-spin text-white text-lg"></i> Authenticating secure
+                            transaction...
+                        </div>
+                    </button>
+
+                    <p class="text-center text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-5"><i
+                            class="fa-solid fa-shield-halved text-green-500"></i> Payments are processed dynamically
+                        with 3D Secure verification</p>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<!-- Razorpay Checkout JS -->
+{% if has_razorpay and razorpay_order_id %}
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.getElementById('main-payment-form');
+        const payBtn = document.getElementById('pay-button');
+        const originalBtnTextHTML = document.getElementById('button-text').innerHTML;
+        const btnText = document.getElementById('button-text');
+        const loader = document.getElementById('loader');
+
+        // Remove standard form submit behavior to use Razorpay Instead
+        form.removeEventListener('submit', window.handleMockSubmit);
+
+        var options = {
+            "key": "{{ razorpay_key_id }}",
+            "amount": "{{ booking.total_price|floatformat:0 }}00",
+            "currency": "INR",
+            "name": "{{ booking.trip.company.company_name }}",
+            "description": "Booking for {{ booking.trip.title }}",
+            "image": "",
+            "order_id": "{{ razorpay_order_id }}", //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+            "handler": function (response) {
+                // On success, submit the form back to our server to finalize booking
+
+                // Add hidden inputs for razorpay details if we want to save them later
+                let paymentIdInput = document.createElement("input");
+                paymentIdInput.setAttribute("type", "hidden");
+                paymentIdInput.setAttribute("name", "razorpay_payment_id");
+                paymentIdInput.setAttribute("value", response.razorpay_payment_id);
+                form.appendChild(paymentIdInput);
+
+                let orderIdInput = document.createElement("input");
+                orderIdInput.setAttribute("type", "hidden");
+                orderIdInput.setAttribute("name", "razorpay_order_id");
+                orderIdInput.setAttribute("value", response.razorpay_order_id);
+                form.appendChild(orderIdInput);
+
+                let signatureInput = document.createElement("input");
+                signatureInput.setAttribute("type", "hidden");
+                signatureInput.setAttribute("name", "razorpay_signature");
+                signatureInput.setAttribute("value", response.razorpay_signature);
+                form.appendChild(signatureInput);
+
+                // Now submit to standard flow
+                HTMLFormElement.prototype.submit.call(form);
+            },
+            "prefill": {
+                "name": "{{ request.user.first_name }} {{ request.user.last_name }}",
+                "email": "{{ request.user.email }}",
+                "contact": "{{ request.user.phone }}"
+            },
+            "theme": {
+                "color": "#ff5e14"
+            },
+            "modal": {
+                "ondismiss": function () {
+                    // Reset UI
+                    payBtn.disabled = false;
+                    btnText.innerHTML = originalBtnTextHTML;
+                    btnText.classList.remove('hidden');
+                    loader.classList.add('hidden');
+                    loader.classList.remove('flex');
+                }
+            }
+        };
+
+        var rzp1 = new Razorpay(options);
+        rzp1.on('payment.failed', function (response) {
+            alert("Payment Failed: " + response.error.description);
+            // Reset UI
+            payBtn.disabled = false;
+            btnText.innerHTML = originalBtnTextHTML;
+            btnText.classList.remove('hidden');
+            loader.classList.add('hidden');
+            loader.classList.remove('flex');
+        });
+
+        form.onsubmit = function (e) {
+            e.preventDefault();
+
+            // UI Loading State (Optional, but keeps consistency)
+            payBtn.disabled = true;
+            btnText.classList.add('hidden');
+            loader.classList.remove('hidden');
+            loader.classList.add('flex');
+
+            rzp1.open();
+        }
+    });
+</script>
+{% endif %}
+<style>
+    .active-tab {
+        background-color: white;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        color: #ff5e14;
+    }
+</style>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Tab Switching logic
+        const tabs = document.querySelectorAll('#payment-tabs button');
+        const panes = document.querySelectorAll('.tab-pane');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', (e) => {
+                e.preventDefault();
+
+                // visually reset tabs
+                tabs.forEach(t => {
+                    t.classList.remove('active-tab');
+                    t.classList.add('text-gray-500', 'hover:text-gray-900', 'hover:bg-white');
+                });
+
+                // visually set active tab
+                tab.classList.add('active-tab');
+                tab.classList.remove('text-gray-500', 'hover:text-gray-900', 'hover:bg-white');
+
+                // update form hidden method value
+                const method = tab.id.split('-')[0];
+                document.getElementById('selected_method').value = method;
+
+                // hide all panes, show target pane
+                const targetId = tab.getAttribute('data-target');
+                panes.forEach(pane => {
+                    pane.classList.add('hidden');
+                    pane.classList.remove('block', 'animate-fade-in');
+                });
+                const selectedPane = document.getElementById(targetId);
+                selectedPane.classList.remove('hidden');
+                selectedPane.classList.add('block', 'animate-fade-in');
+
+                // Re-apply required fields logic
+                document.querySelectorAll('.required-input').forEach(inp => inp.required = false);
+                selectedPane.querySelectorAll('.required-input').forEach(inp => inp.required = true);
+            });
+        });
+
+        // Default required fields on load
+        document.getElementById('pills-upi').querySelectorAll('.required-input').forEach(inp => inp.required = true);
+
+        // Form Submission Loader (Mock logic bound conditionally or saved as function)
+        const form = document.getElementById('main-payment-form');
+        const payBtn = document.getElementById('pay-button');
+        const btnText = document.getElementById('button-text');
+        const loader = document.getElementById('loader');
+
+        window.handleMockSubmit = function (e) {
+            e.preventDefault();
+            payBtn.disabled = true;
+            btnText.classList.add('hidden');
+            loader.classList.remove('hidden');
+            loader.classList.add('flex');
+
+            // Mock processing delay
+            setTimeout(() => {
+                HTMLFormElement.prototype.submit.call(form);
+            }, 1500);
+        };
+
+        // Only bind mock submit if our Razorpay block didn't override it above
+        if (!form.onsubmit) {
+            form.addEventListener('submit', window.handleMockSubmit);
+        }
+
+
+        // Radio button style logic for UPI
+        document.querySelectorAll('.upi-option').forEach(el => {
+            el.addEventListener('click', function () {
+                document.querySelectorAll('.upi-option').forEach(opt => {
+                    opt.classList.remove('border-primary-500', 'bg-primary-50');
+                    opt.classList.add('border-gray-200', 'bg-white', 'filter', 'grayscale');
+                });
+                this.classList.remove('border-gray-200', 'bg-white', 'filter', 'grayscale');
+                this.classList.add('border-primary-500', 'bg-primary-50');
+                this.querySelector('input').checked = true;
+            });
+        });
+
+        // Logic for Banking Mock Options
+        document.querySelectorAll('.bank-option').forEach(el => {
+            el.addEventListener('click', function () {
+                document.querySelectorAll('.bank-option').forEach(opt => {
+                    opt.classList.remove('border-primary-500', 'bg-primary-50');
+                    opt.classList.add('border-gray-200', 'bg-white');
+                    opt.querySelector('.w-10').classList.replace('bg-white', 'bg-gray-50');
+                    opt.querySelector('.w-10').classList.replace('text-primary-500', 'text-gray-400');
+                });
+                this.classList.remove('border-gray-200', 'bg-white');
+                this.classList.add('border-primary-500', 'bg-primary-50');
+                this.querySelector('.w-10').classList.replace('bg-gray-50', 'bg-white');
+                this.querySelector('.w-10').classList.replace('text-gray-400', 'text-primary-500');
+            });
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,475 @@
+{% extends 'admin/base.html' %}
+{% load static %}
+
+{% block title %}Verification Intelligence - Travel Buddy{% endblock %}
+
+{% block breadcrumb %}Verification Management{% endblock %}
+
+{% block content %}
+<div class="dashboard-content">
+    <!-- Verification Header -->
+    <div class="row align-items-center mb-4">
+        <div class="col">
+            <h1 class="h2 fw-bold mb-1">Verification Intelligence</h1>
+            <p class="text-muted mb-0">Partner Credential Audit and Pipeline Oversight</p>
+        </div>
+        <div class="col-auto">
+            <button class="btn btn-light border" onclick="location.reload()">
+                <i class="fa-solid fa-rotate me-2"></i>Sync Records
+            </button>
+        </div>
+    </div>
+
+    <!-- Intelligence Metrics -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="stat-card warning animate-in" style="animation-delay: 0.1s;">
+                <div class="stat-icon"><i class="fa-solid fa-clock-rotate-left"></i></div>
+                <div class="stat-label">Audit Queue</div>
+                <div class="stat-value">{{ pending_count|default:0 }}</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card success animate-in" style="animation-delay: 0.2s;">
+                <div class="stat-icon"><i class="fa-solid fa-circle-check"></i></div>
+                <div class="stat-label">Verified Partners</div>
+                <div class="stat-value">{{ approved_count|default:0 }}</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card danger animate-in" style="animation-delay: 0.3s;">
+                <div class="stat-icon"><i class="fa-solid fa-circle-xmark"></i></div>
+                <div class="stat-label">Rejected Requests</div>
+                <div class="stat-value">{{ rejected_count|default:0 }}</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card primary animate-in" style="animation-delay: 0.4s;">
+                <div class="stat-icon"><i class="fa-solid fa-building-circle-check"></i></div>
+                <div class="stat-label">Total Registry</div>
+                <div class="stat-value">{{ total_companies|default:0 }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pipeline Control Toolbar -->
+    <div class="card border-0 shadow-sm mb-4" style="border-radius: 12px; overflow: hidden;">
+        <div class="card-body p-3 bg-white">
+            <div class="row align-items-center g-3">
+                <div class="col-md-auto">
+                    <div class="btn-group p-1 bg-light rounded-pill" role="group">
+                        <a href="?status=all"
+                            class="btn btn-sm px-3 rounded-pill {% if not status_filter or status_filter == 'all' %}btn-primary shadow-sm{% else %}btn-light text-muted border-0{% endif %}">
+                            All Registry
+                        </a>
+                        <a href="?status=PENDING_VERIFICATION"
+                            class="btn btn-sm px-3 rounded-pill {% if status_filter == 'PENDING_VERIFICATION' %}btn-primary shadow-sm{% else %}btn-light text-muted border-0{% endif %}">
+                            Queue
+                        </a>
+                        <a href="?status=APPROVED"
+                            class="btn btn-sm px-3 rounded-pill {% if status_filter == 'APPROVED' %}btn-primary shadow-sm{% else %}btn-light text-muted border-0{% endif %}">
+                            Verified
+                        </a>
+                        <a href="?status=REJECTED"
+                            class="btn btn-sm px-3 rounded-pill {% if status_filter == 'REJECTED' %}btn-primary shadow-sm{% else %}btn-light text-muted border-0{% endif %}">
+                            Rejected
+                        </a>
+                    </div>
+                </div>
+                <div class="col-md">
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text bg-white border-end-0 text-muted"><i
+                                class="fa-solid fa-magnifying-glass"></i></span>
+                        <input type="text" id="searchInput" class="form-control border-start-0 ps-0"
+                            placeholder="Filter by company name, email, or registry ID...">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Intelligence Data Table -->
+    <div class="card border-0 shadow-sm animate-in"
+        style="border-radius: 12px; overflow: hidden; animation-delay: 0.5s;">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0" id="companiesTable">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="ps-4 border-0 text-muted small fw-bold py-3">PARTNER IDENTITY</th>
+                        <th class="border-0 text-muted small fw-bold py-3">COMMUNICATION</th>
+                        <th class="border-0 text-muted small fw-bold py-3">AUDIT STATUS</th>
+                        <th class="border-0 text-muted small fw-bold py-3">CREDENTIALS</th>
+                        <th class="pe-4 border-0 text-muted small fw-bold text-end py-3">OPERATIONS</th>
+                    </tr>
+                </thead>
+                <tbody class="border-top-0">
+                    {% for company in companies %}
+                    <tr class="company-row border-bottom">
+                        <td class="ps-4 py-3">
+                            <div class="d-flex align-items-center">
+                                <div class="avatar-box me-3">
+                                    <div class="rounded-circle bg-light d-flex align-items-center justify-content-center text-primary"
+                                        style="width: 40px; height: 40px;">
+                                        <i class="fa-solid fa-briefcase"></i>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="fw-bold text-dark" style="font-size: 0.95rem;">
+                                        {{ company.company_name|default:company.username }}
+                                    </div>
+                                    <div class="text-muted x-small">REG ID: {{ company.id }} | @{{ company.username }}
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="d-flex flex-column g-1">
+                                <div class="bg-indigo-subtle text-indigo rounded px-2 py-1 mb-1 d-inline-flex align-items-center"
+                                    style="font-size: 0.8rem; width: fit-content;">
+                                    <i class="fa-solid fa-envelope me-2 opacity-75"></i>{{ company.email }}
+                                </div>
+                                <div class="bg-light text-muted border rounded px-2 py-1 d-inline-flex align-items-center"
+                                    style="font-size: 0.75rem; width: fit-content;">
+                                    <i class="fa-solid fa-phone me-2 opacity-75"></i>
+                                    {% if company.contact_phone %}{{ company.contact_phone }}
+                                    {% elif company.company_phone %}{{ company.company_phone }}
+                                    {% else %}N/A{% endif %}
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            {% if company.verification_status == 'APPROVED' %}
+                            <span class="badge bg-success-subtle text-success px-3 rounded-pill fw-bold"
+                                style="font-size: 0.7rem;">VERIFIED</span>
+                            {% elif company.verification_status == 'PENDING_VERIFICATION' %}
+                            <span class="badge bg-warning-subtle text-warning px-3 rounded-pill fw-bold"
+                                style="font-size: 0.7rem;">AUDIT QUEUE</span>
+                            {% elif company.verification_status == 'REJECTED' %}
+                            <span class="badge bg-danger-subtle text-danger px-3 rounded-pill fw-bold"
+                                style="font-size: 0.7rem;">REJECTED</span>
+                            {% else %}
+                            <span class="badge bg-light text-muted px-3 rounded-pill fw-bold"
+                                style="font-size: 0.7rem;">{{ company.verification_status }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="d-flex flex-wrap gap-2">
+                                {% if company.license_document %}
+                                <span
+                                    class="badge bg-info-subtle text-info border border-info-subtle rounded-pill x-small px-3">
+                                    <i class="fa-solid fa-file-shield me-1"></i>LICENSE
+                                </span>
+                                {% endif %}
+                                {% if company.government_id %}
+                                <span
+                                    class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill x-small px-3">
+                                    <i class="fa-solid fa-id-card me-1"></i>GOV ID
+                                </span>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td class="pe-4 text-end">
+                            <div class="btn-group">
+                                <a href="{% url 'document_review' company.id %}" class="btn btn-sm btn-light border"
+                                    title="Examine Credentials">
+                                    <i class="fa-solid fa-file-signature text-primary"></i>
+                                </a>
+
+                                {% if company.verification_status == 'PENDING_VERIFICATION' %}
+                                <button type="button" class="btn btn-sm btn-light border approve-btn"
+                                    data-company-id="{{ company.id }}" data-company-name="{{ company.company_name }}"
+                                    title="Authorize Partner">
+                                    <i class="fa-solid fa-check text-success"></i>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-light border reject-btn"
+                                    data-company-id="{{ company.id }}" data-company-name="{{ company.company_name }}"
+                                    title="Reject Request">
+                                    <i class="fa-solid fa-xmark text-danger"></i>
+                                </button>
+                                {% endif %}
+
+                                <button type="button" class="btn btn-sm btn-light border delete-company-btn"
+                                    data-company-id="{{ company.id }}" data-company-name="{{ company.company_name }}"
+                                    title="Purge Registry">
+                                    <i class="fa-solid fa-trash-can text-danger"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center py-5">
+                            <div class="mb-3">
+                                <i class="fa-solid fa-folder-closed text-muted"
+                                    style="font-size: 3rem; opacity: 0.2;"></i>
+                            </div>
+                            <h5 class="text-muted fw-normal">No intelligence data matches this filter</h5>
+                            <a href="?status=all" class="btn btn-sm btn-primary rounded-pill mt-2 px-4">Reset Pipeline
+                                View</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if companies.has_other_pages %}
+        <div class="card-footer bg-white py-3 border-0">
+            <nav aria-label="Pipeline navigation">
+                <ul class="pagination pagination-sm justify-content-center mb-0">
+                    {% if companies.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link rounded-circle me-2"
+                            href="?page={{ companies.previous_page_number }}&status={{ status_filter }}">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                    <li class="page-item disabled px-3 py-1 small text-muted">Page {{ companies.number }} of {{ companies.paginator.num_pages }}</li>
+                    {% if companies.has_next %}
+                    <li class="page-item">
+                        <a class="page-link rounded-circle ms-2"
+                            href="?page={{ companies.next_page_number }}&status={{ status_filter }}">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Modals -->
+<!-- Confirm Modal -->
+<div class="modal fade" id="confirmationModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
+            <div class="modal-header border-0 pb-0">
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center p-4">
+                <div id="confirmationIcon" class="mb-4"></div>
+                <h4 class="fw-bold mb-2" id="confirmationModalTitle"></h4>
+                <div class="text-muted mb-4" id="confirmationModalBody"></div>
+
+                <form method="post" action="" id="confirmationForm" class="d-grid mb-2">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-lg fw-bold rounded-pill" id="confirmationButton"></button>
+                </form>
+                <button type="button" class="btn btn-light w-100 rounded-pill fw-bold" data-bs-dismiss="modal">Cancel
+                    Operation</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Reject Reason Modal -->
+<div class="modal fade" id="rejectReasonModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
+            <div class="modal-header bg-danger text-white border-0 py-3 px-4" style="border-radius: 16px 16px 0 0;">
+                <h5 class="modal-title fw-bold"><i class="fa-solid fa-triangle-exclamation me-2"></i>Reject Partner
+                    Application</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="rejectForm" method="post">
+                {% csrf_token %}
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-dark">Audit Findings / Feedback</label>
+                        <textarea class="form-control border-0 bg-light" name="rejection_reason" rows="4" required
+                            placeholder="Specify why the application was rejected..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 p-4 pt-0">
+                    <button type="button" class="btn btn-light rounded-pill px-4 fw-bold"
+                        data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger rounded-pill px-4 fw-bold shadow-sm">Confirm
+                        Rejection</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .stat-card {
+        padding: 1.5rem;
+        border-radius: 16px;
+        background: white;
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        margin-bottom: 1rem;
+    }
+
+    .stat-card.primary .stat-icon {
+        background: rgba(79, 70, 229, 0.1);
+        color: #4f46e5;
+    }
+
+    .stat-card.success .stat-icon {
+        background: rgba(16, 185, 129, 0.1);
+        color: #10b981;
+    }
+
+    .stat-card.warning .stat-icon {
+        background: rgba(245, 158, 11, 0.1);
+        color: #f59e0b;
+    }
+
+    .stat-card.danger .stat-icon {
+        background: rgba(239, 68, 68, 0.1);
+        color: #ef4444;
+    }
+
+    .stat-label {
+        color: #6b7280;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+
+    .stat-value {
+        color: #111827;
+        font-size: 1.5rem;
+        font-weight: 700;
+    }
+
+    .company-row {
+        transition: all 0.2s;
+    }
+
+    .company-row:hover {
+        background-color: rgba(79, 70, 229, 0.02) !important;
+    }
+
+    .x-small {
+        font-size: 0.75rem;
+    }
+
+    .animate-in {
+        animation: fadeInSlideUp 0.5s ease forwards;
+        opacity: 0;
+    }
+
+    @keyframes fadeInSlideUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .btn-group .btn {
+        border-radius: 8px !important;
+        margin: 0 2px;
+    }
+
+    .pagination .page-link {
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        border: none;
+        background: #f8f9fa;
+        color: #6b7280;
+    }
+
+    .pagination .page-link:hover {
+        background: #4f46e5;
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Search Logic
+        const searchInput = document.getElementById('searchInput');
+        const rows = document.querySelectorAll('.company-row');
+        searchInput.addEventListener('input', function () {
+            const term = this.value.toLowerCase().trim();
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(term) ? '' : 'none';
+            });
+        });
+
+        // Modal Logic
+        const confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'));
+        const titleEl = document.getElementById('confirmationModalTitle');
+        const bodyEl = document.getElementById('confirmationModalBody');
+        const iconEl = document.getElementById('confirmationIcon');
+        const submitBtn = document.getElementById('confirmationButton');
+        const formEl = document.getElementById('confirmationForm');
+
+        // Approve
+        document.querySelectorAll('.approve-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const id = this.dataset.companyId;
+                const name = this.dataset.companyName;
+                setupConfirm('Partner Authorization', `Authorize <strong>${name}</strong> for full platform access?`, 'success', 'circle-check', `/approve-verification/${id}/`);
+            });
+        });
+
+        // Delete
+        document.querySelectorAll('.delete-company-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const id = this.dataset.companyId;
+                const name = this.dataset.companyName;
+                setupConfirm('Purge Registry Entry', `CRITICAL: Permanently delete <strong>${name}</strong> and all associated data records?`, 'danger', 'trash-can', `/delete-company/${id}/`);
+                submitBtn.textContent = 'Confirm Force Purge';
+            });
+        });
+
+        function setupConfirm(title, body, type, icon, action) {
+            titleEl.textContent = title;
+            bodyEl.innerHTML = body;
+            iconEl.innerHTML = `<div class="bg-${type}-subtle text-${type} rounded-circle d-flex align-items-center justify-content-center mx-auto" style="width: 80px; height: 80px; font-size: 2.5rem;">
+                <i class="fa-solid fa-${icon}"></i>
+            </div>`;
+            submitBtn.className = `btn btn-lg btn-${type} fw-bold rounded-pill`;
+            submitBtn.textContent = 'Confirm Execution';
+            formEl.action = action;
+            confirmationModal.show();
+        }
+
+        // Reject Logic
+        const rejectModal = new bootstrap.Modal(document.getElementById('rejectReasonModal'));
+        const rejectForm = document.getElementById('rejectForm');
+        document.querySelectorAll('.reject-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const id = this.dataset.companyId;
+                rejectForm.action = `/reject-verification/${id}/`;
+                rejectModal.show();
+            });
+        });
+    });
+</script>
+{% endblock %}
