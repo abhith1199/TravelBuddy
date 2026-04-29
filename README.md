@@ -71,11 +71,11 @@ A core pillar of this project is the promotion of **group traveling**. This fost
    Open `http://127.0.0.1:8000/` in your browser.
 
 ## 📸 Screenshots
-<img width="1920" height="1080" alt="Screenshot 2026-03-15 134530" src="https://github.com/user-attachments/assets/334d8422-90be-44f1-ba97-ec2dcf44e8ac" />
-<img width="1920" height="1080" alt="Screenshot 2026-03-15 134530" src="https://github.com/user-attachments/assets/bfe951f5-1b89-41df-a92f-acb78829acd2" />
-<img width="1920" height="1080" alt="Screenshot 2026-03-15 140558" src="https://github.com/user-attachments/assets/3a889d8f-afe9-4832-a685-63ca45a8fdc3" />
-<img width="1920" height="1080" alt="Screenshot 2026-03-15 142130" src="https://github.com/user-attachments/assets/b3da45ec-38fb-402e-981e-45b92703c900" />
-<img width="1920" height="1080" alt="Screenshot 2026-03-15 134530" src="https://github.com/user-attachments/assets/9da0631a-f0a8-4190-b773-0569cdba0d33" />
+<img width="1920" height="1080" alt="Screenshot 2026-03-15 115638" src="https://github.com/user-attachments/assets/bef2d16c-5aad-4440-a361-be996955cc1d" />
+<img width="1920" height="1080" alt="Screenshot 2026-03-15 134530" src="https://github.com/user-attachments/assets/ae298085-bda8-4363-b7f5-7766d1b40cbd" />
+<img width="1920" height="1080" alt="Screenshot 2026-03-15 140558" src="https://github.com/user-attachments/assets/ef1bffde-aac5-46c7-8ffa-2a3e685ad6a9" />
+<img width="1920" height="1080" alt="Screenshot 2026-03-15 142130" src="https://github.com/user-attachments/assets/d33c85d5-cb52-44c6-8ce4-3c8d5c009c4d" />
+
 
 ## 🤝 Contributing
 Contributions are welcome! Please feel free to submit a Pull Request.
